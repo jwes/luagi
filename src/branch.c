@@ -5,6 +5,9 @@
 #include <git2/errors.h>
 #include <git2/refs.h>
 #include <git2/signature.h>
+#include <git2/commit.h>
+#include <git2/buffer.h>
+#include <git2/branch.h>
 #include "branch.h"
 #include "../lgit.h"
 
@@ -15,12 +18,42 @@
 
 int lgit_create_branch( lua_State *L )
 {
-	/*git_repository** repo = checkrepo(L);
-	char* branch_name = luaL_checkstring(L);
-	int force = luaL_checkboolean(L);
-	*/
-	/* commit userdatum is needed? */
-	lua_pushnil(L);
+	git_repository** repo = checkrepo(L, 1);
+	char* branch_name = luaL_checkstring(L, 2);
+	git_commit** target = ( git_commit** ) luaL_checkudata( L, 3, LGIT_COMMIT_FUNCS);
+	int force = lua_toboolean(L, 3);
+	/* signature type needed */
+	/* get username from table */
+	lua_pushstring( L, "name");
+	lua_gettable( L, 5 );
+	const char* name = luaL_checkstring( L, -1);
+	/* get email from table */
+	lua_pushstring( L, "email");
+	lua_gettable( L, 5 );
+	const char* email = luaL_checkstring( L, -1 );
+
+	git_signature* sig;
+	int ret = git_signature_now( &sig, name, email );
+	if( ret != 0 )
+	{
+		luaL_error( L, "failed to create a signature %d", ret);
+		return 0;
+	}
+	const char* log_message = luaL_optstring(L, 6, NULL);
+
+	git_reference** out = (git_reference**) lua_newuserdata(L, sizeof(git_reference*) );
+
+	ret = git_branch_create( out, *repo, branch_name, *target,
+					force, sig, log_message);
+	if( ret != 0 )
+	{
+		lua_pushnil(L);
+		lua_pushstring(L, "Could not create the branch " );
+		return 2;
+	}
+
+	luaL_getmetatable( L, LGIT_BRANCH_FUNCS );
+	lua_setmetatable( L, -2 );
 	return 1;		
 }
 
