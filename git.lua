@@ -22,7 +22,15 @@ if repo then
 	local commit, err = repo:commit_lookup( head );
 	if not commit then print(err) return end
 
-	print( "commit", commit )
+	print( "commit", commit:summary(), commit:encoding(), commit:id() )
+	print( commit:message() )
+	for k, v in pairs( commit:committer() ) do
+		print( k, v )
+	end
+
+	local tree, err = commit:tree()
+	if not tree then print(err) return end
+	print( tree, "count", tree:entry_count() )
 
 	local old, err = repo:create_branch( "old", commit, false,  signature ); 
 	if not old then print(err) return end

@@ -1,6 +1,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <git2/repository.h>	
+#include <git2/signature.h>	
 
 #include "lgit.h"
 #include "src/common.h"
@@ -49,6 +50,13 @@ static const struct luaL_Reg lgit_branch_funcs [] = {
 };
 
 static const struct luaL_Reg lgit_commit_funcs [] = {
+	{ "id", lgit_commit_id },
+	{ "summary", lgit_commit_summary },
+	{ "message", lgit_commit_message },
+	{ "encoding", lgit_commit_encoding },
+	{ "committer", lgit_commit_committer },
+	{ "author", lgit_commit_author },
+	{ "tree", lgit_commit_tree },
 	{ "__gc", lgit_commit_gc },
 	{ NULL, NULL }
 };
@@ -60,7 +68,6 @@ static const struct luaL_Reg lgit_tree_builder_funcs [] = {
 };
 
 static const struct luaL_Reg lgit_tree_funcs [] = {
-	{ "owner", lgit_tree_owner },
 	{ "id", lgit_tree_id },
 	{ "entry_count", lgit_tree_entrycount },
 	{ "__gc", lgit_tree_gc },
@@ -109,3 +116,39 @@ int luaopen_lgit(lua_State *L)
 	return 1;
 }
 
+int signature_to_table( lua_State *L, const git_signature* sig )
+{
+	lua_newtable( L );
+	lua_pushstring( L, sig->name );
+	lua_setfield( L, -2, SIG_NAME );
+	lua_pushstring( L, sig->email );
+	lua_setfield( L, -2, SIG_EMAIL );
+	git_time time = sig->when;
+
+	lua_pushnumber( L, time.time );
+	lua_setfield( L, -2, SIG_TIME );
+
+	lua_pushnumber( L, time.offset );
+	lua_setfield( L, -2, SIG_TIME_OFF );
+	return 0;
+}
+int table_to_signature( lua_State *L, git_signature* sig, int tablepos )
+{
+	lua_getfield( L, tablepos, SIG_NAME );
+	const char* name = luaL_checkstring( L, -1 );
+	lua_getfield( L, tablepos, SIG_EMAIL );
+	const char* email = luaL_checkstring( L, -1 );
+	lua_getfield( L, tablepos, SIG_TIME );
+	git_time_t time = (git_time_t ) lua_tointeger( L, -1 );
+	lua_getfield( L, tablepos, SIG_TIME_OFF );
+	int offset = lua_tointeger( L, -1 );
+
+	if( time == 0 )
+	{
+		return git_signature_now( &sig, name, email );
+	}
+	else 
+	{
+		return git_signature_new( &sig, name, email, time, offset );
+	}
+}

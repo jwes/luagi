@@ -53,18 +53,6 @@ int lgit_tree_id( lua_State *L )
 	return 1;
 }
 
-int lgit_tree_owner( lua_State *L )
-{
-	git_tree** tree = checktree( L );
-	
-	git_repository** repo = (git_repository**) lua_newuserdata( L, sizeof( git_repository* )); 
-	
-	*repo = git_tree_owner( *tree );
-
-	luaL_getmetatable( L, REPO_NAME );
-	lua_setmetatable( L, -2 );
-	return 1;
-}
 int lgit_tree_entrycount( lua_State *L )
 {
 	git_tree** tree = checktree( L );

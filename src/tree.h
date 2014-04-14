@@ -6,7 +6,6 @@ int lgit_tree_lookup( lua_State *L );
 int lgit_tree_lookup_prefix( lua_State *L );
 
 int lgit_tree_id( lua_State *L );
-int lgit_tree_owner( lua_State *L );
 int lgit_tree_entrycount( lua_State *L );
 
 int lgit_tree_gc( lua_State *L );
