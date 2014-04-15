@@ -12,4 +12,10 @@ int lgit_commit_author( lua_State *L );
 int lgit_commit_committer( lua_State *L );
 int lgit_commit_tree( lua_State *L );
 
+int lgit_commit_parentcount( lua_State *L );
+int lgit_commit_parent( lua_State *L );
+int lgit_commit_parent_id( lua_State *L );
+int lgit_commit_nth_gen_ancestor( lua_State *L );
+int lgit_commit_create( lua_State *L );
+int lgit_commit_amend( lua_State *L );
 #endif

@@ -57,6 +57,11 @@ static const struct luaL_Reg lgit_commit_funcs [] = {
 	{ "committer", lgit_commit_committer },
 	{ "author", lgit_commit_author },
 	{ "tree", lgit_commit_tree },
+	{ "parent_count", lgit_commit_parentcount },
+	{ "parent", lgit_commit_parent },
+	{ "parent_id", lgit_commit_parent_id },
+	{ "ancestor", lgit_commit_nth_gen_ancestor },
+	{ "amend", lgit_commit_amend },
 	{ "__gc", lgit_commit_gc },
 	{ NULL, NULL }
 };
@@ -75,12 +80,13 @@ static const struct luaL_Reg lgit_tree_funcs [] = {
 };
 
 static const struct luaL_Reg repofuncs [] = {
-	{ "create_branch", lgit_create_branch },
+	{ "branch", lgit_create_branch },
 	{ "branches", lgit_branches }, 
-	{ "branch_lookup", lgit_branch_lookup }, 
-	{ "commit_lookup", lgit_commit_lookup },
-	{ "tree_lookup", lgit_tree_lookup }, 
+	{ "lookup_branch", lgit_branch_lookup }, 
+	{ "lookup_commit", lgit_commit_lookup },
+	{ "lookup_tree", lgit_tree_lookup }, 
 	{ "treebuilder", lgit_tree_builder_create },
+	{ "commit", lgit_commit_create }, 
 	{ "__gc", lgit_gc },
 	{ NULL, NULL },
 };

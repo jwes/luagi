@@ -19,7 +19,7 @@ if repo then
 		print( branch, remote, branch:name(), branch:is_head() )
 	end
 
-	local commit, err = repo:commit_lookup( head );
+	local commit, err = repo:lookup_commit( head );
 	if not commit then print(err) return end
 
 	print( "commit", commit:summary(), commit:encoding(), commit:id() )
@@ -32,10 +32,10 @@ if repo then
 	if not tree then print(err) return end
 	print( tree, "count", tree:entry_count() )
 
-	local old, err = repo:create_branch( "old", commit, false,  signature ); 
+	local old, err = repo:branch( "old", commit, false,  signature ); 
 	if not old then print(err) return end
 
-	local b, err = repo:branch_lookup( "old" )
+	local b, err = repo:lookup_branch( "old" )
 	if not b then print( err ) return end
 
 	local c = b:move( "new", signature );
@@ -44,7 +44,7 @@ if repo then
 	c:delete()
 	print( "old", old:name())
 
-	local test, err = repo:create_branch( "test", commit, false,  signature ); 
+	local test, err = repo:branch( "test", commit, false,  signature ); 
 	if not test then print(err) return end
 end
 
