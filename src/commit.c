@@ -213,10 +213,63 @@ int lgit_commit_create( lua_State *L )
 	lua_pushstring( L, git_oid_tostr( array, sizeof( array ), &oid ) ); 
 	return 1;
 }
-
+/*
+ * Needs a table
+ * supported field names:
+ * update_ref
+ * author
+ * committer
+ * message_encoding
+ * message
+ * tree
+ */
 int lgit_commit_amend( lua_State *L )
 {
-	lua_pushnil( L );
+	git_commit** commit = checkcommit( L );
+
+	luaL_checktype( L, 2, LUA_TTABLE);
+	// since all elements can be null, we use a table...
+
+	lua_getfield( L, 2, "update_ref");
+	const char* update_ref = luaL_optstring( L, -1, NULL );
+	git_signature* author = NULL;
+	int ret = 0;
+	lua_getfield( L, 2, "author" );
+	if( lua_istable( L, -1 ) )
+	{
+		ret = table_to_signature( L, author, -1 );
+	}
+	git_signature* committer = NULL;
+	lua_getfield( L, 2, "committer" );
+	if( lua_istable( L, -1 ) )
+	{
+		ret = table_to_signature( L, committer, -1 );
+	}
+
+	lua_getfield( L, 2, "message_encoding" );
+	const char* message_encoding = luaL_optstring( L, -1, NULL );
+
+	lua_getfield( L, 2, "message" );
+	const char* message = luaL_optstring( L, -1, NULL );
+	
+	lua_getfield( L, 2, "tree" );
+	git_tree* tree = NULL;
+	if( lua_isuserdata( L, -1 ) )
+	{
+		tree = *( ( git_tree** ) luaL_checkudata( L, -1, LGIT_TREE_FUNCS ) );
+	}
+
+	// use the table and modify the commit
+	git_oid outid;
+	ret = git_commit_amend( &outid, *commit, update_ref, author, committer, message_encoding, message, tree );
+	if( ret != 0 )
+	{
+		lua_pushnil( L );
+		lua_pushfstring( L, "commit amend failed %d", ret );
+		return 2;
+	}
+	char array [GIT_OID_HEXSZ + 1 ];
+	lua_pushstring( L, git_oid_tostr( array, sizeof( array ), &outid) );
 	return 1;
 }
 
