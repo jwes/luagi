@@ -5,6 +5,8 @@
 #define LGIT_BRANCH_STATICS "is.westhu.lgit.branch.iter"
 #define LGIT_BRANCH_FUNCS "is.westh.lgit.branch"
 #define LGIT_TREE_FUNCS "is.westh.lgit.tree"
+#define LGIT_TREE_ENTRY_FUNCS "is.westh.lgit.tree.entry"
+#define LGIT_TREE_WALK_STATICS "is.westhu.lgit.tree.walk"
 #define LGIT_COMMIT_FUNCS "is.westh.lgit.commit"
 
 #define SIG_NAME "name"

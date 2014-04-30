@@ -67,14 +67,36 @@ static const struct luaL_Reg lgit_commit_funcs [] = {
 };
 
 static const struct luaL_Reg lgit_tree_entry_funcs [] = {
+	{ "name", lgit_tree_entry_name },
+	{ "type", lgit_tree_entry_type },
+	{ "filemode", lgit_tree_entry_filemode },
+	{ "compare", lgit_tree_entry_cmp },
+	{ "__gc", lgit_tree_entry_gc },
+	{ NULL, NULL }
 };
 
+// TODO callback functions from filter
 static const struct luaL_Reg lgit_tree_builder_funcs [] = {
+	{ "clear", lgit_tree_builder_clear },
+	{ "entry_count", lgit_tree_builder_entry_count },
+	{ "get", lgit_tree_builder_get },
+	{ "insert", lgit_tree_builder_insert },
+	{ "remove", lgit_tree_builder_remove },
+	{ "write", lgit_tree_builder_write },
+	{ "__gc", lgit_tree_builder_gc },
+	{ NULL, NULL }
 };
 
+// TODO callback functions from walk
 static const struct luaL_Reg lgit_tree_funcs [] = {
 	{ "id", lgit_tree_id },
 	{ "entry_count", lgit_tree_entrycount },
+	{ "entry_byname", lgit_tree_entry_byname },
+	{ "entry_byid", lgit_tree_entry_byid },
+	{ "entry_byindex", lgit_tree_entry_byindex },
+	{ "entry_bypath", lgit_tree_entry_bypath },
+	{ "builder", lgit_tree_builder_create },
+	{ "walk", lgit_tree_walk },
 	{ "__gc", lgit_tree_gc },
 	{ NULL, NULL }
 };
@@ -114,6 +136,7 @@ int luaopen_lgit(lua_State *L)
 	lua_setfield( L, -2, "__gc" );
 
 	setup_funcs(L, LGIT_TREE_FUNCS, lgit_tree_funcs);
+	setup_funcs(L, LGIT_TREE_ENTRY_FUNCS, lgit_tree_funcs);
 	setup_funcs(L, LGIT_BRANCH_FUNCS, lgit_branch_funcs);
 	setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
 	setup_funcs(L, REPO_NAME, repofuncs);
