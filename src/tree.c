@@ -298,7 +298,6 @@ static int treewalk_callback( const char *root, const git_tree_entry *entry,
 	{
 		return -1;
 	}
-	//printf( " info->last %p \n", info->last );
 	if( info->last == NULL )
 	{
 		info->next = elem;
@@ -317,7 +316,6 @@ static int lgit_walker( lua_State *L );
 int lgit_tree_walk( lua_State *L )
 {
 	git_tree** tree = checktree( L );
-	// direction ...
 	const char* direction = luaL_optstring( L, 2, LGIT_TREE_PRE );
 	git_treewalk_mode mode;
 	if( strncmp( direction, LGIT_TREE_PRE, 3 ) == 0 )
@@ -339,11 +337,9 @@ int lgit_tree_walk( lua_State *L )
 	info->mode = mode;
 	info->tree = tree;
 
-	//printf("starting walk - C \n");
 	git_tree_walk( *info->tree, info->mode, &treewalk_callback, info );
-	//printf("finished walk - C \n");
-	//printf("info created: %p\n", info );
-	
+
+	// TODO
 	// start thread, that does the actual walking
 	// create semaphore, which allows waiting for walkresults.
 	// read in walker from semaphore and than from info
@@ -374,7 +370,6 @@ static int lgit_walker( lua_State *L )
 		free_elem( elem );
 		return 2;
 	}//iteration finished
-	//return yieldk( L, 2, 0, lgit_walker );
 	return 0;
 }
 	
