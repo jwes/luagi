@@ -298,7 +298,7 @@ static int treewalk_callback( const char *root, const git_tree_entry *entry,
 	{
 		return -1;
 	}
-	printf( " info->last %p \n", info->last );
+	//printf( " info->last %p \n", info->last );
 	if( info->last == NULL )
 	{
 		info->next = elem;
@@ -339,14 +339,15 @@ int lgit_tree_walk( lua_State *L )
 	info->mode = mode;
 	info->tree = tree;
 
-	printf("info created: %p\n", info );
-	struct walk_info_element *elem;
-	while ( info->next != NULL )
-	{
-		elem = info->next;
-		info->next = elem->next;
-		free_elem( elem );
-	}
+	//printf("starting walk - C \n");
+	git_tree_walk( *info->tree, info->mode, &treewalk_callback, info );
+	//printf("finished walk - C \n");
+	//printf("info created: %p\n", info );
+	
+	// start thread, that does the actual walking
+	// create semaphore, which allows waiting for walkresults.
+	// read in walker from semaphore and than from info
+	// write to info in the thread
 	lua_pushcclosure( L, lgit_walker, 1 );
 	return 1;
 }
@@ -354,10 +355,26 @@ int lgit_tree_walk( lua_State *L )
 static int lgit_walker( lua_State *L )
 {
 	struct walk_info* info = (struct walk_info*) lua_touserdata( L, lua_upvalueindex( 1 ) );
-	printf("starting walk - C \n");
-	git_tree_walk( *info->tree, info->mode, &treewalk_callback, info );
-	printf("finished walk - C \n");
-	//iteration finished
+	struct walk_info_element *elem;
+	if ( info->next != NULL )
+	{
+		elem = info->next;
+		info->next = elem->next;
+		lua_pushstring( L, elem->root );
+		git_tree_entry** e = (git_tree_entry**) lua_newuserdata( L, sizeof( git_tree_entry* ) );
+		int ret = git_tree_entry_dup( e, elem->entry );
+		if( ret != 0 )
+		{
+			lua_pushnil( L );
+			lua_pushstring( L, "out of memory - dup failed" );
+		}	
+		
+		luaL_getmetatable( L, LGIT_TREE_ENTRY_FUNCS );
+		lua_setmetatable( L, -2 );
+		free_elem( elem );
+		return 2;
+	}//iteration finished
+	//return yieldk( L, 2, 0, lgit_walker );
 	return 0;
 }
 	

@@ -71,6 +71,7 @@ static const struct luaL_Reg lgit_tree_entry_funcs [] = {
 	{ "type", lgit_tree_entry_type },
 	{ "filemode", lgit_tree_entry_filemode },
 	{ "compare", lgit_tree_entry_cmp },
+	{ "id", lgit_tree_entry_id },
 	{ "__gc", lgit_tree_entry_gc },
 	{ NULL, NULL }
 };
@@ -136,7 +137,7 @@ int luaopen_lgit(lua_State *L)
 	lua_setfield( L, -2, "__gc" );
 
 	setup_funcs(L, LGIT_TREE_FUNCS, lgit_tree_funcs);
-	setup_funcs(L, LGIT_TREE_ENTRY_FUNCS, lgit_tree_funcs);
+	setup_funcs(L, LGIT_TREE_ENTRY_FUNCS, lgit_tree_entry_funcs);
 	setup_funcs(L, LGIT_BRANCH_FUNCS, lgit_branch_funcs);
 	setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
 	setup_funcs(L, REPO_NAME, repofuncs);

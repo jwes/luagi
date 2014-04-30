@@ -11,7 +11,7 @@ local tree, err = commit:tree()
 if not tree then print( err ) return end
 
 print( "starting walk" )
-for root, entry in tree:walk("pre") do
-	print( root, entry )
+for root, entry in tree:walk("post") do
+	print(entry:id(), root, entry:name() )
 end
 print( "ending walk" )
