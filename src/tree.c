@@ -19,7 +19,7 @@ int lgit_tree_lookup( lua_State *L )
 	const char* id_str = luaL_checkstring( L, 2 );
 
 	git_oid oid;
-	int ret = git_oid_fromstr( &oid, id_str);
+	int ret = lgit_oid_fromstr( &oid, id_str);
 	if( ret != 0 )
 	{
 		lua_pushnil( L );
@@ -125,7 +125,7 @@ int lgit_tree_entry_byid( lua_State *L )
 	const char* idstring = luaL_checkstring( L , 2 );
 
 	git_oid oid;
-	int ret = git_oid_fromstr( &oid, idstring );
+	int ret = lgit_oid_fromstr( &oid, idstring );
 	if( ret != 0 )
 	{
 		lua_pushnil( L );
@@ -196,14 +196,25 @@ int lgit_tree_entry_id( lua_State *L )
 }
 int lgit_tree_entry_type( lua_State *L )
 {
-	/*TODO git_otype ? userdata neccessary?*/
-	lua_pushnil( L );
+	git_tree_entry** entry = checktreeentry( L, 1 );
+	git_otype type = git_tree_entry_type( *entry );
+	lua_pushstring( L, lgit_otype_to_string( type ) );
 	return 1;
 }
 int lgit_tree_entry_filemode( lua_State *L )
 {
-	/*TODO git_otype ? userdata neccessary?*/
-	lua_pushnil( L );
+	git_tree_entry** entry = checktreeentry( L, 1 );
+	git_filemode_t filemode =  git_tree_entry_filemode( *entry );
+	char array[10];
+	int ret = snprintf( array, 10, "%o", filemode );
+	if( ret < 0)
+	{
+		lua_pushnil( L );
+	}
+	else
+	{
+		lua_pushstring( L, array );
+	}
 	return 1;
 }
 
@@ -214,53 +225,10 @@ int lgit_tree_entry_cmp( lua_State *L )
 	lua_pushinteger( L, git_tree_entry_cmp( *e1, *e2 ));
 	return 1;
 }
-// TODO to_object
 
-
-/* treebuilder stuff */
-int lgit_tree_builder_create( lua_State *L )
+int lgit_tree_entry_to_object( lua_State *L )
 {
-	lua_pushnil( L );
-	return 1;
-}
-
-int lgit_tree_builder_gc( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_clear( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_get( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_insert( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_remove( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_entry_count( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_write( lua_State *L )
-{
-	lua_pushnil( L );
-	return 1;
-}
-int lgit_tree_builder_filter( lua_State *L )
-{
+	//TODO
 	lua_pushnil( L );
 	return 1;
 }
@@ -372,4 +340,3 @@ static int lgit_walker( lua_State *L )
 	}//iteration finished
 	return 0;
 }
-	

@@ -29,6 +29,7 @@ int lgit_tree_entry_id( lua_State *L );
 int lgit_tree_entry_type( lua_State *L );
 int lgit_tree_entry_filemode( lua_State *L );
 int lgit_tree_entry_filemode_raw( lua_State *L );
+int lgit_tree_entry_to_object( lua_State *L );
 
 int lgit_tree_entry_cmp( lua_State *L );
 // TODO to_object
@@ -46,6 +47,7 @@ int lgit_tree_builder_insert( lua_State *L );
 int lgit_tree_builder_remove( lua_State *L );
 int lgit_tree_builder_entry_count( lua_State *L );
 int lgit_tree_builder_write( lua_State *L );
+int lgit_tree_builder_filter( lua_State *L );
 
 
 #define checktreeentry(L, N) \

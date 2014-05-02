@@ -3,6 +3,7 @@
 #include <git2/repository.h>	
 #include <git2/signature.h>	
 
+#include <string.h>
 #include "lgit.h"
 #include "src/common.h"
 #include "src/branch.h"
@@ -72,11 +73,11 @@ static const struct luaL_Reg lgit_tree_entry_funcs [] = {
 	{ "filemode", lgit_tree_entry_filemode },
 	{ "compare", lgit_tree_entry_cmp },
 	{ "id", lgit_tree_entry_id },
+	{ "to_object", lgit_tree_entry_to_object },
 	{ "__gc", lgit_tree_entry_gc },
 	{ NULL, NULL }
 };
 
-// TODO callback functions from filter
 static const struct luaL_Reg lgit_tree_builder_funcs [] = {
 	{ "clear", lgit_tree_builder_clear },
 	{ "entry_count", lgit_tree_builder_entry_count },
@@ -84,11 +85,11 @@ static const struct luaL_Reg lgit_tree_builder_funcs [] = {
 	{ "insert", lgit_tree_builder_insert },
 	{ "remove", lgit_tree_builder_remove },
 	{ "write", lgit_tree_builder_write },
+	{ "filter", lgit_tree_builder_filter },
 	{ "__gc", lgit_tree_builder_gc },
 	{ NULL, NULL }
 };
 
-// TODO callback functions from walk
 static const struct luaL_Reg lgit_tree_funcs [] = {
 	{ "id", lgit_tree_id },
 	{ "entry_count", lgit_tree_entrycount },
@@ -96,7 +97,6 @@ static const struct luaL_Reg lgit_tree_funcs [] = {
 	{ "entry_byid", lgit_tree_entry_byid },
 	{ "entry_byindex", lgit_tree_entry_byindex },
 	{ "entry_bypath", lgit_tree_entry_bypath },
-	{ "builder", lgit_tree_builder_create },
 	{ "walk", lgit_tree_walk },
 	{ "__gc", lgit_tree_gc },
 	{ NULL, NULL }
@@ -108,7 +108,6 @@ static const struct luaL_Reg repofuncs [] = {
 	{ "lookup_branch", lgit_branch_lookup }, 
 	{ "lookup_commit", lgit_commit_lookup },
 	{ "lookup_tree", lgit_tree_lookup }, 
-	{ "treebuilder", lgit_tree_builder_create },
 	{ "commit", lgit_commit_create }, 
 	{ "__gc", lgit_gc },
 	{ NULL, NULL },
@@ -118,6 +117,7 @@ static const struct luaL_Reg mylib [] = {
 	{ "version", lgit_version },
 	{ "features", lgit_features },
 	{ "open", lgit_open },
+	{ "tree_builder", lgit_tree_builder_create },
 	{ NULL, NULL } /*sentinel*/
 };
 
@@ -138,6 +138,7 @@ int luaopen_lgit(lua_State *L)
 
 	setup_funcs(L, LGIT_TREE_FUNCS, lgit_tree_funcs);
 	setup_funcs(L, LGIT_TREE_ENTRY_FUNCS, lgit_tree_entry_funcs);
+	setup_funcs(L, LGIT_TREE_BUILDER_FUNCS, lgit_tree_builder_funcs);
 	setup_funcs(L, LGIT_BRANCH_FUNCS, lgit_branch_funcs);
 	setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
 	setup_funcs(L, REPO_NAME, repofuncs);
@@ -181,4 +182,40 @@ int table_to_signature( lua_State *L, git_signature* sig, int tablepos )
 	{
 		return git_signature_new( &sig, name, email, time, offset );
 	}
+}
+const char* lgit_otype_to_string( git_otype type )
+{
+	switch( type )
+	{
+		case GIT_OBJ_ANY:
+		default:
+			return "any";
+		case GIT_OBJ_BAD:
+			return "invalid";
+		case GIT_OBJ__EXT1:
+		case GIT_OBJ__EXT2:
+			return "reserved for future use";
+		case GIT_OBJ_COMMIT:
+			return "commit";
+		case GIT_OBJ_TREE:
+			return "tree";
+		case GIT_OBJ_BLOB:
+			return "blob";
+		case GIT_OBJ_TAG:
+			return "tag";
+		case GIT_OBJ_OFS_DELTA:
+			return "ofs delta";
+		case GIT_OBJ_REF_DELTA:
+			return "ref delta";
+	}
+}
+
+int lgit_oid_fromstr( git_oid* oid, const char* ref )
+{
+	int len = strlen( ref );
+	if ( len < GIT_OID_MINPREFIXLEN || len > GIT_OID_HEXSZ )
+	{
+		return -21;
+	}
+	return git_oid_fromstrp( oid, ref);
 }

@@ -14,7 +14,7 @@ int lgit_commit_lookup( lua_State *L )
 	const char* ref = luaL_checkstring( L, 2 );
 
 	git_oid oid;
-	int ret = git_oid_fromstr( &oid, ref);
+	int ret = lgit_oid_fromstr( &oid, ref);
 	if( ret != 0 )
 	{
 		lua_pushnil( L );
