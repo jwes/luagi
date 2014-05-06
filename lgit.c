@@ -9,6 +9,7 @@
 #include "src/branch.h"
 #include "src/tree.h"
 #include "src/commit.h"
+#include "src/clone.h"
 
 
 static int lgit_open( lua_State *L )
@@ -109,6 +110,7 @@ static const struct luaL_Reg repofuncs [] = {
 	{ "lookup_commit", lgit_commit_lookup },
 	{ "lookup_tree", lgit_tree_lookup }, 
 	{ "commit", lgit_commit_create }, 
+	{ "clone_into", lgit_clone_into },
 	{ "__gc", lgit_gc },
 	{ NULL, NULL },
 };
@@ -118,6 +120,7 @@ static const struct luaL_Reg mylib [] = {
 	{ "features", lgit_features },
 	{ "open", lgit_open },
 	{ "tree_builder", lgit_tree_builder_create },
+	{ "clone", lgit_clone },
 	{ NULL, NULL } /*sentinel*/
 };
 
