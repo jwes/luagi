@@ -28,11 +28,11 @@ int lgit_tree_lookup( lua_State *L )
 	}
 
 	git_tree** out = (git_tree**)lua_newuserdata( L, sizeof(git_tree*) );
-	ret = git_tree_lookup( out, *repo, &oid );
-	if( ret != 0 )
+	if( git_tree_lookup( out, *repo, &oid ) )
 	{
+		const git_error* err = giterr_last();
 		lua_pushnil( L );
-		lua_pushfstring(L, "failed to lookup tree %d", ret );
+		lua_pushfstring(L, "failed to lookup tree: %s", err->message );
 		return 2;
 	}
 
