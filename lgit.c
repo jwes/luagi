@@ -10,6 +10,7 @@
 #include "src/tree.h"
 #include "src/commit.h"
 #include "src/clone.h"
+#include "src/remote.h"
 
 
 static int lgit_open( lua_State *L )
@@ -112,7 +113,51 @@ static const struct luaL_Reg repofuncs [] = {
 	{ "commit", lgit_commit_create }, 
 	{ "clone_into", lgit_clone_into },
 	{ "__gc", lgit_gc },
+	//remotes
+	{ "remotes", lgit_remote_list },
+	{ "load_remote", lgit_remote_load },
+	{ "create_anon_remote", lgit_remote_create_anonymous },
+	{ "create_remote_with_fetch", lgit_remote_create_with_fetchspec },
+	{ "create_remote", lgit_remote_create },
 	{ NULL, NULL },
+};
+
+static const struct luaL_Reg remotefuncs [] = {
+	{ "save", 				lgit_remote_save 					},
+	{ "owner", 				lgit_remote_owner 					},
+	{ "name", 				lgit_remote_name 					},
+	{ "url", 				lgit_remote_url 					},
+	{ "pushurl", 			lgit_remote_pushurl 				},
+	{ "set_url", 			lgit_remote_set_url 				},
+	{ "set_pushurl",		lgit_remote_set_pushurl 			},
+	{ "add_fetch", 			lgit_remote_add_fetch 				},
+	{ "fetch_refspecs", 	lgit_remote_get_fetch_refspecs 		},
+	{ "set_fetch_refspecs",	lgit_remote_set_fetch_refspecs 		},
+	{ "add_push", 			lgit_remote_add_push 				},
+	{ "get_push_refspecs", 	lgit_remote_get_push_refspecs 		},
+	{ "set_push_refspecs", 	lgit_remote_set_push_refspecs 		},
+	{ "clear_refspecs", 	lgit_remote_clear_refspecs 			},
+	{ "refspec_count",		lgit_remote_refspec_count 			},
+	{ "get_refspec", 		lgit_remote_get_refspec 			},
+	{ "connect", 			lgit_remote_connect 				},
+	{ "ls", 				lgit_remote_ls 						},
+	{ "download", 			lgit_remote_download 				},
+	{ "fetch",				lgit_remote_fetch					},
+	{ "is_connected", 		lgit_remote_connected 				},
+	{ "stop", 				lgit_remote_stop 					},
+	{ "disconnect", 		lgit_remote_disconnect 				},
+	{ "__gc", 				ligt_remote_free 					},
+	{ "check_cert", 		lgit_remote_check_cert 				},
+	{ "set_transport", 		lgit_remote_set_transport 			},
+	{ "set_callbacks",		lgit_remote_set_callbacks			},
+	{ "stats",				lgit_remote_stats					},
+	{ "autotag",			lgit_remote_autotag					},
+	{ "set_autotag",		lgit_remote_set_autotag				},
+	{ "rename",				lgit_remote_rename					},
+	{ "fetch_head",			lgit_remote_update_fetch_head		},
+	{ "set_fetch_head",		lgit_remote_set_update_fetch_head	},
+	{ "update_tips",		lgit_remote_update_tips				},
+	{ NULL, 				NULL 								},
 };
 
 static const struct luaL_Reg mylib [] = {
@@ -121,6 +166,10 @@ static const struct luaL_Reg mylib [] = {
 	{ "open", lgit_open },
 	{ "tree_builder", lgit_tree_builder_create },
 	{ "clone", lgit_clone },
+	// remote
+	{ "is_valid_remote_name", lgit_remote_is_valid_name	},
+	{ "is_valid_remote_url", lgit_remote_valid_url },
+	{ "is_supported_remote_url", lgit_remote_supported_url },
 	{ NULL, NULL } /*sentinel*/
 };
 

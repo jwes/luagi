@@ -4,7 +4,8 @@ FILES := lgit.c \
 		src/tree.c \
 		src/commit.c \
 		src/tree_builder.c \
-		src/clone.c
+		src/clone.c \
+		src/remote.c
 
 lgit.so: $(FILES)
 	gcc --shared -fPIC -o lgit.so \
