@@ -1,3 +1,5 @@
+#ifndef IS_LGIT_REMOTE
+#define IS_LGIT_REMOTE
 #include <lua.h>
 int lgit_remote_list( lua_State *L );
 int lgit_remote_load( lua_State *L );
@@ -41,3 +43,4 @@ int lgit_remote_update_tips( lua_State *L );
 int lgit_remote_is_valid_name( lua_State *L );
 int lgit_remote_valid_url( lua_State *L );
 int lgit_remote_supported_url( lua_State *L );
+#endif
