@@ -43,4 +43,16 @@ int lgit_remote_update_tips( lua_State *L );
 int lgit_remote_is_valid_name( lua_State *L );
 int lgit_remote_valid_url( lua_State *L );
 int lgit_remote_supported_url( lua_State *L );
+
+#define DIRECTION "direction"
+#define STRING "representation"
+#define SRC "src"
+#define DEST "dest"
+#define PUSH "push"
+#define FETCH "fetch"
+#define UNKNOWN "unknown"
+#define FORCE "force"
+#define ALL "all"
+#define NONE "none"
+#define AUTO "auto"
 #endif
