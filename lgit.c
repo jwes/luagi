@@ -122,7 +122,7 @@ static const struct luaL_Reg repofuncs [] = {
 	{ NULL, NULL },
 };
 
-static const struct luaL_Reg remotefuncs [] = {
+static const struct luaL_Reg lgit_remote_funcs [] = {
 	{ "save", 				lgit_remote_save 					},
 	{ "owner", 				lgit_remote_owner 					},
 	{ "name", 				lgit_remote_name 					},
@@ -193,6 +193,7 @@ int luaopen_lgit(lua_State *L)
 	setup_funcs(L, LGIT_TREE_BUILDER_FUNCS, lgit_tree_builder_funcs);
 	setup_funcs(L, LGIT_BRANCH_FUNCS, lgit_branch_funcs);
 	setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
+	setup_funcs(L, LGIT_REMOTE_FUNCS, lgit_remote_funcs);
 	setup_funcs(L, REPO_NAME, repofuncs);
 
 	luaL_newlib( L, mylib );
