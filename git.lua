@@ -1,19 +1,19 @@
 local head = "117d621c4a920dc1c9d706ee83ffce7d8d982b58"
-local lgit = require("lgit")
+local wien = require("wien")
 
 local signature = {
    name = "firstname lastname",
    email = "firstname.lastname@dn.tld",
    }
 
-print( lgit.version() )
+print( wien.version() )
 
-local features = lgit.features()
+local features = wien.features()
 for k, v in pairs( features ) do
    print( k, v );
 end
 
-repo, err = lgit.open(".")
+repo, err = wien.open(".")
 if repo then
    for branch, remote in repo:branches("a") do
       print( branch, remote, branch:name(), branch:is_head() )

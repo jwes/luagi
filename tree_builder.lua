@@ -1,9 +1,9 @@
-local lgit = require("lgit")
+local wien = require("wien")
 
-repo, err = lgit.open(".")
+repo, err = wien.open(".")
 if not repo then print( err ) return end
 
-local builder, err = lgit.tree_builder()
+local builder, err = wien.tree_builder()
 if not builder then print( err ) return end
 function filter ( entry )
 	print( entry:name() )

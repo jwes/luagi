@@ -181,7 +181,7 @@ void setup_funcs( lua_State *L, const char *meta_name, const luaL_Reg *funcs )
    luaL_setfuncs( L, funcs, 0);
 }
 
-int luaopen_lgit(lua_State *L)
+int luaopen_wien(lua_State *L)
 {
    /* metatable for the branch iterator */
    luaL_newmetatable( L, LGIT_BRANCH_STATICS );

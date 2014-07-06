@@ -1,4 +1,4 @@
-local lgit = require("lgit")
+local wien = require("wien")
 local test_commit = "faa4d576cea4a7cab230cc5fde274becd41bac6d"
 
 local signature = {
@@ -6,7 +6,7 @@ local signature = {
    email = "johannes.westhuis@gmail.com"
    }
 
-repo, err = lgit.open(".")
+repo, err = wien.open(".")
 if not repo then print( err ) return end
 
 local commit, err = repo:lookup_commit( test_commit );
