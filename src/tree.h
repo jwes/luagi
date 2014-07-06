@@ -2,7 +2,7 @@
 #define IS_LGIT_TREE
 #include <lua.h>
 #include <git2/tree.h>
-#include "../lgit.h"
+#include "wien.h"
 
 int lgit_tree_lookup( lua_State *L );
 int lgit_tree_lookup_prefix( lua_State *L );
@@ -51,5 +51,5 @@ int lgit_tree_builder_filter( lua_State *L );
 
 
 #define checktreeentry(L, N) \
-		(git_tree_entry**) luaL_checkudata( L, N, LGIT_TREE_ENTRY_FUNCS )
+      (git_tree_entry**) luaL_checkudata( L, N, LGIT_TREE_ENTRY_FUNCS )
 #endif

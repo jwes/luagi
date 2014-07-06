@@ -8,9 +8,9 @@
 
 int lgit_parse_checkout_options( git_checkout_options *options, lua_State *L, const int tableIndex )
 {
-	lua_getfield( L, tableIndex, LGIT_CHECKOUT_OPTS_VERSION );
-	int version = luaL_optinteger( L, -1, GIT_CHECKOUT_OPTIONS_VERSION );
-	git_checkout_init_opts( options, version );
-	return 0;
+   lua_getfield( L, tableIndex, LGIT_CHECKOUT_OPTS_VERSION );
+   int version = luaL_optinteger( L, -1, GIT_CHECKOUT_OPTIONS_VERSION );
+   git_checkout_init_opts( options, version );
+   return 0;
 }
 #endif

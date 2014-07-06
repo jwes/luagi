@@ -12,6 +12,6 @@ if not tree then print( err ) return end
 
 print( "starting walk" )
 for root, entry in tree:walk("post") do
-	print(entry:id(), root, entry:name(), entry:type(), entry:filemode() )
+   print(entry:id(), root, entry:name(), entry:type(), entry:filemode() )
 end
 print( "ending walk" )

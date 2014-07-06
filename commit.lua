@@ -2,9 +2,9 @@ local lgit = require("lgit")
 local test_commit = "faa4d576cea4a7cab230cc5fde274becd41bac6d"
 
 local signature = {
-	name = "Foo Bar",
-	email = "johannes.westhuis@gmail.com"
-	}
+   name = "Foo Bar",
+   email = "johannes.westhuis@gmail.com"
+   }
 
 repo, err = lgit.open(".")
 if not repo then print( err ) return end

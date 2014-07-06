@@ -19,11 +19,11 @@
 #define SIG_TIME_OFF "time_offset"
 
 #define checkrepo(L, n) \
-		(git_repository**) luaL_checkudata( L, n, REPO_NAME )
+      (git_repository**) luaL_checkudata( L, n, REPO_NAME )
 #define checktree(L) \
-		(git_tree**) luaL_checkudata( L, 1, LGIT_TREE_FUNCS )
+      (git_tree**) luaL_checkudata( L, 1, LGIT_TREE_FUNCS )
 #define checkremote(L) \
-		(git_remote**) luaL_checkudata( L, 1, LGIT_REMOTE_FUNCS )
+      (git_remote**) luaL_checkudata( L, 1, LGIT_REMOTE_FUNCS )
 
 int signature_to_table( lua_State *L, const git_signature* sig);
 int table_to_signature( lua_State *L, git_signature* sig, int position );
