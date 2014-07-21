@@ -49,6 +49,40 @@ int lgit_tree_builder_entry_count( lua_State *L );
 int lgit_tree_builder_write( lua_State *L );
 int lgit_tree_builder_filter( lua_State *L );
 
+static const struct luaL_Reg lgit_tree_entry_funcs [] = {
+   { "name", lgit_tree_entry_name },
+   { "type", lgit_tree_entry_type },
+   { "filemode", lgit_tree_entry_filemode },
+   { "compare", lgit_tree_entry_cmp },
+   { "id", lgit_tree_entry_id },
+   { "to_object", lgit_tree_entry_to_object },
+   { "__gc", lgit_tree_entry_gc },
+   { NULL, NULL }
+};
+
+static const struct luaL_Reg lgit_tree_builder_funcs [] = {
+   { "clear", lgit_tree_builder_clear },
+   { "entry_count", lgit_tree_builder_entry_count },
+   { "get", lgit_tree_builder_get },
+   { "insert", lgit_tree_builder_insert },
+   { "remove", lgit_tree_builder_remove },
+   { "write", lgit_tree_builder_write },
+   { "filter", lgit_tree_builder_filter },
+   { "__gc", lgit_tree_builder_gc },
+   { NULL, NULL }
+};
+
+static const struct luaL_Reg lgit_tree_funcs [] = {
+   { "id", lgit_tree_id },
+   { "entry_count", lgit_tree_entrycount },
+   { "entry_byname", lgit_tree_entry_byname },
+   { "entry_byid", lgit_tree_entry_byid },
+   { "entry_byindex", lgit_tree_entry_byindex },
+   { "entry_bypath", lgit_tree_entry_bypath },
+   { "walk", lgit_tree_walk },
+   { "__gc", lgit_tree_gc },
+   { NULL, NULL }
+};
 
 #define checktreeentry(L, N) \
       (git_tree_entry**) luaL_checkudata( L, N, LGIT_TREE_ENTRY_FUNCS )
