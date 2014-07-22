@@ -4,8 +4,6 @@
 #include <git2/oid.h>
 
 #define REPO_NAME "is.westhu.lgit.repo"
-#define LGIT_BRANCH_STATICS "is.westhu.lgit.branch.iter"
-#define LGIT_BRANCH_FUNCS "is.westh.lgit.branch"
 #define LGIT_TREE_FUNCS "is.westh.lgit.tree"
 #define LGIT_TREE_ENTRY_FUNCS "is.westh.lgit.tree.entry"
 #define LGIT_TREE_BUILDER_FUNCS "is.westh.lgit.tree.builder"

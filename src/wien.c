@@ -11,7 +11,7 @@
 #include "commit.h"
 #include "clone.h"
 #include "remote.h"
-
+#include "transport.h"
 
 static int lgit_open( lua_State *L )
 {
@@ -95,6 +95,7 @@ int luaopen_wien(lua_State *L)
    setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
    setup_funcs(L, LGIT_REMOTE_FUNCS, lgit_remote_funcs);
    setup_funcs(L, REPO_NAME, repofuncs);
+   setup_funcs(L, LGIT_TRANSPORT_FUNCS, lgit_transport_funcs );
 
    luaL_newlib( L, mylib );
    return 1;

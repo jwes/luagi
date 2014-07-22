@@ -2,6 +2,9 @@
 #define IS_LGIT_BRANCH
 #include <lua.h>
 
+#define LGIT_BRANCH_FUNCS "is.westh.lgit.branch"
+#define LGIT_BRANCH_STATICS "is.westhu.lgit.branch.iter"
+
 int lgit_create_branch( lua_State *L );
 int lgit_branch_lookup( lua_State *L );
 int lgit_branch_gc( lua_State *L );

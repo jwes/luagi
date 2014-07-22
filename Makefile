@@ -5,7 +5,8 @@ FILES := src/wien.c \
 		src/commit.c \
 		src/tree_builder.c \
 		src/clone.c \
-		src/remote.c
+		src/remote.c \
+      src/transport.c
 
 wien.so: $(FILES)
 	gcc --shared -fPIC -o wien.so \
