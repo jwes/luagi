@@ -4,9 +4,9 @@
 #include <lauxlib.h>
 
 #define LGIT_TRANSPORT_FUNCS "is.westh.lgit.transport"
-#define checktransport(L, N) \
+#define checktransport_at(L, N) \
       (git_transport**) luaL_checkudata( L, N, LGIT_TRANSPORT_FUNCS )
-#define checktransport(L) checktransport( L, 1 )
+#define checktransport(L) checktransport_at( L, 1 )
 
 int lgit_transport_new( lua_State *L );
 int lgit_transport_local( lua_State *L );

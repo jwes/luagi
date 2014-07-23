@@ -5,6 +5,7 @@
 #include <string.h>
 #include "remote.h"
 #include "wien.h"
+#include "transport.h"
 
 int lgit_remote_list( lua_State *L )
 { 
@@ -434,18 +435,25 @@ int lgit_remote_check_cert( lua_State *L )
 }
 int lgit_remote_set_transport( lua_State *L )
 { 
-   //TODO transport
-   lua_pushnil( L ); 
-   return 1; 
+   git_remote **rem = checkremote( L );
+   git_transport **transport = checktransport_at( L , 2 );
+   if( git_remote_set_transport( *rem, *transport ) )
+   {
+      const git_error *err = giterr_last();
+      luaL_error( L, err->message );
+   }
+   return 0; 
 }
 
 int lgit_remote_set_callbacks( lua_State *L )
 { 
+   //todo
    lua_pushnil( L ); 
    return 1; 
 }
 int lgit_remote_stats( lua_State *L )
 { 
+   //todo
    lua_pushnil( L ); 
    return 1; 
 }
