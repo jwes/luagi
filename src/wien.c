@@ -12,6 +12,7 @@
 #include "clone.h"
 #include "remote.h"
 #include "transport.h"
+#include "status.h"
 
 static int lgit_open( lua_State *L )
 {
@@ -57,6 +58,17 @@ static const struct luaL_Reg repofuncs [] = {
    { "create_anon_remote", lgit_remote_create_anonymous },
    { "create_remote_with_fetch", lgit_remote_create_with_fetchspec },
    { "create_remote", lgit_remote_create },
+   //transport
+   { "transport_from_url",     lgit_transport_new   },
+   { "create_local_transport", lgit_transport_local },
+   { "create_dummy_transport", lgit_transport_dummy },
+   { "create_smart_transport", lgit_transport_smart },
+   //status
+   { "status_for_each", lgit_status_foreach },
+   { "status_for_each_ext", lgit_status_foreach_ext },
+   { "status_file", lgit_status_file },
+   { "status_list", lgit_status_list_new },
+   { "status_ignore", lgit_status_should_ignore },
    { NULL, NULL },
 };
 
@@ -94,8 +106,8 @@ int luaopen_wien(lua_State *L)
    setup_funcs(L, LGIT_BRANCH_FUNCS, lgit_branch_funcs);
    setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
    setup_funcs(L, LGIT_REMOTE_FUNCS, lgit_remote_funcs);
+   setup_funcs(L, LGIT_STATUS_FUNCS, lgit_status_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
-   setup_funcs(L, LGIT_TRANSPORT_FUNCS, lgit_transport_funcs );
 
    luaL_newlib( L, mylib );
    return 1;

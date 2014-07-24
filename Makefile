@@ -6,7 +6,8 @@ FILES := src/wien.c \
 		src/tree_builder.c \
 		src/clone.c \
 		src/remote.c \
-      src/transport.c
+      src/transport.c \
+		src/status.c
 
 wien.so: $(FILES)
 	gcc --shared -fPIC -o wien.so \
