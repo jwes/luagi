@@ -1,4 +1,4 @@
-local lgit = require("lgit")
+local wien = require("wien")
 local head = "117d621c4a920dc1c9d706ee83ffce7d8d982b58"
 local prev = "c78833afb82aa413f8ad2ad7cb9548af6e74c74c"
 
