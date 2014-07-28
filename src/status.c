@@ -99,11 +99,6 @@ static int lgit_status_walker( lua_State *L );
 int lgit_status_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   git_status_options opts;
-   if( git_status_init_options( &opts, GIT_STATUS_OPTIONS_VERSION ) )
-   {
-      luaL_error( L, "could not set up options" );
-   }
 
    struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
    if( git_status_foreach( *repo, lgit_status_callback, list ) )
@@ -118,11 +113,35 @@ int lgit_status_foreach( lua_State *L )
    return 1;
 }
 
+static int lgit_status_init_options( lua_State *L, git_status_options *opts )
+{
+   // TODO init options from lua_State
+   lua_isboolean( L, 1 ); 
+   return git_status_init_options( opts, GIT_STATUS_OPTIONS_VERSION ); 
+}
+
 int lgit_status_foreach_ext( lua_State *L )
 {
-   lua_pushnil( L );
+   git_repository **repo = checkrepo( L, 1 );
+   git_status_options opts;
+   if( lgit_status_init_options( L, &opts ) )
+   {
+      luaL_error( L, "could not set up options" );
+   }
+
+   // modify 
+
+   struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
+   if( git_status_foreach_ext( *repo, &opts, lgit_status_callback, list ) )
+   {
+      const git_error* err = giterr_last();
+      luaL_error( L, "error iterating the files %s", err->message );
+   }
+   luaL_getmetatable(L, LGIT_STATUS_FOREACH);
+   lua_setmetatable(L, -2);
+
+   lua_pushcclosure( L, lgit_status_walker, 1 );
    return 1;
-  
 }
 
 int lgit_status_file ( lua_State *L )
@@ -150,7 +169,17 @@ int lgit_status_list_new ( lua_State *L )
 
 int lgit_status_should_ignore( lua_State *L )
 {
-   lua_pushnil( L );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *path = luaL_checkstring( L, 2 );
+   int ignored;
+
+   if( git_status_should_ignore( &ignored, *repo, path ) )
+   {
+      const git_error* err = giterr_last();
+      luaL_error( L, "ignore failed %s", err->message );
+   }
+
+   lua_pushboolean( L,  ignored );
    return 1;
 }
 

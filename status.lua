@@ -12,7 +12,7 @@ local function print_flags ( flags )
 end
 
 
-for path, flags in repo:status_for_each() do
+for path, flags in repo:status_for_each_ext() do
    -- ignore ignored files --
    if not  flags[ "ignored" ]
    then
@@ -24,3 +24,5 @@ end
 print "file status.lua: "
 local flags = repo:status_file("status.lua")
 print_flags( flags )
+
+print( "should bla.swp be ignored?", repo:status_ignored("bla.swp") )

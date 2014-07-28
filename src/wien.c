@@ -68,7 +68,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "status_for_each_ext", lgit_status_foreach_ext },
    { "status_file", lgit_status_file },
    { "status_list", lgit_status_list_new },
-   { "status_ignore", lgit_status_should_ignore },
+   { "status_ignored", lgit_status_should_ignore },
    { NULL, NULL },
 };
 
