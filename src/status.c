@@ -28,6 +28,33 @@ int lgit_get_status_flags_from_lua( lua_State *L )
    return 1;
 }
 
+void  lgit_status_flags_to_table( lua_State *L, const int f )
+{      
+   lua_newtable( L );
+   lua_pushboolean( L, f & GIT_STATUS_INDEX_NEW );
+   lua_setfield( L, -2, INEW );
+   lua_pushboolean( L, f & GIT_STATUS_INDEX_MODIFIED );
+   lua_setfield( L, -2, IMOD );
+   lua_pushboolean( L, f & GIT_STATUS_INDEX_DELETED );
+   lua_setfield( L, -2, IDEL );
+   lua_pushboolean( L, f & GIT_STATUS_INDEX_RENAMED );
+   lua_setfield( L, -2, IREN );
+   lua_pushboolean( L, f & GIT_STATUS_INDEX_TYPECHANGE );
+   lua_setfield( L, -2, ITYP );
+   lua_pushboolean( L, f & GIT_STATUS_WT_NEW );
+   lua_setfield( L, -2, WNEW );
+   lua_pushboolean( L, f & GIT_STATUS_WT_MODIFIED );
+   lua_setfield( L, -2, WMOD );
+   lua_pushboolean( L, f & GIT_STATUS_WT_DELETED );
+   lua_setfield( L, -2, WDEL );
+   lua_pushboolean( L, f & GIT_STATUS_WT_TYPECHANGE );
+   lua_setfield( L, -2, WTYP );
+   lua_pushboolean( L, f & GIT_STATUS_WT_RENAMED );
+   lua_setfield( L, -2, WREN );
+   lua_pushboolean( L, f & GIT_STATUS_IGNORED );
+   lua_setfield( L, -2, IGN );
+}
+
 struct status_element {
    char *path;
    unsigned int status_flags;
@@ -100,7 +127,18 @@ int lgit_status_foreach_ext( lua_State *L )
 
 int lgit_status_file ( lua_State *L )
 {
-   lua_pushnil( L );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *path = luaL_checkstring( L, 2 );
+
+   unsigned int flags;
+
+   if( git_status_file( &flags, *repo, path ) )
+   {
+      const git_error* err = giterr_last();
+      luaL_error( L, "status for the fle %s failed: %s", path, err->message );
+   }
+
+   lgit_status_flags_to_table( L, flags );
    return 1;
 }
 
@@ -144,31 +182,7 @@ static int lgit_status_walker( lua_State *L )
       info->next = elem->next;
       lua_pushstring( L, elem->path );
       // prepare boolean table to get rid of the integer flags
-      const int f = elem->status_flags;
-      lua_newtable( L );
-      lua_pushboolean( L, f & GIT_STATUS_INDEX_NEW );
-      lua_setfield( L, -2, INEW );
-      lua_pushboolean( L, f & GIT_STATUS_INDEX_MODIFIED );
-      lua_setfield( L, -2, IMOD );
-      lua_pushboolean( L, f & GIT_STATUS_INDEX_DELETED );
-      lua_setfield( L, -2, IDEL );
-      lua_pushboolean( L, f & GIT_STATUS_INDEX_RENAMED );
-      lua_setfield( L, -2, IREN );
-      lua_pushboolean( L, f & GIT_STATUS_INDEX_TYPECHANGE );
-      lua_setfield( L, -2, ITYP );
-      lua_pushboolean( L, f & GIT_STATUS_WT_NEW );
-      lua_setfield( L, -2, WNEW );
-      lua_pushboolean( L, f & GIT_STATUS_WT_MODIFIED );
-      lua_setfield( L, -2, WMOD );
-      lua_pushboolean( L, f & GIT_STATUS_WT_DELETED );
-      lua_setfield( L, -2, WDEL );
-      lua_pushboolean( L, f & GIT_STATUS_WT_TYPECHANGE );
-      lua_setfield( L, -2, WTYP );
-      lua_pushboolean( L, f & GIT_STATUS_WT_RENAMED );
-      lua_setfield( L, -2, WREN );
-      lua_pushboolean( L, f & GIT_STATUS_IGNORED );
-      lua_setfield( L, -2, IGN );
-
+      lgit_status_flags_to_table( L, elem->status_flags );
       free_elem( elem );
       return 2;
    }//iteration finished
