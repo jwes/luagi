@@ -8,6 +8,20 @@
 #include <string.h>
 #undef __USE_BSD
 
+#define INEW "index_new"
+#define IMOD "index_modified"
+#define IDEL "index_deleted"
+#define IREN "index_renamed"
+#define ITYP "index_typechange"
+
+#define WNEW "workdir_new"
+#define WMOD "workdir_modified"
+#define WDEL "workdir_deleted"
+#define WTYP "workdir_typechange"
+#define WREN "workdir_renamed"
+
+#define IGN "ignored"
+
 int lgit_get_status_flags_from_lua( lua_State *L )
 {
    lua_pushnil( L );
@@ -129,7 +143,32 @@ static int lgit_status_walker( lua_State *L )
       struct status_element *elem = info->next;
       info->next = elem->next;
       lua_pushstring( L, elem->path );
-      lua_pushinteger( L, elem->status_flags );
+      // prepare boolean table to get rid of the integer flags
+      const int f = elem->status_flags;
+      lua_newtable( L );
+      lua_pushboolean( L, f & GIT_STATUS_INDEX_NEW );
+      lua_setfield( L, -2, INEW );
+      lua_pushboolean( L, f & GIT_STATUS_INDEX_MODIFIED );
+      lua_setfield( L, -2, IMOD );
+      lua_pushboolean( L, f & GIT_STATUS_INDEX_DELETED );
+      lua_setfield( L, -2, IDEL );
+      lua_pushboolean( L, f & GIT_STATUS_INDEX_RENAMED );
+      lua_setfield( L, -2, IREN );
+      lua_pushboolean( L, f & GIT_STATUS_INDEX_TYPECHANGE );
+      lua_setfield( L, -2, ITYP );
+      lua_pushboolean( L, f & GIT_STATUS_WT_NEW );
+      lua_setfield( L, -2, WNEW );
+      lua_pushboolean( L, f & GIT_STATUS_WT_MODIFIED );
+      lua_setfield( L, -2, WMOD );
+      lua_pushboolean( L, f & GIT_STATUS_WT_DELETED );
+      lua_setfield( L, -2, WDEL );
+      lua_pushboolean( L, f & GIT_STATUS_WT_TYPECHANGE );
+      lua_setfield( L, -2, WTYP );
+      lua_pushboolean( L, f & GIT_STATUS_WT_RENAMED );
+      lua_setfield( L, -2, WREN );
+      lua_pushboolean( L, f & GIT_STATUS_IGNORED );
+      lua_setfield( L, -2, IGN );
+
       free_elem( elem );
       return 2;
    }//iteration finished
