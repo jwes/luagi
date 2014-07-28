@@ -26,3 +26,11 @@ local flags = repo:status_file("status.lua")
 print_flags( flags )
 
 print( "should bla.swp be ignored?", repo:status_ignored("bla.swp") )
+
+list, err = repo:status_list() 
+if not list 
+then
+   print( err )
+end
+print( "status of ", #list, " elements" )
+

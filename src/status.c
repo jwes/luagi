@@ -161,12 +161,6 @@ int lgit_status_file ( lua_State *L )
    return 1;
 }
 
-int lgit_status_list_new ( lua_State *L )
-{
-   lua_pushnil( L );
-   return 1;
-}
-
 int lgit_status_should_ignore( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -183,10 +177,34 @@ int lgit_status_should_ignore( lua_State *L )
    return 1;
 }
 
+int lgit_status_list_new ( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_status_options opts;
+   if( lgit_status_init_options( L, &opts ) )
+   {
+      luaL_error( L, "init options failed" );
+   }
+
+   git_status_list **out = (git_status_list **)lua_newuserdata( L, sizeof( git_status_list *) );
+
+   if( git_status_list_new( out, *repo, &opts ) )
+   {
+      const git_error *err = giterr_last();
+      lua_pushnil( L );
+      lua_pushfstring( L, "new failed, %s", err->message );
+      return 2;
+   }
+
+   luaL_getmetatable(L, LGIT_STATUS_FUNCS);
+   lua_setmetatable(L, -2);
+   return 1;
+}
 // list operations
 int lgit_status_list_entrycount( lua_State *L )
 {
-   lua_pushnil( L );
+   git_status_list **list = checkstatuslist( L );
+   lua_pushnumber( L, git_status_list_entrycount( *list ) );
    return 1;
 }
 
@@ -198,8 +216,9 @@ int lgit_status_by_index( lua_State *L )
 
 int lgit_status_list_free( lua_State *L )
 {
-   lua_pushnil( L );
-   return 1;
+   git_status_list **list = checkstatuslist( L );
+   git_status_list_free( *list ); 
+   return 0;
 }
 
 static int lgit_status_walker( lua_State *L )
