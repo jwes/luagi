@@ -95,6 +95,8 @@ int lgit_status_foreach( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
 
    struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
+   list->next = NULL;
+   list->last = NULL;
    if( git_status_foreach( *repo, lgit_status_callback, list ) )
    {
       const git_error* err = giterr_last();
@@ -134,6 +136,8 @@ int lgit_status_foreach_ext( lua_State *L )
    }
 
    struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
+   list->next = NULL;
+   list->last = NULL;
    if( git_status_foreach_ext( *repo, &opts, lgit_status_callback, list ) )
    {
       const git_error* err = giterr_last();
