@@ -17,7 +17,6 @@ int lgit_status_by_index( lua_State *L );
 
 int lgit_status_list_free( lua_State *L );
 
-
 static const struct luaL_Reg lgit_status_funcs [] = {
    { "__index", lgit_status_by_index },
    { "__len", lgit_status_list_entrycount },

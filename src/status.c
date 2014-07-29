@@ -107,23 +107,31 @@ int lgit_status_foreach( lua_State *L )
    return 1;
 }
 
-static int lgit_status_init_options( lua_State *L, git_status_options *opts )
+static int lgit_status_init_options( lua_State *L, int idx, git_status_options *opts )
 {
+   // first version with integer flags
+   git_status_show_t show = luaL_optinteger( L, idx, 0 );
+   unsigned int flags = luaL_optinteger( L, idx + 1, 0 );
+
    // TODO init options from lua_State
-   lua_isboolean( L, 1 ); 
-   return git_status_init_options( opts, GIT_STATUS_OPTIONS_VERSION ); 
+   int ret = git_status_init_options( opts, GIT_STATUS_OPTIONS_VERSION );
+   if( ret == 0 )
+   {
+      opts->show = show;
+      opts->flags = flags;
+   }
+
+   return ret; 
 }
 
 int lgit_status_foreach_ext( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_status_options opts;
-   if( lgit_status_init_options( L, &opts ) )
+   if( lgit_status_init_options( L, 2, &opts ) )
    {
       luaL_error( L, "could not set up options" );
    }
-
-   // modify 
 
    struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
    if( git_status_foreach_ext( *repo, &opts, lgit_status_callback, list ) )
@@ -175,7 +183,7 @@ int lgit_status_list_new ( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_status_options opts;
-   if( lgit_status_init_options( L, &opts ) )
+   if( lgit_status_init_options( L, 2, &opts ) )
    {
       luaL_error( L, "init options failed" );
    }
@@ -247,3 +255,4 @@ static int lgit_status_walker( lua_State *L )
    }//iteration finished
    return 0;
 }
+   

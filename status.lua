@@ -11,8 +11,8 @@ local function print_flags ( flags )
    end
 end
 
-
-for path, flags in repo:status_for_each_ext() do
+print( " foreach" )
+for path, flags in repo:status_for_each() do
    -- ignore ignored files --
    if not  flags[ "ignored" ]
    then
@@ -20,7 +20,17 @@ for path, flags in repo:status_for_each_ext() do
       print_flags( flags )
    end
 end
-
+--[[ not ready, there are memory issues 
+print( "foreach ext only showing index" )
+for path, flags in repo:status_for_each_ext( 1 ) do
+   -- ignore ignored files --
+   if not  flags[ "ignored" ]
+   then
+      print( path )
+      print_flags( flags )
+   end
+end
+]]--
 print "file status.lua: "
 local flags = repo:status_file("status.lua")
 print_flags( flags )
