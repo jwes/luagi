@@ -20,8 +20,12 @@ for path, flags in repo:status_for_each() do
       print_flags( flags )
    end
 end
+
 print( "foreach ext only showing index" )
-for path, flags in repo:status_for_each_ext( 1 ) do
+local options = {}
+options["show"] = 1;
+
+for path, flags in repo:status_for_each_ext( options ) do
    -- ignore ignored files --
    if not  flags[ "ignored" ]
    then
