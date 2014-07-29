@@ -3,8 +3,6 @@
 
 #include <lua.h>
 #include <lauxlib.h>
-//helper
-int lgit_get_status_flags_from_lua( lua_State *L );
 
 //function on repos
 int lgit_status_foreach( lua_State *L );

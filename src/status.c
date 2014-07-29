@@ -22,12 +22,6 @@
 
 #define IGN "ignored"
 
-int lgit_get_status_flags_from_lua( lua_State *L )
-{
-   lua_pushnil( L );
-   return 1;
-}
-
 void  lgit_status_flags_to_table( lua_State *L, const int f )
 {      
    lua_newtable( L );
@@ -210,7 +204,24 @@ int lgit_status_list_entrycount( lua_State *L )
 
 int lgit_status_by_index( lua_State *L )
 {
-   lua_pushnil( L );
+   git_status_list **list = checkstatuslist( L );
+   int idx = luaL_checkinteger( L, 2 );
+   // the index in lua is 1 based
+   idx = idx - 1;
+
+   const git_status_entry *entry = git_status_byindex( *list, idx );
+
+   if( entry == NULL )
+   {
+      lua_pushnil( L );
+      lua_pushstring( L, "index out of bounds");
+      return 2;
+   }
+
+   lgit_status_flags_to_table( L, entry->status );
+
+   //TODO git_diff_delta
+
    return 1;
 }
 

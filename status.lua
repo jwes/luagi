@@ -33,4 +33,8 @@ then
    print( err )
 end
 print( "status of ", #list, " elements" )
+for i = 1, #list 
+do
+   print_flags( list[i] )
+end
 
