@@ -21,10 +21,10 @@ for path, flags in repo:status_for_each() do
    end
 end
 
-print( "foreach ext only showing index" )
+print( "foreach ext only showing index in folder src" )
 local options = {}
-options["show"] = 1;
-
+options["show"] = 1
+options[1] = "src"
 for path, flags in repo:status_for_each_ext( options ) do
    -- ignore ignored files --
    if not  flags[ "ignored" ]

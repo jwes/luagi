@@ -127,18 +127,8 @@ int lgit_status_foreach( lua_State *L )
    return 1;
 }
 
-static int add_flag( lua_State *L, int idx, const char *flag_name, git_status_opt_t flag)
-{
-   lua_getfield( L, idx, flag_name );
-   if( lua_toboolean( L, -1 ) )
-   {
-      return flag;
-   }
-   else
-   {
-      return 0;
-   }
-}
+static int flags_from_lua( lua_State *L, int idx );
+static git_strarray paths_from_lua( lua_State *L, int idx );
 
 static int lgit_status_init_options( lua_State *L, int idx, git_status_options *opts )
 {
@@ -152,53 +142,14 @@ static int lgit_status_init_options( lua_State *L, int idx, git_status_options *
    lua_getfield( L, idx, LGIT_SHOW );
    git_status_show_t show = luaL_optinteger( L, -1, 0 );
 
-   int flags = 0;
-   flags = flags | add_flag( L, idx, 
-                   INC_UNTRACKED, 
-                   GIT_STATUS_OPT_INCLUDE_UNTRACKED );
-   flags = flags | add_flag( L, idx, 
-                   INC_IGNORED, 
-                   GIT_STATUS_OPT_INCLUDE_IGNORED );
-   flags = flags | add_flag( L, idx, 
-                   INC_UNMODIFIED, 
-                   GIT_STATUS_OPT_INCLUDE_UNMODIFIED );
-   flags = flags | add_flag( L, idx, 
-                   EX_SUBMODULES, 
-                   GIT_STATUS_OPT_EXCLUDE_SUBMODULES );
-   flags = flags | add_flag( L, idx, 
-                   REC_UNTRACKED_DIRS, 
-                   GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS );
-   flags = flags | add_flag( L, idx, 
-                   DISABLE_PATHSPEC, 
-                   GIT_STATUS_OPT_DISABLE_PATHSPEC_MATCH );
-   flags = flags | add_flag( L, idx, 
-                   REC_IGNORED_DIRS, 
-                   GIT_STATUS_OPT_RECURSE_IGNORED_DIRS );
-   flags = flags | add_flag( L, idx, 
-                   REN_HEAD_TO_IDX, 
-                   GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX );
-   flags = flags | add_flag( L, idx, 
-                   REN_IDX_TO_WDIR, 
-                   GIT_STATUS_OPT_RENAMES_INDEX_TO_WORKDIR );
-   flags = flags | add_flag( L, idx, 
-                   SORT_SENSI, 
-                   GIT_STATUS_OPT_SORT_CASE_SENSITIVELY );
-   flags = flags | add_flag( L, idx, 
-                   SORT_INSENSI, 
-                   GIT_STATUS_OPT_SORT_CASE_INSENSITIVELY );
-   flags = flags | add_flag( L, idx, 
-                   REN_FROM_REWRITE, 
-                   GIT_STATUS_OPT_RENAMES_FROM_REWRITES );
-   flags = flags | add_flag( L, idx, 
-                   NO_REFRESH, 
-                   GIT_STATUS_OPT_NO_REFRESH );
 
    // TODO init options from lua_State
    int ret = git_status_init_options( opts, GIT_STATUS_OPTIONS_VERSION );
    if( ret == 0 )
    {
       opts->show = show;
-      opts->flags = flags;
+      opts->flags = flags_from_lua( L, idx );
+      opts->pathspec = paths_from_lua( L, idx );
    }
 
    return ret; 
@@ -337,4 +288,91 @@ static int lgit_status_walker( lua_State *L )
    }//iteration finished
    return 0;
 }
+
+static int add_flag( lua_State *L, int idx, const char *flag_name, git_status_opt_t flag)
+{
+   lua_getfield( L, idx, flag_name );
+   if( lua_toboolean( L, -1 ) )
+   {
+      return flag;
+   }
+   else
+   {
+      return 0;
+   }
+}
+
+static int flags_from_lua( lua_State *L, int idx )
+{
+   int flags = 0;
+   flags = flags | add_flag( L, idx, 
+                   INC_UNTRACKED, 
+                   GIT_STATUS_OPT_INCLUDE_UNTRACKED );
+   flags = flags | add_flag( L, idx, 
+                   INC_IGNORED, 
+                   GIT_STATUS_OPT_INCLUDE_IGNORED );
+   flags = flags | add_flag( L, idx, 
+                   INC_UNMODIFIED, 
+                   GIT_STATUS_OPT_INCLUDE_UNMODIFIED );
+   flags = flags | add_flag( L, idx, 
+                   EX_SUBMODULES, 
+                   GIT_STATUS_OPT_EXCLUDE_SUBMODULES );
+   flags = flags | add_flag( L, idx, 
+                   REC_UNTRACKED_DIRS, 
+                   GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS );
+   flags = flags | add_flag( L, idx, 
+                   DISABLE_PATHSPEC, 
+                   GIT_STATUS_OPT_DISABLE_PATHSPEC_MATCH );
+   flags = flags | add_flag( L, idx, 
+                   REC_IGNORED_DIRS, 
+                   GIT_STATUS_OPT_RECURSE_IGNORED_DIRS );
+   flags = flags | add_flag( L, idx, 
+                   REN_HEAD_TO_IDX, 
+                   GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX );
+   flags = flags | add_flag( L, idx, 
+                   REN_IDX_TO_WDIR, 
+                   GIT_STATUS_OPT_RENAMES_INDEX_TO_WORKDIR );
+   flags = flags | add_flag( L, idx, 
+                   SORT_SENSI, 
+                   GIT_STATUS_OPT_SORT_CASE_SENSITIVELY );
+   flags = flags | add_flag( L, idx, 
+                   SORT_INSENSI, 
+                   GIT_STATUS_OPT_SORT_CASE_INSENSITIVELY );
+   flags = flags | add_flag( L, idx, 
+                   REN_FROM_REWRITE, 
+                   GIT_STATUS_OPT_RENAMES_FROM_REWRITES );
+   flags = flags | add_flag( L, idx, 
+                   NO_REFRESH, 
+                   GIT_STATUS_OPT_NO_REFRESH );
+   return flags;
+}
+
+static git_strarray paths_from_lua( lua_State *L, int idx )
+{
+   git_strarray array;
+   array.count = luaL_len( L, idx );
    
+   int size = 0;
+   for( unsigned int i = 1; i <= array.count; i++ )
+   {
+      lua_pushinteger( L, i );
+      lua_gettable( L, idx );
+      const char* str = luaL_checkstring( L, -1 );
+      size += strlen( str ) + 1;
+   }
+  
+   char **strings = (char **) malloc( size );
+   size_t pos = 0;
+   for( unsigned int i = 1; i <= array.count; i++ )
+   {
+      lua_pushinteger( L, i );
+      lua_gettable( L, idx );
+      const char* str = luaL_checkstring( L, -1 );
+      size_t len = strlen( str ) + 1;
+      strncpy(strings[pos], str, len );
+      pos += len;
+   }
+
+   array.strings = strings;
+   return array;
+}
