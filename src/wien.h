@@ -2,6 +2,7 @@
 #define IS_LGIT_H
 #include <git2/types.h>
 #include <git2/oid.h>
+#include <git2/strarray.h>
 
 #define REPO_NAME "is.westhu.lgit.repo"
 #define LGIT_TREE_FUNCS "is.westh.lgit.tree"
@@ -28,5 +29,6 @@ int table_to_signature( lua_State *L, git_signature* sig, int position );
 const char* lgit_otype_to_string( git_otype type );
 
 int lgit_oid_fromstr( git_oid *oid, const char *ref );
+git_strarray lgit_strings_from_lua_list( lua_State *L, int table_idx );
 
 #endif

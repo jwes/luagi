@@ -128,7 +128,6 @@ int lgit_status_foreach( lua_State *L )
 }
 
 static int flags_from_lua( lua_State *L, int idx );
-static git_strarray paths_from_lua( lua_State *L, int idx );
 
 static int lgit_status_init_options( lua_State *L, int idx, git_status_options *opts )
 {
@@ -142,14 +141,13 @@ static int lgit_status_init_options( lua_State *L, int idx, git_status_options *
    lua_getfield( L, idx, LGIT_SHOW );
    git_status_show_t show = luaL_optinteger( L, -1, 0 );
 
-
-   // TODO init options from lua_State
+   // init options from lua_State
    int ret = git_status_init_options( opts, GIT_STATUS_OPTIONS_VERSION );
    if( ret == 0 )
    {
       opts->show = show;
       opts->flags = flags_from_lua( L, idx );
-      opts->pathspec = paths_from_lua( L, idx );
+      opts->pathspec = lgit_strings_from_lua_list( L, idx );
    }
 
    return ret; 
@@ -345,34 +343,4 @@ static int flags_from_lua( lua_State *L, int idx )
                    NO_REFRESH, 
                    GIT_STATUS_OPT_NO_REFRESH );
    return flags;
-}
-
-static git_strarray paths_from_lua( lua_State *L, int idx )
-{
-   git_strarray array;
-   array.count = luaL_len( L, idx );
-   
-   int size = 0;
-   for( unsigned int i = 1; i <= array.count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, idx );
-      const char* str = luaL_checkstring( L, -1 );
-      size += strlen( str ) + 1;
-   }
-  
-   char **strings = (char **) malloc( size );
-   size_t pos = 0;
-   for( unsigned int i = 1; i <= array.count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, idx );
-      const char* str = luaL_checkstring( L, -1 );
-      size_t len = strlen( str ) + 1;
-      strncpy(strings[pos], str, len );
-      pos += len;
-   }
-
-   array.strings = strings;
-   return array;
 }

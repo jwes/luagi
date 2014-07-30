@@ -217,30 +217,8 @@ static int set_refspecs( lua_State *L, int (*func)(git_remote *remote, git_strar
    git_remote **rem = checkremote( L );
    // get table an build git_strarray  
    luaL_checktype( L, 2, LUA_TTABLE ); 
-   unsigned int count = luaL_len( L, 2 );
-   int size = 0;
-   for( unsigned int i = 0; i < count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, 2 );
-      const char* str = luaL_checkstring( L, -1 );
-      size += strlen( str ) + 1;
-   }
-   char **strings = (char **) malloc( size );
-   size_t pos = 0;
-   for( unsigned int i = 0; i < count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, 2 );
-      const char* str = luaL_checkstring( L, -1 );
-      size_t len = strlen( str ) + 1;
-      strncpy(strings[pos], str, len );
-      pos += len;
-   }
 
-   git_strarray array;
-   array.strings = strings;
-   array.count = count;
+   git_strarray array = lgit_strings_from_lua_list( L, 2 );
 
    if( func( *rem, &array))
    {
