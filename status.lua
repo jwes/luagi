@@ -47,6 +47,24 @@ end
 print( "status of ", #list, " elements" )
 for i = 1, #list 
 do
-   print_flags( list[i] )
+   local t = list[i]
+   local flags = t["status"]
+   local head_to_index = t["head_to_index"]
+   local index_to_workdir = t["index_to_workdir"]
+
+   print_flags( flags )
+
+   if head_to_index then
+      print( "\thead to index" )
+      for k, v in pairs( head_to_index ) do
+         print("\t\t", k, v )
+      end
+   end
+   if index_to_workdir then
+      print( "\tindex to workdir" )
+      for k, v in pairs( index_to_workdir ) do
+         print( "\t\t", k, v )
+      end
+   end
 end
 

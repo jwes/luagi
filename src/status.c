@@ -1,5 +1,6 @@
 #include "status.h"
 #include "wien.h"
+#include "diff.h"
 #include <git2/strarray.h>
 #include <git2/diff.h>
 #include <git2/status.h>
@@ -8,23 +9,23 @@
 #include <string.h>
 #undef __USE_BSD
 
-#define INEW "index_new"
-#define IMOD "index_modified"
-#define IDEL "index_deleted"
-#define IREN "index_renamed"
-#define ITYP "index_typechange"
+#define INEW               "index_new"
+#define IMOD               "index_modified"
+#define IDEL               "index_deleted"
+#define IREN               "index_renamed"
+#define ITYP               "index_typechange"
 
-#define WNEW "workdir_new"
-#define WMOD "workdir_modified"
-#define WDEL "workdir_deleted"
-#define WTYP "workdir_typechange"
-#define WREN "workdir_renamed"
+#define WNEW               "workdir_new"
+#define WMOD               "workdir_modified"
+#define WDEL               "workdir_deleted"
+#define WTYP               "workdir_typechange"
+#define WREN               "workdir_renamed"
 
-#define IGN "ignored"
+#define IGN                "ignored"
 
-#define LGIT_SHOW "show"
-#define LGIT_FLAGS "flags"
-#define LGIT_PATHS "paths"
+#define LGIT_SHOW          "show"
+#define LGIT_FLAGS         "flags"
+#define LGIT_PATHS         "paths"
 
 #define INC_UNTRACKED      "include_untracked"
 #define INC_IGNORED        "include_ignored"
@@ -39,6 +40,10 @@
 #define SORT_INSENSI       "sort_case_insensitively"
 #define REN_FROM_REWRITE   "renames_from_rewrites"
 #define NO_REFRESH         "no_refresh"
+
+#define L_STATUS           "index_to_workdir"
+#define L_IDX_TO_WRK       "index_to_workdir"
+#define L_HEAD_TO_IDX      "head_to_index"
 
 void  lgit_status_flags_to_table( lua_State *L, const int f )
 {      
@@ -257,10 +262,25 @@ int lgit_status_by_index( lua_State *L )
       return 2;
    }
 
+   lua_newtable( L );
+
    lgit_status_flags_to_table( L, entry->status );
+   lua_setfield( L , -2, L_STATUS );
 
-   //TODO git_diff_delta
+   // git_diff_delta
 
+   if( entry->head_to_index != NULL )
+   {
+      diff_delta_to_table( L, entry->head_to_index );
+      lua_setfield( L , -2, L_HEAD_TO_IDX );
+   }
+
+   if( entry->index_to_workdir != NULL )
+   {
+      diff_delta_to_table( L, entry->index_to_workdir );
+      lua_setfield( L , -2, L_IDX_TO_WRK );
+   }
+   
    return 1;
 }
 

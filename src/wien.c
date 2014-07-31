@@ -13,6 +13,7 @@
 #include "remote.h"
 #include "transport.h"
 #include "status.h"
+#include "diff.h"
 
 static int lgit_open( lua_State *L )
 {
@@ -69,6 +70,13 @@ static const struct luaL_Reg repofuncs [] = {
    { "status_file", lgit_status_file },
    { "status_list", lgit_status_list_new },
    { "status_ignored", lgit_status_should_ignore },
+   //diff
+
+   { "diff_tree_to_index", lgit_diff_tree_to_index },
+   { "diff_index_to_workdir", lgit_diff_index_to_workdir },
+   { "diff_tree_to_workdir",lgit_diff_tree_to_workdir },
+   { "diff_tree_to_workdir_with_index", lgit_diff_tree_to_workdir_with_index },
+
    { NULL, NULL },
 };
 
@@ -107,6 +115,7 @@ int luaopen_wien(lua_State *L)
    setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
    setup_funcs(L, LGIT_REMOTE_FUNCS, lgit_remote_funcs);
    setup_funcs(L, LGIT_STATUS_FUNCS, lgit_status_funcs );
+   setup_funcs(L, LGIT_DIFF_FUNCS, lgit_diff_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
