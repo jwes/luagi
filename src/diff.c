@@ -77,20 +77,21 @@ int lgit_diff_print( lua_State *L )
 }
 void add_flags( lua_State *L, int idx, int32_t flags )
 {
-   switch( flags )
+   if( flags & GIT_DIFF_FLAG_BINARY )
    {
-   case GIT_DIFF_FLAG_BINARY:
-      lua_pushstring( L, BINARY );
-      break;
-   case GIT_DIFF_FLAG_NOT_BINARY:
-   default:
-      lua_pushstring( L, NOT_BINARY );
-      break;
-   case GIT_DIFF_FLAG_VALID_ID:
-      lua_pushstring( L, VALID_ID );
-      break;
+      lua_pushboolean( L, 1 );
+      lua_setfield( L, idx, BINARY );
    }
-   lua_setfield( L, idx, DIFF_FILE_FLAGS );
+   if( flags & GIT_DIFF_FLAG_NOT_BINARY )
+   {
+      lua_pushboolean( L, 1 );
+      lua_setfield( L, idx, NOT_BINARY );
+   }
+   if( flags & GIT_DIFF_FLAG_VALID_ID )
+   {
+      lua_pushboolean( L, 1 );
+      lua_setfield( L, idx, VALID_ID );
+   }
 }
 
 void diff_file_to_table( lua_State *L, const git_diff_file file )

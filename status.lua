@@ -10,6 +10,16 @@ local function print_flags ( flags )
       end
    end
 end
+local function print_table ( table, prefix ) 
+   if table then
+      for k, v in pairs( table ) do
+         print( prefix, k, v )
+         if type(v) == "table" then
+            print_table( v, prefix.."\t" )
+         end
+      end
+   end
+end
 
 print( " foreach" )
 for path, flags in repo:status_for_each() do
@@ -56,15 +66,11 @@ do
 
    if head_to_index then
       print( "\thead to index" )
-      for k, v in pairs( head_to_index ) do
-         print("\t\t", k, v )
-      end
+      print_table ( head_to_index, "\t\t" )
    end
    if index_to_workdir then
       print( "\tindex to workdir" )
-      for k, v in pairs( index_to_workdir ) do
-         print( "\t\t", k, v )
-      end
+      print_table ( index_to_workdir, "\t\t" )
    end
 end
 
