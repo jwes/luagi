@@ -5,6 +5,7 @@
 #include <lauxlib.h>
 #include "git2/diff.h"
 
+int lgit_diff_tree_to_tree( lua_State *L );
 int lgit_diff_tree_to_index( lua_State *L );
 int lgit_diff_index_to_workdir( lua_State *L );
 int lgit_diff_tree_to_workdir( lua_State *L );
@@ -38,4 +39,6 @@ void diff_file_to_table( lua_State *L, const git_diff_file file );
 void diff_delta_to_table( lua_State *L, const git_diff_delta *delta );
 
 #define LGIT_DIFF_FUNCS "is.westh.lgit.diff"
+#define checkdiff_at(L, N) \
+      (git_diff**) luaL_checkudata( L, N, LGIT_DIFF_FUNCS )
 #endif // IS_LGIT_DIFF

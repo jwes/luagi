@@ -19,8 +19,10 @@
 
 #define checkrepo(L, n) \
       (git_repository**) luaL_checkudata( L, n, REPO_NAME )
+#define checktree_at(L, n) \
+      (git_tree**) luaL_checkudata( L, n, LGIT_TREE_FUNCS )
 #define checktree(L) \
-      (git_tree**) luaL_checkudata( L, 1, LGIT_TREE_FUNCS )
+        checktree_at( L, 1 )
 #define checkremote(L) \
       (git_remote**) luaL_checkudata( L, 1, LGIT_REMOTE_FUNCS )
 
