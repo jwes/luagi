@@ -1,25 +1,6 @@
 local wien = require( "wien" );
 local repo = wien.open(".");
-local function print_flags ( flags )
-   if flags 
-   then
-      for flag, bool in pairs( flags ) do
-          if bool then
-            print( "\t", flag )
-         end
-      end
-   end
-end
-local function print_table ( table, prefix ) 
-   if table then
-      for k, v in pairs( table ) do
-         print( prefix, k, v )
-         if type(v) == "table" then
-            print_table( v, prefix.."\t" )
-         end
-      end
-   end
-end
+local wh = require("wien_helper");
 
 print( " foreach" )
 for path, flags in repo:status_for_each() do
@@ -27,7 +8,7 @@ for path, flags in repo:status_for_each() do
    if not  flags[ "ignored" ]
    then
       print( path )
-      print_flags( flags )
+      wh.print_flags( flags )
    end
 end
 
@@ -40,12 +21,12 @@ for path, flags in repo:status_for_each_ext( options ) do
    if not  flags[ "ignored" ]
    then
       print( path )
-      print_flags( flags )
+      wh.print_flags( flags )
    end
 end
 print "file status.lua: "
 local flags = repo:status_file("status.lua")
-print_flags( flags )
+wh.print_flags( flags )
 
 print( "should bla.swp be ignored?", repo:status_ignored("bla.swp") )
 
@@ -62,15 +43,15 @@ do
    local head_to_index = t["head_to_index"]
    local index_to_workdir = t["index_to_workdir"]
 
-   print_flags( flags )
+   wh.print_flags( flags )
 
    if head_to_index then
       print( "\thead to index" )
-      print_table ( head_to_index, "\t\t" )
+      wh.print_table ( head_to_index, "\t\t" )
    end
    if index_to_workdir then
       print( "\tindex to workdir" )
-      print_table ( index_to_workdir, "\t\t" )
+      wh.print_table ( index_to_workdir, "\t\t" )
    end
 end
 

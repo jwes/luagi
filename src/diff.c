@@ -2,6 +2,8 @@
 #include "wien.h"
 #include <git2/diff.h>
 #include <git2/errors.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define DIFF_FILE_ID "id"
 #define DIFF_FILE_PATH "path"
@@ -140,11 +142,111 @@ int lgit_diff_is_sorted_icase( lua_State *L )
    return 1; 
 }
 
+struct foreach_f
+{
+   lua_State *L;
+   lua_CFunction file;
+   int use_hunks;
+   lua_CFunction hunks;
+   int use_lines;
+   lua_CFunction lines;
+};
+
+static int diff_file_callback( const git_diff_delta *delta,
+                 float progress,
+                 void *payload)
+{
+   struct foreach_f *f = (struct foreach_f *) payload;
+
+   lua_pushcfunction( f->L, f->file );
+   diff_delta_to_table( f->L, delta );
+   lua_pushnumber( f->L, progress );
+
+   if( lua_pcall( f->L, 2, 1, 0 ) != LUA_OK )
+   {
+      luaL_error( f->L, "can not call file callback" );
+   }
+   return luaL_checkinteger( f->L, -1 );
+}
+
+static int diff_hunk_callback( const git_diff_delta *delta,
+                const git_diff_hunk *hunk,
+                void *payload)
+{
+   struct foreach_f *f = (struct foreach_f *) payload;
+   if( ! f->use_hunks )
+      return 1;
+
+   lua_pushcfunction( f->L, f->hunks );
+   diff_delta_to_table( f->L, delta );
+
+   lua_pushinteger( f->L, hunk->old_start );
+   lua_pushinteger( f->L, hunk->old_lines );
+   lua_pushinteger( f->L, hunk->new_start );
+   lua_pushinteger( f->L, hunk->new_lines );
+   lua_pushstring( f->L, hunk->header );
+   
+   if( lua_pcall( f->L, 6, 1, 0 ) )
+   {
+      luaL_error( f->L, "can not call hunk callback" );
+   }
+   return luaL_checkinteger( f->L, -1 );
+}
+
+static int diff_line_callback( const git_diff_delta *delta,
+                const git_diff_hunk *hunk,
+                const git_diff_line *line,
+                void *payload)
+{
+   struct foreach_f *f = (struct foreach_f *) payload;
+
+   if( ! f->use_lines )
+      return 1;
+
+   lua_pushcfunction( f->L, f->lines );
+   diff_delta_to_table( f->L, delta );
+
+   lua_pushstring( f->L, hunk->header );
+   lua_pushfstring( f->L, "%c", line->origin ); 
+   lua_pushinteger( f->L, line->old_lineno );
+   lua_pushinteger( f->L, line->new_lineno );
+   lua_pushinteger( f->L, line->num_lines );
+   
+   char content [ line->content_len + 1 ];
+   memcpy( content, line->content, line->content_len );
+   content[ line->content_len ] = 0;
+   lua_pushstring( f->L, content ); 
+
+   if( lua_pcall( f->L, 7, 1, 0 ) )
+   {
+      luaL_error( f->L, "can not call line callback" );
+   }
+   return luaL_checkinteger( f->L, -1 );
+}
+
 int lgit_diff_foreach( lua_State *L )
 {
-   //TODO callbacks
-   lua_pushnil( L );
-   return 1;
+   git_diff **diff = checkdiff_at( L, 1 );
+
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+   
+   struct foreach_f *f = (struct foreach_f *) malloc( sizeof( struct foreach_f) );
+   f->L = L;
+   f->file = lua_tocfunction( L, 2 );
+   f->use_hunks = lua_iscfunction( L, 3 ); 
+   f->hunks = lua_tocfunction( L, 3 );
+   f->use_lines = lua_iscfunction( L, 4 ); 
+   f->lines = lua_tocfunction( L, 4 );
+
+   git_diff_foreach( *diff,
+                   diff_file_callback,
+                   diff_hunk_callback,
+                   diff_line_callback,
+                   f );
+
+   free( f );
+
+   return 0;
 }
 int lgit_diff_print( lua_State *L )
 {
