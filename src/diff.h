@@ -20,6 +20,8 @@ int lgit_diff_is_sorted_icase( lua_State *L );
 int lgit_diff_foreach( lua_State *L );
 int lgit_diff_print( lua_State *L );
 
+int lgit_diff_free( lua_State *L );
+
 //TODO git_diff_blob*
 //TODO git_diff_buffer
 //
@@ -31,6 +33,7 @@ static const struct luaL_Reg lgit_diff_funcs [] = {
    { "is_sorted", lgit_diff_is_sorted_icase },
    { "foreach", lgit_diff_foreach },
    { "__tostring", lgit_diff_print },
+   { "__gc", lgit_diff_free },
    { NULL, NULL }
 };
 

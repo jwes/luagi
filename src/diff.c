@@ -135,19 +135,31 @@ int lgit_diff_get_delta( lua_State *L )
 }
 int lgit_diff_is_sorted_icase( lua_State *L )
 {
-   lua_pushnil( L );
+   git_diff **diff = checkdiff_at( L, 1 );
+   lua_pushboolean( L, git_diff_is_sorted_icase( *diff ) );
    return 1; 
 }
+
 int lgit_diff_foreach( lua_State *L )
 {
+   //TODO callbacks
    lua_pushnil( L );
    return 1;
 }
 int lgit_diff_print( lua_State *L )
 {
+   //TODO callbacks
    lua_pushnil( L );
    return 1; 
 }
+
+int lgit_diff_free( lua_State *L )
+{
+   git_diff **diff = checkdiff_at( L, 1 );
+   git_diff_free( *diff );
+   return 0;
+}
+
 void add_flags( lua_State *L, int idx, int32_t flags )
 {
    if( flags & GIT_DIFF_FLAG_BINARY )
