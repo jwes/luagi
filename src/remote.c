@@ -477,38 +477,24 @@ int lgit_remote_set_autotag( lua_State *L )
    return 0; 
 }
 
-struct rename_payload
-{
-   lua_State *L;
-   lua_CFunction function;
-};
-static int rename_problem_cb( const char *problematic_ref_spec, void *payload )
-{
-   struct rename_payload *p = (struct rename_payload *) payload;
-   lua_pushcfunction( p->L, p->function );
-   lua_pushstring( p->L, problematic_ref_spec );
-   
-   return lua_pcall( p->L, 1, 0, 0 );
-}
-
 int lgit_remote_rename( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    const char *new_name = luaL_checkstring( L, 2 );
-   struct rename_payload p;
-   if( lua_iscfunction( L, 3 ) == 0 )
-   {
-      lua_CFunction function = lua_tocfunction( L, 3 );
-      p.L = L;
-      p.function = function;
-   }
-
-   if( git_remote_rename( *rem, new_name, rename_problem_cb, &p) )
+   git_strarray problems;
+   if( git_remote_rename( &problems, *rem, new_name ) )
    {
       const git_error *err = giterr_last();
       luaL_error( L, err->message );
    }
-   return 0; 
+
+   for( unsigned int i = 0; i < problems.count; i++ )
+   {
+      lua_pushstring( L, problems.strings[i] );
+   }
+   git_strarray_free( &problems );
+   unsigned int count = problems.count;
+   return count; 
 }
 
 int lgit_remote_update_fetch_head( lua_State *L )
