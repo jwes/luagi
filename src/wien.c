@@ -201,27 +201,17 @@ git_strarray lgit_strings_from_lua_list( lua_State *L, int table_idx )
    git_strarray array;
    array.count = luaL_len( L, table_idx );
    
-   int size = 0;
-   for( unsigned int i = 1; i <= array.count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, table_idx );
-      const char* str = luaL_checkstring( L, -1 );
-      size += strlen( str ) + 1;
-   }
-  
-   char **strings = (char **) malloc( size );
-   size_t pos = 0;
-   for( unsigned int i = 1; i <= array.count; i++ )
+   array.strings = calloc( array.count, sizeof( char * ) );
+   for( size_t i = 1; i <= array.count; i++ )
    {
       lua_pushinteger( L, i );
       lua_gettable( L, table_idx );
       const char* str = luaL_checkstring( L, -1 );
       size_t len = strlen( str ) + 1;
-      strncpy(strings[pos], str, len );
-      pos += len;
+      char* tmpStr = malloc( len );
+      strncpy( tmpStr, str, len );
+      array.strings[ i - 1 ] = tmpStr;
    }
 
-   array.strings = strings;
    return array;
 }
