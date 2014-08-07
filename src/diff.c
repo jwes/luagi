@@ -145,25 +145,27 @@ int lgit_diff_is_sorted_icase( lua_State *L )
 struct foreach_f
 {
    lua_State *L;
-   lua_CFunction file;
    int use_hunks;
-   lua_CFunction hunks;
    int use_lines;
-   lua_CFunction lines;
 };
 
 static int diff_file_callback( const git_diff_delta *delta,
                  float progress,
                  void *payload)
 {
-   struct foreach_f *f = (struct foreach_f *) payload;
+   struct foreach_f *f = payload;
 
-   lua_pushcfunction( f->L, f->file );
+
+   
+   lua_pushvalue( f->L, 2 );
    diff_delta_to_table( f->L, delta );
    lua_pushnumber( f->L, progress );
 
+   debugStack( f->L );
+
    if( lua_pcall( f->L, 2, 1, 0 ) != LUA_OK )
    {
+      dumpStack( f->L );
       luaL_error( f->L, "can not call file callback" );
    }
    return luaL_checkinteger( f->L, -1 );
@@ -173,11 +175,11 @@ static int diff_hunk_callback( const git_diff_delta *delta,
                 const git_diff_hunk *hunk,
                 void *payload)
 {
-   struct foreach_f *f = (struct foreach_f *) payload;
+   struct foreach_f *f = payload;
    if( ! f->use_hunks )
       return 1;
 
-   lua_pushcfunction( f->L, f->hunks );
+   lua_pushvalue( f->L, 3 );
    diff_delta_to_table( f->L, delta );
 
    lua_pushinteger( f->L, hunk->old_start );
@@ -198,12 +200,12 @@ static int diff_line_callback( const git_diff_delta *delta,
                 const git_diff_line *line,
                 void *payload)
 {
-   struct foreach_f *f = (struct foreach_f *) payload;
+   struct foreach_f *f = payload;
 
    if( ! f->use_lines )
       return 1;
 
-   lua_pushcfunction( f->L, f->lines );
+   lua_pushvalue( f->L, 4 );
    diff_delta_to_table( f->L, delta );
 
    lua_pushstring( f->L, hunk->header );
@@ -230,13 +232,10 @@ int lgit_diff_foreach( lua_State *L )
 
    luaL_checktype( L, 2, LUA_TFUNCTION );
    
-   struct foreach_f *f = (struct foreach_f *) malloc( sizeof( struct foreach_f) );
+   struct foreach_f *f = malloc( sizeof( struct foreach_f) );
    f->L = L;
-   f->file = lua_tocfunction( L, 2 );
-   f->use_hunks = lua_iscfunction( L, 3 ); 
-   f->hunks = lua_tocfunction( L, 3 );
-   f->use_lines = lua_iscfunction( L, 4 ); 
-   f->lines = lua_tocfunction( L, 4 );
+   f->use_hunks = lua_type( L, 3) == LUA_TFUNCTION ;
+   f->use_lines = lua_type( L, 4) == LUA_TFUNCTION ;
 
    git_diff_foreach( *diff,
                    diff_file_callback,
@@ -298,7 +297,10 @@ void diff_file_to_table( lua_State *L, const git_diff_file file )
 
    lua_pushinteger( L, file.mode );
    lua_setfield( L, -2, DIFF_FILE_MODE );
+
+   debugStack( L );
 }
+
 
 void diff_delta_to_table( lua_State *L, const git_diff_delta *delta )
 {
@@ -320,5 +322,8 @@ void diff_delta_to_table( lua_State *L, const git_diff_delta *delta )
 
    diff_file_to_table( L, delta->new_file );
    lua_setfield( L, -2, DIFF_DELTA_NEW_FILE );
+  
+   debugStack( L );
+
 }
 

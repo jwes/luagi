@@ -32,4 +32,5 @@ function lines ( delta, header, origin, old_linenr, new_linenr, num_lines )
    return 0
 end
 
+diff:foreach(files, hunks )
 --diff:foreach(files,  hunks, lines)
