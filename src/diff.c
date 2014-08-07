@@ -168,7 +168,10 @@ static int diff_file_callback( const git_diff_delta *delta,
       dumpStack( f->L );
       luaL_error( f->L, "can not call file callback" );
    }
-   return luaL_checkinteger( f->L, -1 );
+
+   int ret = luaL_checkinteger( f->L, -1 );
+   lua_pop( f->L, 1 );
+   return ret;
 }
 
 static int diff_hunk_callback( const git_diff_delta *delta,
@@ -192,7 +195,9 @@ static int diff_hunk_callback( const git_diff_delta *delta,
    {
       luaL_error( f->L, "can not call hunk callback" );
    }
-   return luaL_checkinteger( f->L, -1 );
+   int ret = luaL_checkinteger( f->L, -1 );
+   lua_pop( f->L, 1 );
+   return ret;
 }
 
 static int diff_line_callback( const git_diff_delta *delta,
@@ -223,7 +228,9 @@ static int diff_line_callback( const git_diff_delta *delta,
    {
       luaL_error( f->L, "can not call line callback" );
    }
-   return luaL_checkinteger( f->L, -1 );
+   int ret = luaL_checkinteger( f->L, -1 );
+   lua_pop( f->L, 1 );
+   return ret;
 }
 
 int lgit_diff_foreach( lua_State *L )
@@ -234,6 +241,7 @@ int lgit_diff_foreach( lua_State *L )
    
    struct foreach_f *f = malloc( sizeof( struct foreach_f) );
    f->L = L;
+
    f->use_hunks = lua_type( L, 3) == LUA_TFUNCTION ;
    f->use_lines = lua_type( L, 4) == LUA_TFUNCTION ;
 

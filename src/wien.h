@@ -34,7 +34,6 @@ int lgit_oid_fromstr( git_oid *oid, const char *ref );
 git_strarray lgit_strings_from_lua_list( lua_State *L, int table_idx );
 
 void dumpStack( lua_State* L );
-#define STACK_DEBUG
 #ifdef STACK_DEBUG
 #define debugStack( L ); dumpStack( L );
 #else
