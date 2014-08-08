@@ -32,7 +32,7 @@ static const struct luaL_Reg lgit_diff_funcs [] = {
    { "get_delta", lgit_diff_get_delta },
    { "is_sorted", lgit_diff_is_sorted_icase },
    { "foreach", lgit_diff_foreach },
-   { "__tostring", lgit_diff_print },
+   { "print", lgit_diff_print },
    { "__gc", lgit_diff_free },
    { NULL, NULL }
 };

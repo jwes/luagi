@@ -19,6 +19,7 @@ int lgit_commit_lookup( lua_State *L )
    {
       lua_pushnil( L );
       lua_pushstring(L, "the given string is no valid git oid");
+      return 2;
    }
 
    git_commit** out_commit = (git_commit**)lua_newuserdata( L, sizeof( git_commit* ));

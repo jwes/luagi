@@ -22,6 +22,12 @@
 #define NOT_BINARY "not_binary"
 #define VALID_ID "valid_id"
 
+#define PATCH "patch"
+#define PATCH_HEADER "patch_header"
+#define RAW "raw"
+#define NAME_ONLY "name_only"
+#define NAME_STATUS "name_status"
+
 void options_from_lua( lua_State *L, int idx, git_diff_options *opts )
 {
    lua_isboolean( L, idx );
@@ -182,7 +188,7 @@ static int diff_hunk_callback( const git_diff_delta *delta,
    if( ! f->use_hunks )
       return 1;
 
-   lua_pushvalue( f->L, 3 );
+   lua_pushvalue( f->L, f->use_hunks );
    diff_delta_to_table( f->L, delta );
 
    lua_pushinteger( f->L, hunk->old_start );
@@ -208,21 +214,38 @@ static int diff_line_callback( const git_diff_delta *delta,
    struct foreach_f *f = payload;
 
    if( ! f->use_lines )
+   {
       return 1;
+   }
 
-   lua_pushvalue( f->L, 4 );
+   lua_pushvalue( f->L, f->use_lines );
    diff_delta_to_table( f->L, delta );
 
-   lua_pushstring( f->L, hunk->header );
+   if( hunk && hunk->header && *hunk->header )
+   {
+      lua_pushstring( f->L, hunk->header );
+   }
+   else
+   {
+      lua_pushnil( f->L );
+   }
+
    lua_pushfstring( f->L, "%c", line->origin ); 
    lua_pushinteger( f->L, line->old_lineno );
    lua_pushinteger( f->L, line->new_lineno );
    lua_pushinteger( f->L, line->num_lines );
    
-   char content [ line->content_len + 1 ];
-   memcpy( content, line->content, line->content_len );
-   content[ line->content_len ] = 0;
-   lua_pushstring( f->L, content ); 
+   if( line->content && *line->content )
+   {
+      char content [ line->content_len + 1 ];
+      memcpy( content, line->content, line->content_len );
+      content[ line->content_len ] = 0;
+      lua_pushstring( f->L, content ); 
+   }
+   else
+   {
+      lua_pushnil( f->L );
+   }
 
    if( lua_pcall( f->L, 7, 1, 0 ) )
    {
@@ -242,8 +265,18 @@ int lgit_diff_foreach( lua_State *L )
    struct foreach_f *f = malloc( sizeof( struct foreach_f) );
    f->L = L;
 
-   f->use_hunks = lua_type( L, 3) == LUA_TFUNCTION ;
-   f->use_lines = lua_type( L, 4) == LUA_TFUNCTION ;
+   if( lua_type( L, 3) == LUA_TFUNCTION )
+   {
+      f->use_hunks = 3;
+   } else {
+      f->use_hunks = 0;
+   }
+   if( lua_type( L, 4) == LUA_TFUNCTION )
+   {
+      f->use_lines = 4;
+   } else {
+      f->use_lines = 0;
+   }
 
    git_diff_foreach( *diff,
                    diff_file_callback,
@@ -257,9 +290,42 @@ int lgit_diff_foreach( lua_State *L )
 }
 int lgit_diff_print( lua_State *L )
 {
-   //TODO callbacks
-   lua_pushnil( L );
-   return 1; 
+   git_diff **diff = checkdiff_at( L, 1 );
+   git_diff_format_t format = GIT_DIFF_FORMAT_PATCH;
+   const char *format_str = luaL_checkstring( L, 2 );
+
+   if( strncmp( format_str, PATCH_HEADER, sizeof( PATCH_HEADER ) ) ) 
+   {
+        format = GIT_DIFF_FORMAT_PATCH; 
+   }
+   else if( strncmp( format_str, RAW, sizeof( RAW ) ) ) 
+   {
+        format = GIT_DIFF_FORMAT_RAW; 
+   }
+   else if( strncmp( format_str, NAME_ONLY, sizeof( NAME_ONLY ) ) )
+   {
+        format = GIT_DIFF_FORMAT_NAME_ONLY;
+   }
+   else if( strncmp( format_str, NAME_STATUS, sizeof( NAME_STATUS ) ) )
+   {
+        format = GIT_DIFF_FORMAT_NAME_STATUS;
+   }
+   luaL_checktype( L, 3, LUA_TFUNCTION );
+
+   struct foreach_f *f = malloc( sizeof( struct foreach_f) );
+   f->L = L;
+   f->use_hunks=0;
+   f->use_lines=3;
+
+   if( git_diff_print( *diff, format, diff_line_callback, f ) )
+   {
+      free( f );
+      const git_error *err = giterr_last();
+      luaL_error(L, err->message );
+      return 0;
+   }
+   free( f );
+   return 0; 
 }
 
 int lgit_diff_free( lua_State *L )
