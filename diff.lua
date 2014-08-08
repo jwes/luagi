@@ -41,6 +41,8 @@ function lines ( delta, header, origin, old_linenr, new_linenr, num_lines, conte
 end
 
 diff:foreach(files, hunks, lines )
-
+print( " == print test == " )
+diff:print( "patch", lines )
+diff:find_similar()
 diff:print( "patch", lines )
 

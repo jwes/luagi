@@ -121,9 +121,23 @@ int lgit_diff_merge( lua_State *L )
 int lgit_diff_find_similar( lua_State *L )
 {
    //TODO find options
-   lua_pushnil( L );
-   return 1;
+   git_diff **diff = checkdiff_at( L, 1 );
+
+   git_diff_find_options options;
+   if( git_diff_find_init_options( &options, GIT_DIFF_FIND_OPTIONS_VERSION ) ) 
+   {
+      const git_error *err = giterr_last();
+      luaL_error( L, err->message );
+   }
+
+   if( git_diff_find_similar( *diff, &options ) )
+   {
+      const git_error *err = giterr_last();
+      luaL_error( L, err->message );
+   }
+   return 0;
 }
+
 int lgit_diff_num_deltas( lua_State *L )
 { 
    git_diff **diff = checkdiff_at( L, 1 );
