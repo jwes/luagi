@@ -20,9 +20,11 @@ if not tree2 then print( err ) return end
 local diff, err = repo:diff_tree_to_tree( tree, tree2 )
 if not diff then print( err ) return end
 
-print( diff:is_sorted() )
+--print( diff:is_sorted() )--
 print( diff:num_deltas() )
+print( diff:num_deltas( "added") )
 
+--[[
 function files ( delta, progress )
    --wh.print_table( delta, "\t" )--
    print ("p:", progress ) 
@@ -45,4 +47,4 @@ print( " == print test == " )
 diff:print( "patch", lines )
 diff:find_similar()
 diff:print( "patch", lines )
-
+]]--

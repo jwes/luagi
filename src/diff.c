@@ -1,5 +1,5 @@
-#include "diff.h"
-#include "wien.h"
+#include "diff.h" 
+#include "wien.h" 
 #include <git2/diff.h>
 #include <git2/errors.h>
 #include <stdlib.h>
@@ -27,6 +27,15 @@
 #define RAW "raw"
 #define NAME_ONLY "name_only"
 #define NAME_STATUS "name_status"
+
+#define D_ADDED "added"
+#define D_DELETED "deleted"
+#define D_MODIFIED "modified"
+#define D_RENAMED "renamed"
+#define D_COPIED "copied"
+#define D_IGNORED "ignored"
+#define D_UNTRACKED "untracked"
+#define D_TYPECHANGE "typechange"
 
 void options_from_lua( lua_State *L, int idx, git_diff_options *opts )
 {
@@ -137,13 +146,22 @@ int lgit_diff_find_similar( lua_State *L )
    }
    return 0;
 }
+static git_delta_t delta_t_from_string( const char *type );
 
 int lgit_diff_num_deltas( lua_State *L )
 { 
    git_diff **diff = checkdiff_at( L, 1 );
-   //TODO: type parameter
-   lua_pushinteger( L, git_diff_num_deltas( *diff ) );
-   return 1; 
+
+   if( ! lua_isstring( L, 2 ) )
+   {
+      lua_pushinteger( L, git_diff_num_deltas( *diff ) );
+      return 1; 
+   }
+   // there is a type parameter, use it
+   const char *type = lua_tostring( L, 2 );
+   git_delta_t t =  delta_t_from_string( type );
+   lua_pushinteger( L, git_diff_num_deltas_of_type( *diff, t ) );
+   return 1;
 } // includes num deltas of type
 
 int lgit_diff_get_delta( lua_State *L )
@@ -415,3 +433,40 @@ void diff_delta_to_table( lua_State *L, const git_diff_delta *delta )
 
 }
 
+static git_delta_t delta_t_from_string( const char *type )
+{
+   git_delta_t t = GIT_DELTA_UNMODIFIED;
+   if( strncmp( type, D_ADDED, strlen( D_ADDED ) ) )
+   {
+      t = GIT_DELTA_ADDED;
+   }
+   else if( strncmp( type, D_DELETED, strlen( D_DELETED ) ) )
+   {
+      t = GIT_DELTA_DELETED;
+   }
+   else if( strncmp( type, D_MODIFIED, strlen( D_MODIFIED ) ) )
+   {
+      t = GIT_DELTA_MODIFIED;
+   }
+   else if( strncmp( type, D_RENAMED, strlen( D_RENAMED ) ) )
+   {
+      t = GIT_DELTA_RENAMED;
+   }
+   else if( strncmp( type, D_COPIED, strlen( D_COPIED ) ) )
+   {
+      t = GIT_DELTA_COPIED;
+   }
+   else if( strncmp( type, D_IGNORED, strlen( D_IGNORED ) ) )
+   {
+      t = GIT_DELTA_IGNORED;
+   }
+   else if( strncmp( type, D_UNTRACKED, strlen( D_UNTRACKED ) ) )
+   {
+      t = GIT_DELTA_UNTRACKED;
+   }
+   else if( strncmp( type, D_TYPECHANGE, strlen( D_TYPECHANGE ) ) )
+   {
+      t = GIT_DELTA_TYPECHANGE;
+   }
+   return t;
+}
