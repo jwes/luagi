@@ -123,8 +123,26 @@ int lgit_index_write_tree( lua_State *L )
    return 1;
 }
 
-int lgit_index_entrycount( lua_State *L ){ lua_pushnil( L ); return 1; }
-int lgit_index_clear( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_entrycount( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+
+   lua_pushinteger( L, git_index_entrycount( *index ) );
+   return 1;
+}
+
+int lgit_index_clear( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+
+   if( git_index_clear( *index ) )
+   {
+      const git_error *err = giterr_last();
+      luaL_error( L, err->message );
+   }
+   return 0;
+}
+
 int lgit_index_get_byindex( lua_State *L ){ lua_pushnil( L ); return 1; }
 int lgit_index_get_bypath( lua_State *L ){ lua_pushnil( L ); return 1; }
 int lgit_index_remove( lua_State *L ){ lua_pushnil( L ); return 1; }
