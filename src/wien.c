@@ -92,9 +92,8 @@ static const struct luaL_Reg mylib [] = {
    { "is_valid_remote_name", lgit_remote_is_valid_name   },
    { "is_valid_remote_url", lgit_remote_valid_url },
    { "is_supported_remote_url", lgit_remote_supported_url },
-   //index
-   { "new_index", lgit_index_new },
-   { "open_index", lgit_index_open },
+   //index if path is given, it does open
+   { "create_index", lgit_index_new },
    { NULL, NULL } /*sentinel*/
 };
 

@@ -3,8 +3,8 @@
 
 #include <lua.h>
 #include <lauxlib.h>
+#include <git2/index.h>
 
-int lgit_index_open( lua_State *L );
 int lgit_index_new( lua_State *L );
 int lgit_index_free( lua_State *L );
 int lgit_index_owner( lua_State *L );
@@ -37,6 +37,9 @@ int lgit_index_conflict_cleanup( lua_State *L );
 int lgit_index_has_conflicts( lua_State *L );
 // TODO conflict iterator
 #define LGIT_INDEX_FUNCS "is.westhu.lgit.index"
+
+#define checkindex_at(L, N) \
+      (git_index**) luaL_checkudata( L, N, LGIT_INDEX_FUNCS )
 
 static const struct luaL_Reg lgit_index_funcs [] = {
    { "owner",   lgit_index_owner },
