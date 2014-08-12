@@ -50,7 +50,6 @@ static const struct luaL_Reg lgit_index_funcs [] = {
    { "path",   lgit_index_path },
    { "read_tree",   lgit_index_read_tree },
    { "write_tree",   lgit_index_write_tree },
-   { "write_tree_to",   lgit_index_write_tree_to }, //TODO maybe include in write tree
    { "__len",   lgit_index_entrycount },
    { "by_index",   lgit_index_get_byindex }, //TODO __inedx?
    { "clear",   lgit_index_clear },
