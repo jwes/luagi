@@ -14,6 +14,7 @@
 #include "transport.h"
 #include "status.h"
 #include "diff.h"
+#include "index.h"
 
 static int lgit_open( lua_State *L )
 {
@@ -91,6 +92,9 @@ static const struct luaL_Reg mylib [] = {
    { "is_valid_remote_name", lgit_remote_is_valid_name   },
    { "is_valid_remote_url", lgit_remote_valid_url },
    { "is_supported_remote_url", lgit_remote_supported_url },
+   //index
+   { "new_index", lgit_index_new },
+   { "open_index", lgit_index_open },
    { NULL, NULL } /*sentinel*/
 };
 
@@ -117,6 +121,7 @@ int luaopen_wien(lua_State *L)
    setup_funcs(L, LGIT_REMOTE_FUNCS, lgit_remote_funcs);
    setup_funcs(L, LGIT_STATUS_FUNCS, lgit_status_funcs );
    setup_funcs(L, LGIT_DIFF_FUNCS, lgit_diff_funcs );
+   setup_funcs(L, LGIT_INDEX_FUNCS, lgit_index_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

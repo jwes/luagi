@@ -1,0 +1,33 @@
+#include "index.h"
+
+int lgit_index_open( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_new( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_free( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_owner( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_caps( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_set_caps( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_read( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_write( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_path( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_read_tree( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_write_tree( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_write_tree_to( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_entrycount( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_clear( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_get_byindex( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_get_bypath( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_remove( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_remove_directory( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_add( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_entry_stage( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_add_bypath( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_remove_bypath( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_add_all( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_remove_all( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_update_all( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_find( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_conflict_add( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_conflict_get( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_conflict_remove( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_conflict_cleanup( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_has_conflicts( lua_State *L ){ lua_pushnil( L ); return 1; }
