@@ -1,5 +1,6 @@
 #include "diff.h" 
 #include "wien.h" 
+#include "index.h"
 #include <git2/diff.h>
 #include <git2/errors.h>
 #include <stdlib.h>
@@ -70,18 +71,52 @@ int lgit_diff_tree_to_tree( lua_State *L )
 
 int lgit_diff_tree_to_index( lua_State *L )
 {
-//TODO index
-   lua_pushnil( L );
+   git_repository **repo = checkrepo( L, 1 );
+   git_tree **tree = checktree_at( L, 2 );
+   git_index **index = checkindex_at( L, 3 );
+
+   git_diff_options opts;
+   options_from_lua( L, 4, &opts );
+
+   git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
+
+   if( git_diff_tree_to_index( diff, *repo, *tree, *index, &opts ) )
+   {
+      const git_error *err = giterr_last();
+      lua_pushnil( L );
+      lua_pushstring( L, err->message );
+      return 2;
+   }
+
+   luaL_getmetatable(L, LGIT_DIFF_FUNCS);
+   lua_setmetatable(L, -2);
    return 1; 
 }
 
 int lgit_diff_index_to_workdir( lua_State *L )
 {
-//TODO index
-   lua_pushnil( L );
+   git_repository **repo = checkrepo( L, 1 );
+   git_index **index = checkindex_at( L, 2 );
+
+   git_diff_options opts;
+   options_from_lua( L, 3, &opts );
+   
+   git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
+
+   if( git_diff_index_to_workdir( diff, *repo, *index, &opts ) )
+   {
+      const git_error *err = giterr_last();
+      lua_pushnil( L );
+      lua_pushstring( L, err->message );
+      return 2;
+   }
+
+   luaL_getmetatable(L, LGIT_DIFF_FUNCS);
+   lua_setmetatable(L, -2);
+
    return 1; 
 }
-int lgit_diff_tree_to_workdir( lua_State *L )
+static int tree_to_workdir( lua_State *L, int (*func)(git_diff **diff, git_repository *repo, git_tree *old_tree, const git_diff_options *opts ) )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_tree **tree = checktree_at( L, 2 );
@@ -91,7 +126,7 @@ int lgit_diff_tree_to_workdir( lua_State *L )
    
    git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
 
-   if( git_diff_tree_to_workdir( diff, *repo, *tree, &opts ) )
+   if( func( diff, *repo, *tree, &opts ) )
    {
       const git_error *err = giterr_last();
       lua_pushnil( L );
@@ -107,11 +142,13 @@ int lgit_diff_tree_to_workdir( lua_State *L )
    lua_pushnil( L );
    return 1; 
 }
+int lgit_diff_tree_to_workdir( lua_State *L )
+{
+   return tree_to_workdir( L, git_diff_tree_to_workdir );
+}
 int lgit_diff_tree_to_workdir_with_index( lua_State *L )
 {
-//TODO index
-   lua_pushnil( L );
-   return 1; 
+   return tree_to_workdir( L, git_diff_tree_to_workdir_with_index );
 }
 
 // diff functions
