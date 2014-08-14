@@ -37,9 +37,12 @@ int lgit_index_conflict_cleanup( lua_State *L );
 int lgit_index_has_conflicts( lua_State *L );
 // TODO conflict iterator
 #define LGIT_INDEX_FUNCS "is.westhu.lgit.index"
+#define LGIT_INDEX_ENTRY_FUNCS "is.westhu.lgit.index.entry"
 
 #define checkindex_at(L, N) \
       (git_index**) luaL_checkudata( L, N, LGIT_INDEX_FUNCS )
+#define checkindexentry_at(L, N) \
+      (const git_index_entry*) luaL_checkudata( L, N, LGIT_INDEX_ENTRY_FUNCS )
 
 static const struct luaL_Reg lgit_index_funcs [] = {
    { "owner",   lgit_index_owner },
@@ -70,6 +73,11 @@ static const struct luaL_Reg lgit_index_funcs [] = {
    { "conflice_cleanup",   lgit_index_conflict_cleanup },
    { "has_conflicts",   lgit_index_has_conflicts },
    { "__gc",   lgit_index_free },
+   { NULL, NULL }
+};
+
+static const struct luaL_Reg lgit_index_entry_funcs [] = {
+   { "stage", lgit_index_entry_stage },
    { NULL, NULL }
 };
 #endif

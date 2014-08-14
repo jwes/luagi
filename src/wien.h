@@ -3,6 +3,7 @@
 #include <git2/types.h>
 #include <git2/oid.h>
 #include <git2/strarray.h>
+#include <git2/errors.h>
 
 #define REPO_NAME "is.westhu.lgit.repo"
 #define LGIT_TREE_FUNCS "is.westh.lgit.tree"
@@ -16,6 +17,16 @@
 #define SIG_EMAIL "email"
 #define SIG_TIME "time"
 #define SIG_TIME_OFF "time_offset"
+
+#define ERROR_ABORT( L ) \
+   const git_error *err = giterr_last(); \
+   luaL_error( L, err->message ); 
+
+#define ERROR_PUSH( L ) \
+   const git_error *err = giterr_last(); \
+   lua_pushnil( L ); \
+   lua_pushstring( L, err->message ); \
+   return 2;
 
 #define checkrepo(L, n) \
       (git_repository**) luaL_checkudata( L, n, REPO_NAME )
