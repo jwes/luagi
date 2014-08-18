@@ -11,20 +11,14 @@ int lgit_index_new( lua_State *L )
    {
       if( git_index_new( index ) )
       {
-         const git_error *err = giterr_last();
-         lua_pushnil( L );
-         lua_pushstring( L, err->message );
-         return 2;
+         ERROR_PUSH( L )
       }
    }
    else 
    {
       if( git_index_open( index, path ) )
       {
-         const git_error *err = giterr_last();
-         lua_pushnil( L );
-         lua_pushstring( L, err->message );
-         return 2;
+         ERROR_PUSH( L )
       }
    }
 
@@ -56,8 +50,7 @@ int lgit_index_read( lua_State *L )
 
    if( git_index_read( *index, force ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ERROR_ABORT( L )
    }
    return 0;
 }
@@ -68,8 +61,7 @@ int lgit_index_write( lua_State *L )
 
    if( git_index_write( *index ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ERROR_ABORT( L )
    }
    return 0;
 }
@@ -88,8 +80,7 @@ int lgit_index_read_tree( lua_State *L )
 
    if( git_index_read_tree( *index, *tree ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ERROR_ABORT( L )
    }
    return 0;
 }
@@ -113,10 +104,7 @@ int lgit_index_write_tree( lua_State *L )
    {
       if( git_index_write_tree( &out, *index ) )
       {
-         const git_error *err = giterr_last();
-         lua_pushnil( L );
-         lua_pushstring( L, err->message );
-         return 2;
+         ERROR_PUSH( L )
       }
    }
    char buf [ GIT_OID_HEXSZ + 1 ];
@@ -249,9 +237,87 @@ int lgit_index_remove_bypath( lua_State *L )
    return lgit_index_do_bypath( L, git_index_remove_bypath );
 }
 
-int lgit_index_add_all( lua_State *L ){ lua_pushnil( L ); return 1; }
-int lgit_index_remove_all( lua_State *L ){ lua_pushnil( L ); return 1; }
-int lgit_index_update_all( lua_State *L ){ lua_pushnil( L ); return 1; }
+struct pathspec_payload
+{
+   lua_State *L;
+   int function_pos;
+};
+
+static int index_matched_pathspec( const char *path, const char *matched_pathspec, void *payload )
+{
+   struct pathspec_payload *p = payload;
+   lua_pushvalue( p->L, p->function_pos );
+   lua_pushstring( p->L, path );
+   lua_pushstring( p->L, matched_pathspec );
+
+   if( lua_pcall( p->L, 2, 1, 0 ) != LUA_OK )
+   {
+      dumpStack( p->L );
+      luaL_error( p->L, "can not call path callback" );
+   }
+
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+int lgit_index_add_all( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+
+   struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
+   p->L = L;
+   p->function_pos = 3;
+   
+   //TODO flags
+   int flags = 0;
+
+   if( git_index_add_all( *index, &array, flags, index_matched_pathspec, p ) )
+   {
+      ERROR_ABORT( L );
+   }
+   git_strarray_free( &array );
+   free( p );
+   return 0;
+}
+
+
+int lgit_index_remove_all( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+
+   struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
+   p->L = L;
+   p->function_pos = 3;
+   
+   if( git_index_remove_all( *index, &array, index_matched_pathspec, p ) )
+   {
+      ERROR_ABORT( L );
+   }
+   git_strarray_free( &array );
+   free( p );
+   return 0;
+} 
+
+int lgit_index_update_all( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+
+   struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
+   p->L = L;
+   p->function_pos = 3;
+   
+   if( git_index_update_all( *index, &array, index_matched_pathspec, p ) )
+   {
+      ERROR_ABORT( L );
+   }
+   git_strarray_free( &array );
+   free( p );
+   return 0;
+}
 
 int lgit_index_find( lua_State *L )
 {
@@ -271,8 +337,7 @@ int lgit_index_conflict_add( lua_State *L )
 
    if( git_index_conflict_add( *index, ancestor_entry, our_entry, their_entry ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ERROR_ABORT( L )
    }
    return 0;
 }
