@@ -3,6 +3,10 @@
 #include <git2/errors.h>
 #include "wien.h"
 
+#define FORCE "force"
+#define DISABLE_PATHSPEC_MATCH "disable_pathspec_match"
+#define CHECK_PATHSPEC "check_pathspec"
+
 int lgit_index_new( lua_State *L )
 {
    const char *path = luaL_optstring( L, 1, NULL );
@@ -94,10 +98,7 @@ int lgit_index_write_tree( lua_State *L )
       git_repository **repo = checkrepo( L, 2 );
       if( git_index_write_tree_to( &out, *index, *repo ) )
       {
-         const git_error *err = giterr_last();
-         lua_pushnil( L );
-         lua_pushstring( L, err->message );
-         return 2;
+         ERROR_PUSH( L )
       }
    }
    else
@@ -268,10 +269,25 @@ int lgit_index_add_all( lua_State *L )
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
-   p->function_pos = 3;
-   
-   //TODO flags
-   int flags = 0;
+   p->function_pos = 4;
+  
+   int flags = GIT_INDEX_ADD_DEFAULT;
+   lua_getfield( L, 3, FORCE );
+   if( lua_toboolean( L, -1 ) )
+   {
+      flags |= GIT_INDEX_ADD_FORCE;
+   }
+   lua_getfield( L, 3, DISABLE_PATHSPEC_MATCH );
+   if( lua_toboolean( L, -1 ) )
+   {
+      flags |= GIT_INDEX_ADD_DISABLE_PATHSPEC_MATCH;
+   }
+   lua_getfield( L, 3, CHECK_PATHSPEC );
+   if( lua_toboolean( L, -1 ) )
+   {
+      flags |= GIT_INDEX_ADD_CHECK_PATHSPEC;
+   }
+   lua_pop( L, 3 );
 
    if( git_index_add_all( *index, &array, flags, index_matched_pathspec, p ) )
    {
@@ -359,9 +375,9 @@ int lgit_index_conflict_get( lua_State *L )
    }
 
    luaL_getmetatable(L, LGIT_INDEX_ENTRY_FUNCS);
+   lua_setmetatable(L, -1);
    lua_setmetatable(L, -2);
    lua_setmetatable(L, -3);
-   lua_setmetatable(L, -4);
    return 3;
 }
 
@@ -387,4 +403,54 @@ int lgit_index_has_conflicts( lua_State *L )
 
    lua_pushboolean( L, git_index_has_conflicts( *index ) );
    return 1;
+}
+
+int lgit_index_conflict_free( lua_State *L )
+{
+   git_index_conflict_iterator **iter = checkindexconflict_at( L, 1 );
+   git_index_conflict_iterator_free( *iter );
+   return 0;
+}
+
+static int conflict_iter( lua_State *L )
+{
+   git_index_conflict_iterator **iter = checkindexconflict_at( L, lua_upvalueindex( 1 ) );   
+
+    const git_index_entry *ancestor_out = lua_newuserdata( L, sizeof( git_index_entry ) );
+   const git_index_entry *our_out = lua_newuserdata( L, sizeof( git_index_entry ) );
+   const git_index_entry *their_out = lua_newuserdata( L, sizeof( git_index_entry ) );
+   int ret = git_index_conflict_next( &ancestor_out, &our_out, &their_out, *iter );
+   if( ret < 0 )
+   {
+      ERROR_ABORT( L )
+      return 0;
+   }
+   else if ( ret == 0 )
+   {
+      return 0;
+   }
+
+   luaL_getmetatable(L, LGIT_INDEX_ENTRY_FUNCS);
+   lua_setmetatable(L, -1);
+   lua_setmetatable(L, -2);
+   lua_setmetatable(L, -3);
+   return 3;
+
+}
+
+int lgit_index_conflict_iterator( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+   
+   git_index_conflict_iterator **out = lua_newuserdata( L, sizeof( git_index_conflict_iterator *) );
+   if( git_index_conflict_iterator_new( out, *index ) )
+   {
+      ERROR_ABORT( L )
+   }
+
+   luaL_getmetatable(L, LGIT_INDEX_CONFLICT_FUNCS);
+   lua_setmetatable(L, -2);
+
+   lua_pushcclosure( L, conflict_iter, -2 );
+   return 1; 
 }

@@ -122,6 +122,7 @@ int luaopen_wien(lua_State *L)
    setup_funcs(L, LGIT_DIFF_FUNCS, lgit_diff_funcs );
    setup_funcs(L, LGIT_INDEX_FUNCS, lgit_index_funcs );
    setup_funcs(L, LGIT_INDEX_ENTRY_FUNCS, lgit_index_entry_funcs );
+   setup_funcs(L, LGIT_INDEX_CONFLICT_FUNCS, lgit_index_conflict_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
