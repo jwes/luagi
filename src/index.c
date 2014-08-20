@@ -7,6 +7,11 @@
 #define DISABLE_PATHSPEC_MATCH "disable_pathspec_match"
 #define CHECK_PATHSPEC "check_pathspec"
 
+#define IGNORE_CASE "ignore_case"
+#define NO_FILEMODE "no_filemode"
+#define NO_SYMLINKS "no_symlinks"
+#define FROM_OWNER "from_owner"
+
 int lgit_index_new( lua_State *L )
 {
    const char *path = luaL_optstring( L, 1, NULL );
@@ -38,9 +43,84 @@ int lgit_index_free( lua_State *L )
    return 0;
 }
 
-int lgit_index_owner( lua_State *L ){ lua_pushnil( L ); return 1; }
-int lgit_index_caps( lua_State *L ){ lua_pushnil( L ); return 1; }
-int lgit_index_set_caps( lua_State *L ){ lua_pushnil( L ); return 1; }
+int lgit_index_owner( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+   git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
+   *repo = git_index_owner( *index );
+   if( *repo == NULL )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable(L, REPO_NAME );
+   lua_setmetatable(L, -2);
+   return 1;
+}
+
+int lgit_index_caps( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+   int caps = git_index_caps( *index );
+
+   lua_newtable(L);
+   lua_pushboolean( L, caps & GIT_INDEXCAP_IGNORE_CASE );
+   lua_setfield( L, -2, IGNORE_CASE );
+
+   lua_pushboolean( L, caps & GIT_INDEXCAP_NO_FILEMODE );
+   lua_setfield( L, -2, NO_FILEMODE );
+
+   lua_pushboolean( L, caps & GIT_INDEXCAP_NO_SYMLINKS );
+   lua_setfield( L, -2, NO_SYMLINKS );
+
+   lua_pushboolean( L, caps & GIT_INDEXCAP_FROM_OWNER );
+   lua_setfield( L, -2, FROM_OWNER );
+   return 1;
+}
+
+int lgit_index_set_caps( lua_State *L )
+{
+   git_index **index = checkindex_at( L, 1 );
+
+   if( ! lua_istable( L, 2 ) )
+   {
+      ERROR_ABORT( L )
+      return 0;
+   }
+   int caps = 0;
+   lua_getfield( L, 2, IGNORE_CASE );
+   if( lua_toboolean( L, -1 ) )
+   {
+      caps |= GIT_INDEXCAP_IGNORE_CASE;
+   }
+   lua_pop( L, 1 );
+
+   lua_getfield( L, 2, NO_FILEMODE );
+   if( lua_toboolean( L, -1 ) )
+   {
+      caps |= GIT_INDEXCAP_NO_FILEMODE;
+   }
+   lua_pop( L, 1 );
+
+   lua_getfield( L, 2, NO_SYMLINKS );
+   if( lua_toboolean( L, -1 ) )
+   {
+      caps |= GIT_INDEXCAP_NO_SYMLINKS;
+   }
+   lua_pop( L, 1 );
+
+   lua_getfield( L, 2, FROM_OWNER );
+   if( lua_toboolean( L, -1 ) )
+   {
+      caps |= GIT_INDEXCAP_FROM_OWNER;
+   }
+   lua_pop( L, 1 );
+
+   if( git_index_set_caps( *index, caps ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
 
 int lgit_index_read( lua_State *L )
 {
