@@ -76,7 +76,7 @@ static const struct luaL_Reg lgit_index_funcs [] = {
    { "conflict_add",   lgit_index_conflict_add },
    { "conflict_get",   lgit_index_conflict_get },
    { "conflict_remove",   lgit_index_conflict_remove },
-   { "conflice_cleanup",   lgit_index_conflict_cleanup },
+   { "conflict_cleanup",   lgit_index_conflict_cleanup },
    { "has_conflicts",   lgit_index_has_conflicts },
    { "iterate_conflict", lgit_index_conflict_iterator },
    { "__gc",   lgit_index_free },
