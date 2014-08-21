@@ -39,7 +39,6 @@ int lgit_index_conflict_iterator( lua_State *L );
 int lgit_index_conflict_free( lua_State *L );
 int lgit_repository_index( lua_State *L );
 
-// TODO conflict iterator
 #define LGIT_INDEX_FUNCS "is.westhu.lgit.index"
 #define LGIT_INDEX_ENTRY_FUNCS "is.westhu.lgit.index.entry"
 #define LGIT_INDEX_CONFLICT_FUNCS "is.westhu.lgit.index.conflict"
