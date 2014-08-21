@@ -9,7 +9,6 @@ int luagi_object_lookup_bypath( lua_State *L );
 
 //use
 int luagi_object_id( lua_State *L );
-int luagi_object_short_id( lua_State *L );
 int luagi_object_type( lua_State *L );
 int luagi_object_owner( lua_State *L );
 int luagi_object_free( lua_State *L );
@@ -28,7 +27,6 @@ int luagi_object_peel( lua_State *L );
 
 static const struct luaL_Reg lgit_index_funcs [] = {
    { "id",   luagi_object_id },
-   { "short_id",   luagi_object_short_id },
    { "type",   luagi_object_type },
    { "owner",   luagi_object_owner },
    { "__gc",   luagi_object_free },
