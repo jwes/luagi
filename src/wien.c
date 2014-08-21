@@ -44,7 +44,6 @@ static int lgit_gc( lua_State *L )
    return 0;
 }
 
-
 static const struct luaL_Reg repofuncs [] = {
    { "branch", lgit_create_branch },
    { "branches", lgit_branches }, 
@@ -78,6 +77,8 @@ static const struct luaL_Reg repofuncs [] = {
    { "diff_index_to_workdir", lgit_diff_index_to_workdir },
    { "diff_tree_to_workdir",lgit_diff_tree_to_workdir },
    { "diff_tree_to_workdir_with_index", lgit_diff_tree_to_workdir_with_index },
+
+   { "index", lgit_repository_index },
 
    { NULL, NULL },
 };

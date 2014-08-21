@@ -1,6 +1,7 @@
 #include "index.h"
 #include <string.h>
 #include <git2/errors.h>
+#include <git2/repository.h>
 #include "wien.h"
 
 #define FORCE "force"
@@ -534,3 +535,20 @@ int lgit_index_conflict_iterator( lua_State *L )
    lua_pushcclosure( L, conflict_iter, -2 );
    return 1; 
 }
+
+int lgit_repository_index( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_index ** index = lua_newuserdata( L, sizeof( git_index *) );
+
+   if( git_repository_index( index, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable(L, LGIT_INDEX_FUNCS);
+   lua_setmetatable(L, -2);
+
+   return 1;
+}
+
