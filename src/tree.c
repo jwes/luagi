@@ -7,6 +7,7 @@
 
 #include "tree.h"
 #include "wien.h"
+#include "object.h"
 
 #include <stdio.h>
 
@@ -228,8 +229,17 @@ int lgit_tree_entry_cmp( lua_State *L )
 
 int lgit_tree_entry_to_object( lua_State *L )
 {
-   //TODO
-   lua_pushnil( L );
+   git_repository **repo = checkrepo( L, 1 );
+   git_tree_entry **entry = checktreeentry( L, 2 );
+
+   git_object **out = lua_newuserdata( L, sizeof( git_object *) );
+   if( git_tree_entry_to_object( out, *repo, *entry ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable( L, LGIT_OBJECT_FUNCS );
+   lua_setmetatable( L, -2 );
    return 1;
 }
 

@@ -32,7 +32,7 @@ int lgit_tree_entry_filemode_raw( lua_State *L );
 int lgit_tree_entry_to_object( lua_State *L );
 
 int lgit_tree_entry_cmp( lua_State *L );
-// TODO to_object
+
 #define LGIT_TREE_PRE "pre"
 #define LGIT_TREE_POST "post"
 
@@ -55,7 +55,6 @@ static const struct luaL_Reg lgit_tree_entry_funcs [] = {
    { "filemode", lgit_tree_entry_filemode },
    { "compare", lgit_tree_entry_cmp },
    { "id", lgit_tree_entry_id },
-   { "to_object", lgit_tree_entry_to_object },
    { "__gc", lgit_tree_entry_gc },
    { NULL, NULL }
 };

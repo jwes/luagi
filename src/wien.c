@@ -79,6 +79,8 @@ static const struct luaL_Reg repofuncs [] = {
    { "diff_tree_to_workdir_with_index", lgit_diff_tree_to_workdir_with_index },
 
    { "index", lgit_repository_index },
+   //treeentry
+   { "treeentry_to_object", lgit_tree_entry_to_object },
 
    { NULL, NULL },
 };
