@@ -20,7 +20,7 @@ static void parse_options( git_clone_options* options, lua_State *L, const int t
    if( lua_istable( L, -1 ) )
    {
       git_checkout_options opts;
-      lgit_parse_checkout_options( &opts, L, -1 );
+      luagi_parse_checkout_options( &opts, L, -1 );
       options->checkout_opts = opts;
    }
    else

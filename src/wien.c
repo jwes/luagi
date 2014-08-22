@@ -15,6 +15,8 @@
 #include "status.h"
 #include "diff.h"
 #include "index.h"
+#include "object.h"
+#include "checkout.h"
 
 static int lgit_open( lua_State *L )
 {
@@ -81,6 +83,10 @@ static const struct luaL_Reg repofuncs [] = {
    { "index", lgit_repository_index },
    //treeentry
    { "treeentry_to_object", lgit_tree_entry_to_object },
+   //checkout
+   { "checkout_head", luagi_checkout_head },
+   { "checkout_index", luagi_checkout_index },
+   { "checkout_tree", luagi_checkout_tree },
 
    { NULL, NULL },
 };
@@ -126,6 +132,7 @@ int luaopen_wien(lua_State *L)
    setup_funcs(L, LGIT_INDEX_FUNCS, lgit_index_funcs );
    setup_funcs(L, LGIT_INDEX_ENTRY_FUNCS, lgit_index_entry_funcs );
    setup_funcs(L, LGIT_INDEX_CONFLICT_FUNCS, lgit_index_conflict_funcs );
+   setup_funcs(L, LGIT_OBJECT_FUNCS, lgit_object_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

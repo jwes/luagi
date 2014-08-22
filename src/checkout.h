@@ -6,11 +6,11 @@
 
 #define LGIT_CHECKOUT_OPTS_VERSION "version"
 
-int lgit_parse_checkout_options( git_checkout_options *options, lua_State *L, const int tableIndex )
-{
-   lua_getfield( L, tableIndex, LGIT_CHECKOUT_OPTS_VERSION );
-   int version = luaL_optinteger( L, -1, GIT_CHECKOUT_OPTIONS_VERSION );
-   git_checkout_init_options( options, version );
-   return 0;
-}
+int luagi_parse_checkout_options( git_checkout_options *options, lua_State *L, const int tableIndex );
+
+
+int luagi_checkout_head( lua_State *L );
+int luagi_checkout_index( lua_State *L );
+int luagi_checkout_tree( lua_State *L );
+
 #endif

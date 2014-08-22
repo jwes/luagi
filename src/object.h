@@ -25,7 +25,7 @@ int luagi_object_peel( lua_State *L );
 #define checkobject_at(L, N) \
       (git_object**) luaL_checkudata( L, N, LGIT_OBJECT_FUNCS )
 
-static const struct luaL_Reg lgit_index_funcs [] = {
+static const struct luaL_Reg lgit_object_funcs [] = {
    { "id",   luagi_object_id },
    { "type",   luagi_object_type },
    { "owner",   luagi_object_owner },

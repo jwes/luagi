@@ -10,7 +10,8 @@ FILES := src/wien.c \
 		src/status.c \
 		src/diff.c \
 		src/index.c \
-		src/object.c
+		src/object.c \
+		src/checkout.c
 
 wien.so: $(FILES)
 	gcc --shared -fPIC -o wien.so \
