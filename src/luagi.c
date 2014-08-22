@@ -4,7 +4,7 @@
 #include <git2/signature.h>   
 
 #include <string.h>
-#include "wien.h"
+#include "luagi.h"
 #include "common.h"
 #include "branch.h"
 #include "tree.h"
@@ -18,7 +18,7 @@
 #include "object.h"
 #include "checkout.h"
 
-static int lgit_open( lua_State *L )
+static int luagi_open( lua_State *L )
 {
    git_repository **repo;
 
@@ -39,7 +39,7 @@ static int lgit_open( lua_State *L )
    return 1;
 }
 
-static int lgit_gc( lua_State *L )
+static int luagi_gc( lua_State *L )
 {
    git_repository **repo = checkrepo(L, 1);
    git_repository_free( *repo );
@@ -47,42 +47,42 @@ static int lgit_gc( lua_State *L )
 }
 
 static const struct luaL_Reg repofuncs [] = {
-   { "branch", lgit_create_branch },
-   { "branches", lgit_branches }, 
-   { "lookup_branch", lgit_branch_lookup }, 
-   { "lookup_commit", lgit_commit_lookup },
-   { "lookup_tree", lgit_tree_lookup }, 
-   { "commit", lgit_commit_create }, 
-   { "clone_into", lgit_clone_into },
-   { "__gc", lgit_gc },
+   { "branch", luagi_create_branch },
+   { "branches", luagi_branches }, 
+   { "lookup_branch", luagi_branch_lookup }, 
+   { "lookup_commit", luagi_commit_lookup },
+   { "lookup_tree", luagi_tree_lookup }, 
+   { "commit", luagi_commit_create }, 
+   { "clone_into", luagi_clone_into },
+   { "__gc", luagi_gc },
    //remotes
-   { "remotes", lgit_remote_list },
-   { "load_remote", lgit_remote_load },
-   { "create_anon_remote", lgit_remote_create_anonymous },
-   { "create_remote_with_fetch", lgit_remote_create_with_fetchspec },
-   { "create_remote", lgit_remote_create },
+   { "remotes", luagi_remote_list },
+   { "load_remote", luagi_remote_load },
+   { "create_anon_remote", luagi_remote_create_anonymous },
+   { "create_remote_with_fetch", luagi_remote_create_with_fetchspec },
+   { "create_remote", luagi_remote_create },
    //transport
-   { "transport_from_url",     lgit_transport_new   },
-   { "create_local_transport", lgit_transport_local },
-   { "create_dummy_transport", lgit_transport_dummy },
-   { "create_smart_transport", lgit_transport_smart },
+   { "transport_from_url",     luagi_transport_new   },
+   { "create_local_transport", luagi_transport_local },
+   { "create_dummy_transport", luagi_transport_dummy },
+   { "create_smart_transport", luagi_transport_smart },
    //status
-   { "status_for_each", lgit_status_foreach },
-   { "status_for_each_ext", lgit_status_foreach_ext },
-   { "status_file", lgit_status_file },
-   { "status_list", lgit_status_list_new },
-   { "status_ignored", lgit_status_should_ignore },
+   { "status_for_each", luagi_status_foreach },
+   { "status_for_each_ext", luagi_status_foreach_ext },
+   { "status_file", luagi_status_file },
+   { "status_list", luagi_status_list_new },
+   { "status_ignored", luagi_status_should_ignore },
    //diff
 
-   { "diff_tree_to_index", lgit_diff_tree_to_index },
-   { "diff_tree_to_tree", lgit_diff_tree_to_tree },
-   { "diff_index_to_workdir", lgit_diff_index_to_workdir },
-   { "diff_tree_to_workdir",lgit_diff_tree_to_workdir },
-   { "diff_tree_to_workdir_with_index", lgit_diff_tree_to_workdir_with_index },
+   { "diff_tree_to_index", luagi_diff_tree_to_index },
+   { "diff_tree_to_tree", luagi_diff_tree_to_tree },
+   { "diff_index_to_workdir", luagi_diff_index_to_workdir },
+   { "diff_tree_to_workdir",luagi_diff_tree_to_workdir },
+   { "diff_tree_to_workdir_with_index", luagi_diff_tree_to_workdir_with_index },
 
-   { "index", lgit_repository_index },
+   { "index", luagi_repository_index },
    //treeentry
-   { "treeentry_to_object", lgit_tree_entry_to_object },
+   { "treeentry_to_object", luagi_tree_entry_to_object },
    //checkout
    { "checkout_head", luagi_checkout_head },
    { "checkout_index", luagi_checkout_index },
@@ -92,17 +92,17 @@ static const struct luaL_Reg repofuncs [] = {
 };
 
 static const struct luaL_Reg mylib [] = {
-   { "version", lgit_version },
-   { "features", lgit_features },
-   { "open", lgit_open },
-   { "tree_builder", lgit_tree_builder_create },
-   { "clone", lgit_clone },
+   { "version", luagi_version },
+   { "features", luagi_features },
+   { "open", luagi_open },
+   { "tree_builder", luagi_tree_builder_create },
+   { "clone", luagi_clone },
    // remote
-   { "is_valid_remote_name", lgit_remote_is_valid_name   },
-   { "is_valid_remote_url", lgit_remote_valid_url },
-   { "is_supported_remote_url", lgit_remote_supported_url },
+   { "is_valid_remote_name", luagi_remote_is_valid_name   },
+   { "is_valid_remote_url", luagi_remote_valid_url },
+   { "is_supported_remote_url", luagi_remote_supported_url },
    //index if path is given, it does open
-   { "create_index", lgit_index_new },
+   { "create_index", luagi_index_new },
    { NULL, NULL } /*sentinel*/
 };
 
@@ -114,25 +114,25 @@ void setup_funcs( lua_State *L, const char *meta_name, const luaL_Reg *funcs )
    luaL_setfuncs( L, funcs, 0);
 }
 
-int luaopen_wien(lua_State *L)
+int luaopen_luagi(lua_State *L)
 {
    /* metatable for the branch iterator */
-   luaL_newmetatable( L, LGIT_BRANCH_STATICS );
-   lua_pushcfunction( L, lgit_branch_iter_gc);
+   luaL_newmetatable( L, LUAGI_BRANCH_STATICS );
+   lua_pushcfunction( L, luagi_branch_iter_gc);
    lua_setfield( L, -2, "__gc" );
 
-   setup_funcs(L, LGIT_TREE_FUNCS, lgit_tree_funcs);
-   setup_funcs(L, LGIT_TREE_ENTRY_FUNCS, lgit_tree_entry_funcs);
-   setup_funcs(L, LGIT_TREE_BUILDER_FUNCS, lgit_tree_builder_funcs);
-   setup_funcs(L, LGIT_BRANCH_FUNCS, lgit_branch_funcs);
-   setup_funcs(L, LGIT_COMMIT_FUNCS, lgit_commit_funcs);
-   setup_funcs(L, LGIT_REMOTE_FUNCS, lgit_remote_funcs);
-   setup_funcs(L, LGIT_STATUS_FUNCS, lgit_status_funcs );
-   setup_funcs(L, LGIT_DIFF_FUNCS, lgit_diff_funcs );
-   setup_funcs(L, LGIT_INDEX_FUNCS, lgit_index_funcs );
-   setup_funcs(L, LGIT_INDEX_ENTRY_FUNCS, lgit_index_entry_funcs );
-   setup_funcs(L, LGIT_INDEX_CONFLICT_FUNCS, lgit_index_conflict_funcs );
-   setup_funcs(L, LGIT_OBJECT_FUNCS, lgit_object_funcs );
+   setup_funcs(L, LUAGI_TREE_FUNCS, luagi_tree_funcs);
+   setup_funcs(L, LUAGI_TREE_ENTRY_FUNCS, luagi_tree_entry_funcs);
+   setup_funcs(L, LUAGI_TREE_BUILDER_FUNCS, luagi_tree_builder_funcs);
+   setup_funcs(L, LUAGI_BRANCH_FUNCS, luagi_branch_funcs);
+   setup_funcs(L, LUAGI_COMMIT_FUNCS, luagi_commit_funcs);
+   setup_funcs(L, LUAGI_REMOTE_FUNCS, luagi_remote_funcs);
+   setup_funcs(L, LUAGI_STATUS_FUNCS, luagi_status_funcs );
+   setup_funcs(L, LUAGI_DIFF_FUNCS, luagi_diff_funcs );
+   setup_funcs(L, LUAGI_INDEX_FUNCS, luagi_index_funcs );
+   setup_funcs(L, LUAGI_INDEX_ENTRY_FUNCS, luagi_index_entry_funcs );
+   setup_funcs(L, LUAGI_INDEX_CONFLICT_FUNCS, luagi_index_conflict_funcs );
+   setup_funcs(L, LUAGI_OBJECT_FUNCS, luagi_object_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
@@ -175,7 +175,7 @@ int table_to_signature( lua_State *L, git_signature *sig, int tablepos )
       return git_signature_new( &sig, name, email, time, offset );
    }
 }
-const char *lgit_otype_to_string( git_otype type )
+const char *luagi_otype_to_string( git_otype type )
 {
    switch( type )
    {
@@ -202,7 +202,7 @@ const char *lgit_otype_to_string( git_otype type )
    }
 }
 
-int lgit_oid_fromstr( git_oid *oid, const char *ref )
+int luagi_oid_fromstr( git_oid *oid, const char *ref )
 {
    int len = strlen( ref );
    if ( len < GIT_OID_MINPREFIXLEN || len > GIT_OID_HEXSZ )
@@ -212,7 +212,7 @@ int lgit_oid_fromstr( git_oid *oid, const char *ref )
    return git_oid_fromstrp( oid, ref);
 }
 
-git_strarray lgit_strings_from_lua_list( lua_State *L, int table_idx )
+git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx )
 {
    git_strarray array;
    array.count = luaL_len( L, table_idx );

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <git2/errors.h>
 #include <git2/repository.h>
-#include "wien.h"
+#include "luagi.h"
 
 #define FORCE "force"
 #define DISABLE_PATHSPEC_MATCH "disable_pathspec_match"
@@ -13,7 +13,7 @@
 #define NO_SYMLINKS "no_symlinks"
 #define FROM_OWNER "from_owner"
 
-int lgit_index_new( lua_State *L )
+int luagi_index_new( lua_State *L )
 {
    const char *path = luaL_optstring( L, 1, NULL );
    git_index **index = lua_newuserdata( L, sizeof( git_index *) ); 
@@ -32,19 +32,19 @@ int lgit_index_new( lua_State *L )
       }
    }
 
-   luaL_getmetatable(L, LGIT_INDEX_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_FUNCS);
    lua_setmetatable(L, -2);
    return 1;
 }
 
-int lgit_index_free( lua_State *L )
+int luagi_index_free( lua_State *L )
 { 
    git_index **index = checkindex_at( L, 1 );
    git_index_free( *index );
    return 0;
 }
 
-int lgit_index_owner( lua_State *L )
+int luagi_index_owner( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
@@ -58,7 +58,7 @@ int lgit_index_owner( lua_State *L )
    return 1;
 }
 
-int lgit_index_caps( lua_State *L )
+int luagi_index_caps( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    int caps = git_index_caps( *index );
@@ -78,7 +78,7 @@ int lgit_index_caps( lua_State *L )
    return 1;
 }
 
-int lgit_index_set_caps( lua_State *L )
+int luagi_index_set_caps( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
 
@@ -123,7 +123,7 @@ int lgit_index_set_caps( lua_State *L )
    return 0;
 }
 
-int lgit_index_read( lua_State *L )
+int luagi_index_read( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
 
@@ -140,7 +140,7 @@ int lgit_index_read( lua_State *L )
    return 0;
 }
 
-int lgit_index_write( lua_State *L )
+int luagi_index_write( lua_State *L )
 {
    git_index **index = checkindex_at(L, 1 );
 
@@ -151,14 +151,14 @@ int lgit_index_write( lua_State *L )
    return 0;
 }
 
-int lgit_index_path( lua_State *L )
+int luagi_index_path( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    lua_pushstring( L, git_index_path( *index ) );
    return 1;
 }
 
-int lgit_index_read_tree( lua_State *L )
+int luagi_index_read_tree( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    git_tree **tree = checktree_at( L, 2 );
@@ -170,7 +170,7 @@ int lgit_index_read_tree( lua_State *L )
    return 0;
 }
 
-int lgit_index_write_tree( lua_State *L )
+int luagi_index_write_tree( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    git_oid out;
@@ -194,7 +194,7 @@ int lgit_index_write_tree( lua_State *L )
    return 1;
 }
 
-int lgit_index_entrycount( lua_State *L )
+int luagi_index_entrycount( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
 
@@ -202,7 +202,7 @@ int lgit_index_entrycount( lua_State *L )
    return 1;
 }
 
-int lgit_index_clear( lua_State *L )
+int luagi_index_clear( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
 
@@ -213,7 +213,7 @@ int lgit_index_clear( lua_State *L )
    return 0;
 }
 
-int lgit_index_get_byindex( lua_State *L )
+int luagi_index_get_byindex( lua_State *L )
 { 
    git_index **index = checkindex_at( L, 1 );
    int pos = luaL_checkinteger( L, 2 );
@@ -228,12 +228,12 @@ int lgit_index_get_byindex( lua_State *L )
 
    memcpy( entry, out, sizeof( git_index_entry ) );
 
-   luaL_getmetatable(L, LGIT_INDEX_ENTRY_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_ENTRY_FUNCS);
    lua_setmetatable(L, -2);
    return 1;
 }
 
-int lgit_index_get_bypath( lua_State *L )
+int luagi_index_get_bypath( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -249,12 +249,12 @@ int lgit_index_get_bypath( lua_State *L )
 
    memcpy( entry, out, sizeof( git_index_entry ) );
 
-   luaL_getmetatable(L, LGIT_INDEX_ENTRY_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_ENTRY_FUNCS);
    lua_setmetatable(L, -2);
    return 1;
 }
    
-static int lgit_remove_func( lua_State *L, int (*func)( git_index *index, const char *path, int stage ) )
+static int luagi_remove_func( lua_State *L, int (*func)( git_index *index, const char *path, int stage ) )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -267,17 +267,17 @@ static int lgit_remove_func( lua_State *L, int (*func)( git_index *index, const 
    return 0;
 }
 
-int lgit_index_remove( lua_State *L )
+int luagi_index_remove( lua_State *L )
 {
-  return lgit_remove_func( L, git_index_remove ); 
+  return luagi_remove_func( L, git_index_remove ); 
 }
 
-int lgit_index_remove_directory( lua_State *L )
+int luagi_index_remove_directory( lua_State *L )
 {
-  return lgit_remove_func( L, git_index_remove_directory ); 
+  return luagi_remove_func( L, git_index_remove_directory ); 
 }
 
-int lgit_index_add( lua_State *L )
+int luagi_index_add( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const git_index_entry *entry = checkindexentry_at( L, 2 );
@@ -289,7 +289,7 @@ int lgit_index_add( lua_State *L )
    return 0;
 }
 
-int lgit_index_entry_stage( lua_State *L )
+int luagi_index_entry_stage( lua_State *L )
 {
    const git_index_entry *entry = checkindexentry_at( L, 1 );
 
@@ -297,7 +297,7 @@ int lgit_index_entry_stage( lua_State *L )
    return 1;
 }
 
-static int lgit_index_do_bypath( lua_State *L, int (*func)( git_index *index, const char *path) )
+static int luagi_index_do_bypath( lua_State *L, int (*func)( git_index *index, const char *path) )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -309,14 +309,14 @@ static int lgit_index_do_bypath( lua_State *L, int (*func)( git_index *index, co
    return 0;
 }
 
-int lgit_index_add_bypath( lua_State *L )
+int luagi_index_add_bypath( lua_State *L )
 {
-   return lgit_index_do_bypath( L, git_index_add_bypath );
+   return luagi_index_do_bypath( L, git_index_add_bypath );
 }
 
-int lgit_index_remove_bypath( lua_State *L )
+int luagi_index_remove_bypath( lua_State *L )
 {
-   return lgit_index_do_bypath( L, git_index_remove_bypath );
+   return luagi_index_do_bypath( L, git_index_remove_bypath );
 }
 
 struct pathspec_payload
@@ -343,10 +343,10 @@ static int index_matched_pathspec( const char *path, const char *matched_pathspe
    return ret;
 }
 
-int lgit_index_add_all( lua_State *L )
+int luagi_index_add_all( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
-   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+   git_strarray array = luagi_strings_from_lua_list( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
@@ -380,10 +380,10 @@ int lgit_index_add_all( lua_State *L )
 }
 
 
-int lgit_index_remove_all( lua_State *L )
+int luagi_index_remove_all( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
-   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+   git_strarray array = luagi_strings_from_lua_list( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
@@ -398,10 +398,10 @@ int lgit_index_remove_all( lua_State *L )
    return 0;
 } 
 
-int lgit_index_update_all( lua_State *L )
+int luagi_index_update_all( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
-   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+   git_strarray array = luagi_strings_from_lua_list( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
@@ -416,7 +416,7 @@ int lgit_index_update_all( lua_State *L )
    return 0;
 }
 
-int lgit_index_find( lua_State *L )
+int luagi_index_find( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -425,7 +425,7 @@ int lgit_index_find( lua_State *L )
    return 1;
 }
 
-int lgit_index_conflict_add( lua_State *L )
+int luagi_index_conflict_add( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const git_index_entry *ancestor_entry = checkindexentry_at( L, 2 );
@@ -439,7 +439,7 @@ int lgit_index_conflict_add( lua_State *L )
    return 0;
 }
 
-int lgit_index_conflict_get( lua_State *L )
+int luagi_index_conflict_get( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -455,19 +455,19 @@ int lgit_index_conflict_get( lua_State *L )
       return 0;
    }
 
-   luaL_getmetatable(L, LGIT_INDEX_ENTRY_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_ENTRY_FUNCS);
    lua_setmetatable(L, -1);
    lua_setmetatable(L, -2);
    lua_setmetatable(L, -3);
    return 3;
 }
 
-int lgit_index_conflict_remove( lua_State *L )
+int luagi_index_conflict_remove( lua_State *L )
 {
-   return lgit_index_do_bypath( L, git_index_conflict_remove );
+   return luagi_index_do_bypath( L, git_index_conflict_remove );
 }
 
-int lgit_index_conflict_cleanup( lua_State *L )
+int luagi_index_conflict_cleanup( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    if( git_index_conflict_cleanup( *index ) )
@@ -478,7 +478,7 @@ int lgit_index_conflict_cleanup( lua_State *L )
    return 0;
 }
 
-int lgit_index_has_conflicts( lua_State *L )
+int luagi_index_has_conflicts( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
 
@@ -486,7 +486,7 @@ int lgit_index_has_conflicts( lua_State *L )
    return 1;
 }
 
-int lgit_index_conflict_free( lua_State *L )
+int luagi_index_conflict_free( lua_State *L )
 {
    git_index_conflict_iterator **iter = checkindexconflict_at( L, 1 );
    git_index_conflict_iterator_free( *iter );
@@ -511,7 +511,7 @@ static int conflict_iter( lua_State *L )
       return 0;
    }
 
-   luaL_getmetatable(L, LGIT_INDEX_ENTRY_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_ENTRY_FUNCS);
    lua_setmetatable(L, -1);
    lua_setmetatable(L, -2);
    lua_setmetatable(L, -3);
@@ -519,7 +519,7 @@ static int conflict_iter( lua_State *L )
 
 }
 
-int lgit_index_conflict_iterator( lua_State *L )
+int luagi_index_conflict_iterator( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    
@@ -529,14 +529,14 @@ int lgit_index_conflict_iterator( lua_State *L )
       ERROR_ABORT( L )
    }
 
-   luaL_getmetatable(L, LGIT_INDEX_CONFLICT_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_CONFLICT_FUNCS);
    lua_setmetatable(L, -2);
 
    lua_pushcclosure( L, conflict_iter, -2 );
    return 1; 
 }
 
-int lgit_repository_index( lua_State *L )
+int luagi_repository_index( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_index ** index = lua_newuserdata( L, sizeof( git_index *) );
@@ -546,7 +546,7 @@ int lgit_repository_index( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   luaL_getmetatable(L, LGIT_INDEX_FUNCS);
+   luaL_getmetatable(L, LUAGI_INDEX_FUNCS);
    lua_setmetatable(L, -2);
 
    return 1;

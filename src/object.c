@@ -1,7 +1,7 @@
 #include "object.h"
 #include <git2/object.h>
 #include <git2/oid.h>
-#include "wien.h"
+#include "luagi.h"
 int luagi_object_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -22,7 +22,7 @@ int luagi_object_lookup( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   luaL_getmetatable(L, LGIT_OBJECT_FUNCS );
+   luaL_getmetatable(L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable(L, -2);
 
    return 1;
@@ -42,7 +42,7 @@ int luagi_object_lookup_bypath( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   luaL_getmetatable(L, LGIT_OBJECT_FUNCS );
+   luaL_getmetatable(L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable(L, -2);
 
    return 1;

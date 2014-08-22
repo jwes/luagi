@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 #define checktreebuilder(L) \
-      (git_treebuilder**) luaL_checkudata( L, 1, LGIT_TREE_BUILDER_FUNCS )
+      (git_treebuilder**) luaL_checkudata( L, 1, LUAGI_TREE_BUILDER_FUNCS )
 /* treebuilder stuff */
-int lgit_tree_builder_create( lua_State *L )
+int luagi_tree_builder_create( lua_State *L )
 {
    git_tree *tree = NULL;
    if( lua_isuserdata( L, 1) )
@@ -23,24 +23,24 @@ int lgit_tree_builder_create( lua_State *L )
       return 2;
    }
    
-   luaL_getmetatable( L, LGIT_TREE_BUILDER_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_BUILDER_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_tree_builder_gc( lua_State *L )
+int luagi_tree_builder_gc( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    git_treebuilder_free( *builder );
    return 0;
 }
-int lgit_tree_builder_clear( lua_State *L )
+int luagi_tree_builder_clear( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    git_treebuilder_clear( *builder );
    return 0;
 }
-int lgit_tree_builder_get( lua_State *L )
+int luagi_tree_builder_get( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    const char* filename = luaL_checkstring( L, 2 );
@@ -59,17 +59,17 @@ int lgit_tree_builder_get( lua_State *L )
       lua_pushfstring( L, "git_tree_entry_dup failed %d", ret );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_TREE_ENTRY_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
-int lgit_tree_builder_insert( lua_State *L )
+int luagi_tree_builder_insert( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    const char* filename = luaL_checkstring( L, 2 );
    const char* ref = luaL_checkstring( L, 3 );
    git_oid oid;
-   int ret = lgit_oid_fromstr( &oid, ref );
+   int ret = luagi_oid_fromstr( &oid, ref );
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -92,11 +92,11 @@ int lgit_tree_builder_insert( lua_State *L )
       lua_pushfstring( L, "error inserting entry -- %d", ret );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_TREE_ENTRY_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
-int lgit_tree_builder_remove( lua_State *L )
+int luagi_tree_builder_remove( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    const char* filename = luaL_checkstring( L, 2 );
@@ -104,13 +104,13 @@ int lgit_tree_builder_remove( lua_State *L )
    lua_pushinteger( L, ret );
    return 1;
 }
-int lgit_tree_builder_entry_count( lua_State *L )
+int luagi_tree_builder_entry_count( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    lua_pushinteger( L, git_treebuilder_entrycount( *builder ) );
    return 1;
 }
-int lgit_tree_builder_write( lua_State *L )
+int luagi_tree_builder_write( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    git_repository** repo = checkrepo( L, 2 );
@@ -141,7 +141,7 @@ static int builder_filter( const git_tree_entry *entry, void *payload )
       luaL_error( fp->L, "dup failed" );
    }
 
-   luaL_getmetatable( fp->L, LGIT_TREE_ENTRY_FUNCS );
+   luaL_getmetatable( fp->L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( fp->L, -2 );
 
    if(lua_pcall( fp->L, 2, 1, 0) )
@@ -151,7 +151,7 @@ static int builder_filter( const git_tree_entry *entry, void *payload )
    return lua_toboolean( fp->L, -1 );
 }
 
-int lgit_tree_builder_filter( lua_State *L )
+int luagi_tree_builder_filter( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    if( lua_iscfunction( L, 2 ) == 0 )

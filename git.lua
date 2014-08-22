@@ -1,19 +1,19 @@
 local head = "117d621c4a920dc1c9d706ee83ffce7d8d982b58"
-local wien = require("wien")
+local luagi = require("luagi")
 
 local signature = {
    name = "firstname lastname",
    email = "firstname.lastname@dn.tld",
    }
 
-print( wien.version() )
+print( luagi.version() )
 
-local features = wien.features()
+local features = luagi.features()
 for k, v in pairs( features ) do
    print( k, v );
 end
 
-repo, err = wien.open(".")
+repo, err = luagi.open(".")
 if repo then
    for branch, remote in repo:branches("a") do
       print( branch, remote, branch:name(), branch:is_head() )

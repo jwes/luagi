@@ -4,10 +4,10 @@
 #include <git2/signature.h>
 #include <string.h>
 #include "remote.h"
-#include "wien.h"
+#include "luagi.h"
 #include "transport.h"
 
-int lgit_remote_list( lua_State *L )
+int luagi_remote_list( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
 
@@ -30,7 +30,7 @@ int lgit_remote_list( lua_State *L )
    }
    return 1; 
 }
-int lgit_remote_load( lua_State *L )
+int luagi_remote_load( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
    const char *name = luaL_checkstring( L, 2 );
@@ -44,12 +44,12 @@ int lgit_remote_load( lua_State *L )
       lua_pushstring( L, err->message );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_REMOTE_FUNCS  );
+   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
    lua_setmetatable( L, -2 );
    return 1; 
 }
 
-int lgit_remote_create_anonymous( lua_State *L )
+int luagi_remote_create_anonymous( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
    const char *url = luaL_checkstring( L, 2 );
@@ -64,12 +64,12 @@ int lgit_remote_create_anonymous( lua_State *L )
       lua_pushstring( L, err->message );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_REMOTE_FUNCS  );
+   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
    lua_setmetatable( L, -2 );
    return 1; 
 }
 
-int lgit_remote_create_with_fetchspec( lua_State *L )
+int luagi_remote_create_with_fetchspec( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
    const char *name = luaL_checkstring( L, 2 );
@@ -85,12 +85,12 @@ int lgit_remote_create_with_fetchspec( lua_State *L )
       lua_pushstring( L, err->message );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_REMOTE_FUNCS  );
+   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
    lua_setmetatable( L, -2 );
    return 1; 
 }
 
-int lgit_remote_create( lua_State *L )
+int luagi_remote_create( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
    const char *name = luaL_checkstring( L, 2 );
@@ -106,12 +106,12 @@ int lgit_remote_create( lua_State *L )
       return 2;
    }
    
-   luaL_getmetatable( L, LGIT_REMOTE_FUNCS  );
+   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
    lua_setmetatable( L, -2 );
    return 1; 
 }
 
-int lgit_remote_save( lua_State *L )
+int luagi_remote_save( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
    if( git_remote_save( *rem ) )
@@ -122,7 +122,7 @@ int lgit_remote_save( lua_State *L )
    return 0; 
 }
 
-int lgit_remote_owner( lua_State *L )
+int luagi_remote_owner( lua_State *L )
 { 
    lua_pushnil( L ); 
    lua_pushstring( L, "not yet implemented" );
@@ -155,29 +155,29 @@ static void set_param( lua_State* L, int (*func)(git_remote *remote, const char*
    }
 }
 
-int lgit_remote_name( lua_State *L )
+int luagi_remote_name( lua_State *L )
 { 
    return get_param( L, git_remote_name );
 }
-int lgit_remote_url( lua_State *L )
+int luagi_remote_url( lua_State *L )
 { 
    return get_param( L, git_remote_url );
 }
-int lgit_remote_pushurl( lua_State *L )
+int luagi_remote_pushurl( lua_State *L )
 {
    return get_param( L, git_remote_pushurl );
 }
-int lgit_remote_set_url( lua_State *L )
+int luagi_remote_set_url( lua_State *L )
 { 
    set_param( L, git_remote_set_url );
    return 0; 
 }
-int lgit_remote_set_pushurl( lua_State *L )
+int luagi_remote_set_pushurl( lua_State *L )
 { 
    set_param( L, git_remote_set_pushurl );
    return 0; 
 }
-int lgit_remote_add_fetch( lua_State *L )
+int luagi_remote_add_fetch( lua_State *L )
 { 
    set_param( L, git_remote_add_fetch );
    return 0; 
@@ -207,7 +207,7 @@ int get_refspecs( lua_State *L, int (*func)(git_strarray *array, const git_remot
    git_strarray_free( &array );
    return 1; 
 }
-int lgit_remote_get_fetch_refspecs( lua_State *L )
+int luagi_remote_get_fetch_refspecs( lua_State *L )
 {
    return get_refspecs( L, git_remote_get_fetch_refspecs );
 }
@@ -218,7 +218,7 @@ static int set_refspecs( lua_State *L, int (*func)(git_remote *remote, git_strar
    // get table an build git_strarray  
    luaL_checktype( L, 2, LUA_TTABLE ); 
 
-   git_strarray array = lgit_strings_from_lua_list( L, 2 );
+   git_strarray array = luagi_strings_from_lua_list( L, 2 );
 
    if( func( *rem, &array))
    {
@@ -229,34 +229,34 @@ static int set_refspecs( lua_State *L, int (*func)(git_remote *remote, git_strar
    return 0; 
 }
 
-int lgit_remote_set_fetch_refspecs( lua_State *L )
+int luagi_remote_set_fetch_refspecs( lua_State *L )
 {
    return set_refspecs( L, git_remote_set_fetch_refspecs );
 }
 
-int lgit_remote_add_push( lua_State *L )
+int luagi_remote_add_push( lua_State *L )
 { 
    set_param( L, git_remote_add_push );
    return 0; 
 }
 
-int lgit_remote_get_push_refspecs( lua_State *L )
+int luagi_remote_get_push_refspecs( lua_State *L )
 { 
    return get_refspecs( L, git_remote_get_push_refspecs );
 }
 
-int lgit_remote_set_push_refspecs( lua_State *L )
+int luagi_remote_set_push_refspecs( lua_State *L )
 { 
    return set_refspecs( L, git_remote_set_push_refspecs );
 }
 
-int lgit_remote_clear_refspecs( lua_State *L )
+int luagi_remote_clear_refspecs( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
    git_remote_clear_refspecs( *rem );
    return 0;
 }
-int lgit_remote_refspec_count( lua_State *L )
+int luagi_remote_refspec_count( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
    size_t count = git_remote_refspec_count( *rem );
@@ -267,7 +267,7 @@ int lgit_remote_refspec_count( lua_State *L )
 /** we return a table with src, dest, string-representation
   force flag, and direction.
  if someone needs the transform methods, we have to create the userdata**/
-int lgit_remote_get_refspec( lua_State *L )
+int luagi_remote_get_refspec( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
    size_t n = luaL_checkinteger( L , 2 );
@@ -310,7 +310,7 @@ int lgit_remote_get_refspec( lua_State *L )
 
    return 1; 
 }
-int lgit_remote_connect( lua_State *L )
+int luagi_remote_connect( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
    const char* direction = luaL_checkstring( L, 2 );
@@ -329,14 +329,14 @@ int lgit_remote_connect( lua_State *L )
    return 0;
 }
 
-int lgit_remote_ls( lua_State *L )
+int luagi_remote_ls( lua_State *L )
 { 
 // TODO type git_remote_head? 
    lua_pushnil( L ); 
    lua_pushstring( L, "not yet implemented" );
    return 2; 
 }
-int lgit_remote_download( lua_State *L )
+int luagi_remote_download( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    if( git_remote_download( *rem ) )
@@ -366,12 +366,12 @@ static int call_with_sig( lua_State *L, int (*func)( git_remote *remote, const g
    return 0;
 }
 
-int lgit_remote_fetch( lua_State *L )
+int luagi_remote_fetch( lua_State *L )
 {
    return call_with_sig( L, git_remote_fetch );
 }
 
-int lgit_remote_connected( lua_State *L )
+int luagi_remote_connected( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
 
@@ -379,7 +379,7 @@ int lgit_remote_connected( lua_State *L )
    return 1; 
 }
 
-int lgit_remote_stop( lua_State *L )
+int luagi_remote_stop( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
 
@@ -387,7 +387,7 @@ int lgit_remote_stop( lua_State *L )
    return 0; 
 }
 
-int lgit_remote_disconnect( lua_State *L )
+int luagi_remote_disconnect( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
 
@@ -403,7 +403,7 @@ int ligt_remote_free( lua_State *L )
    return 0;
 }
 
-int lgit_remote_check_cert( lua_State *L )
+int luagi_remote_check_cert( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    luaL_checktype( L, 2, LUA_TBOOLEAN );
@@ -411,7 +411,7 @@ int lgit_remote_check_cert( lua_State *L )
    git_remote_check_cert( *rem, check );
    return 0; 
 }
-int lgit_remote_set_transport( lua_State *L )
+int luagi_remote_set_transport( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    git_transport **transport = checktransport_at( L , 2 );
@@ -423,19 +423,19 @@ int lgit_remote_set_transport( lua_State *L )
    return 0; 
 }
 
-int lgit_remote_set_callbacks( lua_State *L )
+int luagi_remote_set_callbacks( lua_State *L )
 { 
    //todo
    lua_pushnil( L ); 
    return 1; 
 }
-int lgit_remote_stats( lua_State *L )
+int luagi_remote_stats( lua_State *L )
 { 
    //todo
    lua_pushnil( L ); 
    return 1; 
 }
-int lgit_remote_autotag( lua_State *L )
+int luagi_remote_autotag( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    git_remote_autotag_option_t option = git_remote_autotag( *rem );
@@ -456,7 +456,7 @@ int lgit_remote_autotag( lua_State *L )
    return 1; 
 }
 
-int lgit_remote_set_autotag( lua_State *L )
+int luagi_remote_set_autotag( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    const char *option = luaL_optstring( L, 2, AUTO );
@@ -477,7 +477,7 @@ int lgit_remote_set_autotag( lua_State *L )
    return 0; 
 }
 
-int lgit_remote_rename( lua_State *L )
+int luagi_remote_rename( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    const char *new_name = luaL_checkstring( L, 2 );
@@ -497,13 +497,13 @@ int lgit_remote_rename( lua_State *L )
    return count; 
 }
 
-int lgit_remote_update_fetch_head( lua_State *L )
+int luagi_remote_update_fetch_head( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    lua_pushboolean( L, git_remote_update_fetchhead( *rem ) );
    return 1; 
 }
-int lgit_remote_set_update_fetch_head( lua_State *L )
+int luagi_remote_set_update_fetch_head( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
    luaL_checktype( L, 2, LUA_TBOOLEAN );
@@ -511,23 +511,23 @@ int lgit_remote_set_update_fetch_head( lua_State *L )
    git_remote_set_update_fetchhead( *rem, v );
    return 0; 
 }
-int lgit_remote_update_tips( lua_State *L )
+int luagi_remote_update_tips( lua_State *L )
 { 
    return call_with_sig( L, git_remote_update_tips );
 }
-int lgit_remote_is_valid_name( lua_State *L )
+int luagi_remote_is_valid_name( lua_State *L )
 { 
    const char *name = luaL_checkstring( L, 1 );
    lua_pushboolean( L, git_remote_is_valid_name( name ) );
    return 1; 
 }
-int lgit_remote_valid_url( lua_State *L )
+int luagi_remote_valid_url( lua_State *L )
 { 
    const char *url = luaL_checkstring( L, 1 );
    lua_pushboolean( L, git_remote_valid_url( url ) );
    return 1; 
 }
-int lgit_remote_supported_url( lua_State *L )
+int luagi_remote_supported_url( lua_State *L )
 { 
    const char *url = luaL_checkstring( L, 1 );
    lua_pushboolean( L, git_remote_valid_url( url ) );

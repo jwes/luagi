@@ -1,5 +1,5 @@
-local wien = require( "wien" )
-local index, err =  wien.create_index()
+local luagi = require( "luagi" )
+local index, err =  luagi.create_index()
 if not index then print( err ); return end
 
 function index_info( index )
@@ -12,7 +12,7 @@ end
 
 index_info( index )
 
-local repo, err = wien.open(".")
+local repo, err = luagi.open(".")
 if not repo then print( err ); return end
 
 local rind, err = repo:index()

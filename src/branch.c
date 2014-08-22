@@ -9,18 +9,18 @@
 #include <git2/buffer.h>
 #include <git2/branch.h>
 #include "branch.h"
-#include "wien.h"
+#include "luagi.h"
 
 #include <stdio.h>
 
 #define checkbranch(L) \
-      (git_reference**) luaL_checkudata( L, 1, LGIT_BRANCH_FUNCS )
+      (git_reference**) luaL_checkudata( L, 1, LUAGI_BRANCH_FUNCS )
 
-int lgit_create_branch( lua_State *L )
+int luagi_create_branch( lua_State *L )
 {
    git_repository** repo = checkrepo(L, 1);
    char* branch_name = luaL_checkstring(L, 2);
-   git_commit** target = ( git_commit** ) luaL_checkudata( L, 3, LGIT_COMMIT_FUNCS);
+   git_commit** target = ( git_commit** ) luaL_checkudata( L, 3, LUAGI_COMMIT_FUNCS);
    int force = lua_toboolean(L, 4);
    git_signature sig;
    int ret = table_to_signature( L, &sig, 5 );
@@ -42,12 +42,12 @@ int lgit_create_branch( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_BRANCH_FUNCS );
+   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;      
 }
 
-int lgit_delete_branch( lua_State *L )
+int luagi_delete_branch( lua_State *L )
 {
    git_reference** out = checkbranch(L);
    int ret = git_branch_delete( *out );
@@ -59,7 +59,7 @@ int lgit_delete_branch( lua_State *L )
    return 0;      
 }
 
-int lgit_move_branch( lua_State *L )
+int luagi_move_branch( lua_State *L )
 {
    git_reference** ref = checkbranch(L);
    const char* to_name = luaL_checkstring(L, 2);
@@ -102,7 +102,7 @@ int lgit_move_branch( lua_State *L )
          luaL_error( L, "moving failed %d", ret );
       }
    }
-   luaL_getmetatable( L, LGIT_BRANCH_FUNCS );
+   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 
@@ -110,7 +110,7 @@ int lgit_move_branch( lua_State *L )
 
 static int branch_iter( lua_State *L);
 
-int lgit_branches( lua_State *L )
+int luagi_branches( lua_State *L )
 {
    git_repository** repo = checkrepo(L, 1);
    const char* modus = luaL_checkstring(L, 2);
@@ -131,7 +131,7 @@ int lgit_branches( lua_State *L )
 
    /* create iterator userdata and open iterator */
    git_branch_iterator** iter =(git_branch_iterator**) lua_newuserdata(L, sizeof(git_branch_iterator*));
-   luaL_getmetatable(L, LGIT_BRANCH_STATICS);
+   luaL_getmetatable(L, LUAGI_BRANCH_STATICS);
    lua_setmetatable(L, -2);
 
    int ret = git_branch_iterator_new( iter, *repo, flags);
@@ -153,7 +153,7 @@ static int branch_iter( lua_State *L )
    int ret = git_branch_next( out, &type, iter );
    if( ret == 0 )
    {
-      luaL_getmetatable( L, LGIT_BRANCH_FUNCS );
+      luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
       lua_setmetatable( L, -2 );
 
       lua_pushboolean(L, type == GIT_BRANCH_REMOTE );
@@ -171,7 +171,7 @@ static int branch_iter( lua_State *L )
    }
 }
 
-int lgit_branch_iter_gc( lua_State *L )
+int luagi_branch_iter_gc( lua_State *L )
 {
    git_branch_iterator** iter = (git_branch_iterator**) lua_touserdata( L, lua_upvalueindex( 1 ) );
    if( iter != NULL )
@@ -181,7 +181,7 @@ int lgit_branch_iter_gc( lua_State *L )
    return 0;
 }
 
-int lgit_branch_upstream_get( lua_State *L )
+int luagi_branch_upstream_get( lua_State *L )
 {
    git_reference** ref = checkbranch(L);
    git_reference** out = (git_reference**) lua_newuserdata(L, sizeof(git_reference*) );
@@ -201,18 +201,18 @@ int lgit_branch_upstream_get( lua_State *L )
       }
    }
    
-   luaL_getmetatable( L, LGIT_BRANCH_FUNCS );
+   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_branch_upstream_set( lua_State *L )
+int luagi_branch_upstream_set( lua_State *L )
 {
    lua_pushnil( L );
    return 1;
 }
 
-int lgit_branch_lookup( lua_State *L )
+int luagi_branch_lookup( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1);
    const char* branch_name = luaL_checkstring( L, 2 );
@@ -239,19 +239,19 @@ int lgit_branch_lookup( lua_State *L )
          return 0;
       }
    }
-   luaL_getmetatable( L, LGIT_BRANCH_FUNCS );
+   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_branch_gc( lua_State *L )
+int luagi_branch_gc( lua_State *L )
 {
    git_reference** ref = checkbranch(L);
    git_reference_free( *ref );
    return 0;
 }
 
-int lgit_branch_is_head( lua_State *L )
+int luagi_branch_is_head( lua_State *L )
 {
    git_reference** ref = checkbranch(L);
    int ret = git_branch_is_head( *ref );
@@ -259,7 +259,7 @@ int lgit_branch_is_head( lua_State *L )
    return 1;
 }
 
-int lgit_branch_name( lua_State *L )
+int luagi_branch_name( lua_State *L )
 {
    git_reference** ref = checkbranch(L);
    const char* out;

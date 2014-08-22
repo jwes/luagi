@@ -4,17 +4,17 @@
 #include <git2/signature.h>
 #include <git2/errors.h>
 #include "commit.h"
-#include "wien.h"
+#include "luagi.h"
 
 #define checkcommit( L ) \
-   (git_commit**) luaL_checkudata( L, 1, LGIT_COMMIT_FUNCS )
-int lgit_commit_lookup( lua_State *L )
+   (git_commit**) luaL_checkudata( L, 1, LUAGI_COMMIT_FUNCS )
+int luagi_commit_lookup( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );
    const char* ref = luaL_checkstring( L, 2 );
 
    git_oid oid;
-   int ret = lgit_oid_fromstr( &oid, ref);
+   int ret = luagi_oid_fromstr( &oid, ref);
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -29,19 +29,19 @@ int lgit_commit_lookup( lua_State *L )
       lua_pushnil( L );
       lua_pushfstring( L, "lookup failed - %d", ret );
    }
-   luaL_getmetatable( L, LGIT_COMMIT_FUNCS );
+   luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_commit_gc( lua_State *L )
+int luagi_commit_gc( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    git_commit_free( *commit );
    return 0;
 }
 
-int lgit_commit_id( lua_State *L )
+int luagi_commit_id( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    const git_oid* oid = git_commit_id( *commit );
@@ -50,28 +50,28 @@ int lgit_commit_id( lua_State *L )
    return 1;
 }
 
-int lgit_commit_encoding( lua_State *L )
+int luagi_commit_encoding( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    lua_pushstring( L, git_commit_message_encoding( *commit ));
    return 1;
 }
 
-int lgit_commit_message( lua_State *L )
+int luagi_commit_message( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    lua_pushstring( L, git_commit_message( *commit ));
    return 1;
 }
 
-int lgit_commit_summary( lua_State *L )
+int luagi_commit_summary( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    lua_pushstring( L, git_commit_summary( *commit ));
    return 1;
 }
 
-int lgit_commit_committer( lua_State *L )
+int luagi_commit_committer( lua_State *L )
 {
    git_commit** commit = checkcommit( L );   
    const git_signature* sig = git_commit_committer( *commit );
@@ -86,7 +86,7 @@ int lgit_commit_committer( lua_State *L )
    return 1;
 }
 
-int lgit_commit_author( lua_State *L )
+int luagi_commit_author( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    const git_signature* sig = git_commit_author( *commit );
@@ -101,7 +101,7 @@ int lgit_commit_author( lua_State *L )
    return 1;
 }
 
-int lgit_commit_tree( lua_State *L )
+int luagi_commit_tree( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    git_tree** tree = (git_tree**) lua_newuserdata( L, sizeof( git_tree* ) );
@@ -113,12 +113,12 @@ int lgit_commit_tree( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_TREE_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_commit_parentcount( lua_State *L )
+int luagi_commit_parentcount( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int count = git_commit_parentcount( *commit );
@@ -126,7 +126,7 @@ int lgit_commit_parentcount( lua_State *L )
    return 1;
 }
 
-int lgit_commit_parent( lua_State *L )
+int luagi_commit_parent( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
@@ -138,12 +138,12 @@ int lgit_commit_parent( lua_State *L )
       lua_pushfstring( L, "can't find parent %d: %d", n, ret );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_COMMIT_FUNCS );
+   luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_commit_parent_id( lua_State *L )
+int luagi_commit_parent_id( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
@@ -153,7 +153,7 @@ int lgit_commit_parent_id( lua_State *L )
    return 1;
 }
 
-int lgit_commit_nth_gen_ancestor( lua_State *L )
+int luagi_commit_nth_gen_ancestor( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
@@ -172,12 +172,12 @@ int lgit_commit_nth_gen_ancestor( lua_State *L )
 
       lua_pushfstring( L, errf, n, ret );
    }
-   luaL_getmetatable( L, LGIT_COMMIT_FUNCS );
+   luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_commit_create( lua_State *L )
+int luagi_commit_create( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );
    const char* update_ref = luaL_optstring( L, 2, NULL );
@@ -187,7 +187,7 @@ int lgit_commit_create( lua_State *L )
    ret = table_to_signature( L, &committer, 4 );
    const char* encoding = luaL_optstring( L, 5, NULL );
    const char* message = luaL_checkstring( L, 6 );
-   git_tree** tree = (git_tree**) luaL_checkudata( L, 7, LGIT_TREE_FUNCS );
+   git_tree** tree = (git_tree**) luaL_checkudata( L, 7, LUAGI_TREE_FUNCS );
    
    // table of parents
    luaL_checktype( L, 8, LUA_TTABLE );
@@ -197,7 +197,7 @@ int lgit_commit_create( lua_State *L )
    for( unsigned int i = 1; i <= n; i++ )
    {
       lua_rawgeti( L, 8, i );
-      parents[i] = *( (git_commit**) luaL_checkudata( L, -1, LGIT_COMMIT_FUNCS ) );
+      parents[i] = *( (git_commit**) luaL_checkudata( L, -1, LUAGI_COMMIT_FUNCS ) );
    }
 
    git_oid oid;
@@ -224,7 +224,7 @@ int lgit_commit_create( lua_State *L )
  * message
  * tree
  */
-int lgit_commit_amend( lua_State *L )
+int luagi_commit_amend( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
 
@@ -257,7 +257,7 @@ int lgit_commit_amend( lua_State *L )
    git_tree* tree = NULL;
    if( lua_isuserdata( L, -1 ) )
    {
-      tree = *( ( git_tree** ) luaL_checkudata( L, -1, LGIT_TREE_FUNCS ) );
+      tree = *( ( git_tree** ) luaL_checkudata( L, -1, LUAGI_TREE_FUNCS ) );
    }
 
    // use the table and modify the commit

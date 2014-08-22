@@ -1,5 +1,5 @@
 #include "diff.h" 
-#include "wien.h" 
+#include "luagi.h" 
 #include "index.h"
 #include <git2/diff.h>
 #include <git2/errors.h>
@@ -44,7 +44,7 @@ void options_from_lua( lua_State *L, int idx, git_diff_options *opts )
    git_diff_init_options( opts, GIT_DIFF_OPTIONS_VERSION );
 }
 
-int lgit_diff_tree_to_tree( lua_State *L )
+int luagi_diff_tree_to_tree( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_tree **old_tree = checktree_at( L, 2 );
@@ -63,13 +63,13 @@ int lgit_diff_tree_to_tree( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LGIT_DIFF_FUNCS);
+   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
    lua_setmetatable(L, -2);
 
    return 1;
 }
 
-int lgit_diff_tree_to_index( lua_State *L )
+int luagi_diff_tree_to_index( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_tree **tree = checktree_at( L, 2 );
@@ -88,12 +88,12 @@ int lgit_diff_tree_to_index( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LGIT_DIFF_FUNCS);
+   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
    lua_setmetatable(L, -2);
    return 1; 
 }
 
-int lgit_diff_index_to_workdir( lua_State *L )
+int luagi_diff_index_to_workdir( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_index **index = checkindex_at( L, 2 );
@@ -111,7 +111,7 @@ int lgit_diff_index_to_workdir( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LGIT_DIFF_FUNCS);
+   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
    lua_setmetatable(L, -2);
 
    return 1; 
@@ -134,7 +134,7 @@ static int tree_to_workdir( lua_State *L, int (*func)(git_diff **diff, git_repos
       return 2;
    }
 
-   luaL_getmetatable(L, LGIT_DIFF_FUNCS);
+   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
    lua_setmetatable(L, -2);
 
    return 1;
@@ -142,17 +142,17 @@ static int tree_to_workdir( lua_State *L, int (*func)(git_diff **diff, git_repos
    lua_pushnil( L );
    return 1; 
 }
-int lgit_diff_tree_to_workdir( lua_State *L )
+int luagi_diff_tree_to_workdir( lua_State *L )
 {
    return tree_to_workdir( L, git_diff_tree_to_workdir );
 }
-int lgit_diff_tree_to_workdir_with_index( lua_State *L )
+int luagi_diff_tree_to_workdir_with_index( lua_State *L )
 {
    return tree_to_workdir( L, git_diff_tree_to_workdir_with_index );
 }
 
 // diff functions
-int lgit_diff_merge( lua_State *L )
+int luagi_diff_merge( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
    git_diff **from = checkdiff_at( L, 2 );
@@ -164,7 +164,7 @@ int lgit_diff_merge( lua_State *L )
    return 0; 
 }
 
-int lgit_diff_find_similar( lua_State *L )
+int luagi_diff_find_similar( lua_State *L )
 {
    //TODO find options
    git_diff **diff = checkdiff_at( L, 1 );
@@ -185,7 +185,7 @@ int lgit_diff_find_similar( lua_State *L )
 }
 static git_delta_t delta_t_from_string( const char *type );
 
-int lgit_diff_num_deltas( lua_State *L )
+int luagi_diff_num_deltas( lua_State *L )
 { 
    git_diff **diff = checkdiff_at( L, 1 );
 
@@ -201,7 +201,7 @@ int lgit_diff_num_deltas( lua_State *L )
    return 1;
 } // includes num deltas of type
 
-int lgit_diff_get_delta( lua_State *L )
+int luagi_diff_get_delta( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
    int idx = luaL_checkinteger( L, 2 );
@@ -210,7 +210,7 @@ int lgit_diff_get_delta( lua_State *L )
    diff_delta_to_table( L, delta );
    return 1; 
 }
-int lgit_diff_is_sorted_icase( lua_State *L )
+int luagi_diff_is_sorted_icase( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
    lua_pushboolean( L, git_diff_is_sorted_icase( *diff ) );
@@ -325,7 +325,7 @@ static int diff_line_callback( const git_diff_delta *delta,
    return ret;
 }
 
-int lgit_diff_foreach( lua_State *L )
+int luagi_diff_foreach( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
 
@@ -357,7 +357,7 @@ int lgit_diff_foreach( lua_State *L )
 
    return 0;
 }
-int lgit_diff_print( lua_State *L )
+int luagi_diff_print( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
    git_diff_format_t format = GIT_DIFF_FORMAT_PATCH;
@@ -397,7 +397,7 @@ int lgit_diff_print( lua_State *L )
    return 0; 
 }
 
-int lgit_diff_free( lua_State *L )
+int luagi_diff_free( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
    git_diff_free( *diff );

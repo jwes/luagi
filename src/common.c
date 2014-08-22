@@ -4,7 +4,7 @@
 #include <lauxlib.h>
 #include "common.h"
 
-int lgit_version( lua_State *L )
+int luagi_version( lua_State *L )
 {
    int major;
    int minor;
@@ -19,7 +19,7 @@ int lgit_version( lua_State *L )
    return 3;
 }
 
-int lgit_features( lua_State *L )
+int luagi_features( lua_State *L )
 {
    int bitfield = git_libgit2_features();
 

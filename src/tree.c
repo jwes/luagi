@@ -6,21 +6,21 @@
 #undef __USE_BSD
 
 #include "tree.h"
-#include "wien.h"
+#include "luagi.h"
 #include "object.h"
 
 #include <stdio.h>
 
 /*#define checktree(L) \
-      (git_tree**) luaL_checkudata( L, 1, LGIT_TREE_FUNCS )
+      (git_tree**) luaL_checkudata( L, 1, LUAGI_TREE_FUNCS )
 */
-int lgit_tree_lookup( lua_State *L )
+int luagi_tree_lookup( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );
    const char* id_str = luaL_checkstring( L, 2 );
 
    git_oid oid;
-   int ret = lgit_oid_fromstr( &oid, id_str);
+   int ret = luagi_oid_fromstr( &oid, id_str);
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -37,19 +37,19 @@ int lgit_tree_lookup( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_TREE_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_tree_lookup_prefix( lua_State *L )
+int luagi_tree_lookup_prefix( lua_State *L )
 {
    lua_pushnil( L );
    lua_pushstring(L, "not yet implemented" );
    return 2;
 }
 
-int lgit_tree_id( lua_State *L )
+int luagi_tree_id( lua_State *L )
 {
    git_tree** tree = checktree( L );
    const git_oid* oid = git_tree_id( *tree );
@@ -58,7 +58,7 @@ int lgit_tree_id( lua_State *L )
    return 1;
 }
 
-int lgit_tree_entrycount( lua_State *L )
+int luagi_tree_entrycount( lua_State *L )
 {
    git_tree** tree = checktree( L );
    size_t count = git_tree_entrycount( *tree );
@@ -66,7 +66,7 @@ int lgit_tree_entrycount( lua_State *L )
    return 1;
 }
 
-int lgit_tree_gc( lua_State *L )
+int luagi_tree_gc( lua_State *L )
 {
    git_tree** tree = checktree( L );
    git_tree_free( *tree );
@@ -85,12 +85,12 @@ static int tree_entry_by_final( lua_State *L, const git_tree_entry* entry )
       lua_pushfstring( L, "dup failed, %d", ret );
       return 2;
    }
-   luaL_getmetatable( L, LGIT_TREE_ENTRY_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_tree_entry_byname( lua_State *L )
+int luagi_tree_entry_byname( lua_State *L )
 {
    git_tree** tree = checktree( L );
    const char* filename = luaL_checkstring( L , 2 );
@@ -105,7 +105,7 @@ int lgit_tree_entry_byname( lua_State *L )
    return tree_entry_by_final( L, e );
 }
 
-int lgit_tree_entry_byindex( lua_State *L )
+int luagi_tree_entry_byindex( lua_State *L )
 {
    git_tree** tree = checktree( L );
    unsigned int index = luaL_checkunsigned( L , 2 );
@@ -120,13 +120,13 @@ int lgit_tree_entry_byindex( lua_State *L )
    return tree_entry_by_final(L, e );
 }
 
-int lgit_tree_entry_byid( lua_State *L )
+int luagi_tree_entry_byid( lua_State *L )
 {
    git_tree** tree = checktree( L );
    const char* idstring = luaL_checkstring( L , 2 );
 
    git_oid oid;
-   int ret = lgit_oid_fromstr( &oid, idstring );
+   int ret = luagi_oid_fromstr( &oid, idstring );
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -145,7 +145,7 @@ int lgit_tree_entry_byid( lua_State *L )
 }
 
 /* user owned tree entries */
-int lgit_tree_entry_bypath( lua_State *L )
+int luagi_tree_entry_bypath( lua_State *L )
 {
    git_tree** tree = checktree( L );
    const char* path = luaL_checkstring( L , 2 );
@@ -166,12 +166,12 @@ int lgit_tree_entry_bypath( lua_State *L )
       }
       return 2;
    }
-   luaL_getmetatable( L, LGIT_TREE_ENTRY_FUNCS );
+   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
 
-int lgit_tree_entry_gc( lua_State *L )
+int luagi_tree_entry_gc( lua_State *L )
 {
    git_tree_entry** entry = checktreeentry( L, 1 );
    git_tree_entry_free( *entry );
@@ -179,13 +179,13 @@ int lgit_tree_entry_gc( lua_State *L )
 }
 
 /* entry stuff */
-int lgit_tree_entry_name( lua_State *L )
+int luagi_tree_entry_name( lua_State *L )
 {
    git_tree_entry** entry = checktreeentry( L, 1 );
    lua_pushstring( L, git_tree_entry_name( *entry ));
    return 1;
 }
-int lgit_tree_entry_id( lua_State *L )
+int luagi_tree_entry_id( lua_State *L )
 {
    git_tree_entry** entry = checktreeentry( L, 1 );   
    const git_oid* oid = git_tree_entry_id( *entry );
@@ -195,14 +195,14 @@ int lgit_tree_entry_id( lua_State *L )
    return 1;
    
 }
-int lgit_tree_entry_type( lua_State *L )
+int luagi_tree_entry_type( lua_State *L )
 {
    git_tree_entry** entry = checktreeentry( L, 1 );
    git_otype type = git_tree_entry_type( *entry );
-   lua_pushstring( L, lgit_otype_to_string( type ) );
+   lua_pushstring( L, luagi_otype_to_string( type ) );
    return 1;
 }
-int lgit_tree_entry_filemode( lua_State *L )
+int luagi_tree_entry_filemode( lua_State *L )
 {
    git_tree_entry** entry = checktreeentry( L, 1 );
    git_filemode_t filemode =  git_tree_entry_filemode( *entry );
@@ -219,7 +219,7 @@ int lgit_tree_entry_filemode( lua_State *L )
    return 1;
 }
 
-int lgit_tree_entry_cmp( lua_State *L )
+int luagi_tree_entry_cmp( lua_State *L )
 {
    git_tree_entry** e1 = checktreeentry( L, 1 );   
    git_tree_entry** e2 = checktreeentry( L, 2 );   
@@ -227,7 +227,7 @@ int lgit_tree_entry_cmp( lua_State *L )
    return 1;
 }
 
-int lgit_tree_entry_to_object( lua_State *L )
+int luagi_tree_entry_to_object( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_tree_entry **entry = checktreeentry( L, 2 );
@@ -238,7 +238,7 @@ int lgit_tree_entry_to_object( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   luaL_getmetatable( L, LGIT_OBJECT_FUNCS );
+   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
 }
@@ -289,25 +289,25 @@ static int treewalk_callback( const char *root, const git_tree_entry *entry,
    return 1;
 }
 
-static int lgit_walker( lua_State *L );
+static int luagi_walker( lua_State *L );
 
-int lgit_tree_walk( lua_State *L )
+int luagi_tree_walk( lua_State *L )
 {
    git_tree** tree = checktree( L );
-   const char* direction = luaL_optstring( L, 2, LGIT_TREE_PRE );
+   const char* direction = luaL_optstring( L, 2, LUAGI_TREE_PRE );
    git_treewalk_mode mode;
-   if( strncmp( direction, LGIT_TREE_PRE, 3 ) == 0 )
+   if( strncmp( direction, LUAGI_TREE_PRE, 3 ) == 0 )
    {
       mode = GIT_TREEWALK_PRE;
    }
-   else if ( strncmp( direction, LGIT_TREE_POST, 4 ) == 0 )
+   else if ( strncmp( direction, LUAGI_TREE_POST, 4 ) == 0 )
    {
       mode = GIT_TREEWALK_POST;
    } else {
       luaL_error( L, "wrong order, user 'pre' or 'post'" );
    }
    struct walk_info* info = (struct walk_info*) lua_newuserdata(L, sizeof(struct walk_info ) );
-   luaL_getmetatable(L, LGIT_TREE_WALK_STATICS);
+   luaL_getmetatable(L, LUAGI_TREE_WALK_STATICS);
    lua_setmetatable(L, -2);
 
    info->next = NULL;
@@ -322,11 +322,11 @@ int lgit_tree_walk( lua_State *L )
    // create semaphore, which allows waiting for walkresults.
    // read in walker from semaphore and than from info
    // write to info in the thread
-   lua_pushcclosure( L, lgit_walker, 1 );
+   lua_pushcclosure( L, luagi_walker, 1 );
    return 1;
 }
 
-static int lgit_walker( lua_State *L )
+static int luagi_walker( lua_State *L )
 {
    struct walk_info* info = (struct walk_info*) lua_touserdata( L, lua_upvalueindex( 1 ) );
    struct walk_info_element *elem;
@@ -343,7 +343,7 @@ static int lgit_walker( lua_State *L )
          lua_pushstring( L, "out of memory - dup failed" );
       }  
       
-      luaL_getmetatable( L, LGIT_TREE_ENTRY_FUNCS );
+      luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
       lua_setmetatable( L, -2 );
       free_elem( elem );
       return 2;

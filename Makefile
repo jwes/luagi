@@ -1,4 +1,4 @@
-FILES := src/wien.c \
+FILES := src/luagi.c \
 		src/common.c \
 		src/branch.c \
 		src/tree.c \
@@ -13,8 +13,8 @@ FILES := src/wien.c \
 		src/object.c \
 		src/checkout.c
 
-wien.so: $(FILES)
-	gcc --shared -fPIC -o wien.so \
+luagi.so: $(FILES)
+	gcc --shared -fPIC -o luagi.so \
 	$(FILES) \
 		-g -Wall -Wextra -Werror -std=c11 \
 		-lc -lgit2 -llua 

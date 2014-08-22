@@ -2,7 +2,7 @@
 #include <lauxlib.h>
 #include <git2/transport.h>
 #include <git2/errors.h>
-#include "wien.h"
+#include "luagi.h"
 #include <string.h>
 
 #define SSH "ssh"
@@ -10,7 +10,7 @@
 
 /* TODO: git_transport_register and git_transport_unregister */
 
-int lgit_transport_new( lua_State *L )
+int luagi_transport_new( lua_State *L )
 {
    git_remote **remote = checkremote( L );
    const char* url = luaL_checkstring( L, 2 );
@@ -23,13 +23,13 @@ int lgit_transport_new( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_TRANSPORT_FUNCS );
+   luaL_getmetatable( L, LUAGI_TRANSPORT_FUNCS );
    lua_setmetatable( L, -2 );
 
    return 1;
 }
 
-int lgit_transport_local( lua_State *L )
+int luagi_transport_local( lua_State *L )
 {
    git_remote **remote = checkremote( L );     
 
@@ -42,13 +42,13 @@ int lgit_transport_local( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_TRANSPORT_FUNCS );
+   luaL_getmetatable( L, LUAGI_TRANSPORT_FUNCS );
    lua_setmetatable( L, -2 );
 
    return 1;
 }
 
-int lgit_transport_dummy( lua_State *L )
+int luagi_transport_dummy( lua_State *L )
 {
    git_remote **remote = checkremote( L );     
 
@@ -61,7 +61,7 @@ int lgit_transport_dummy( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_TRANSPORT_FUNCS );
+   luaL_getmetatable( L, LUAGI_TRANSPORT_FUNCS );
    lua_setmetatable( L, -2 );
 
    return 1;
@@ -84,7 +84,7 @@ static int http_callback ( git_smart_subtransport **out,
    return git_smart_subtransport_http( out, owner );
 }
 
-int lgit_transport_smart( lua_State *L )
+int luagi_transport_smart( lua_State *L )
 {
    git_remote **remote = checkremote( L );     
    const char *tstring = luaL_checkstring( L, 2 );
@@ -114,7 +114,7 @@ int lgit_transport_smart( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LGIT_TRANSPORT_FUNCS );
+   luaL_getmetatable( L, LUAGI_TRANSPORT_FUNCS );
    lua_setmetatable( L, -2 );
 
    return 1;

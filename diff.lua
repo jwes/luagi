@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
-local wien = require( "wien" );
-local wh = require("wien_helper" );
-local repo = wien.open(".");
+local luagi = require( "luagi" );
+local wh = require("luagi_helper" );
+local repo = luagi.open(".");
 local rev = "c78833afb82aa413f8ad2ad7cb9548af6e74c74c"
 local rev2 = "117d621c4a920dc1c9d706ee83ffce7d8d982b58"
 

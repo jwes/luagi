@@ -1,34 +1,34 @@
-#ifndef IS_LGIT_BRANCH
-#define IS_LGIT_BRANCH
+#ifndef IS_LUAGI_BRANCH
+#define IS_LUAGI_BRANCH
 #include <lua.h>
 
-#define LGIT_BRANCH_FUNCS "is.westh.lgit.branch"
-#define LGIT_BRANCH_STATICS "is.westhu.lgit.branch.iter"
+#define LUAGI_BRANCH_FUNCS "is.westh.luagi.branch"
+#define LUAGI_BRANCH_STATICS "is.westhu.luagi.branch.iter"
 
-int lgit_create_branch( lua_State *L );
-int lgit_branch_lookup( lua_State *L );
-int lgit_branch_gc( lua_State *L );
+int luagi_create_branch( lua_State *L );
+int luagi_branch_lookup( lua_State *L );
+int luagi_branch_gc( lua_State *L );
 
-int lgit_branch_name( lua_State *L );
-int lgit_delete_branch( lua_State *L );
-int lgit_move_branch( lua_State *L );
+int luagi_branch_name( lua_State *L );
+int luagi_delete_branch( lua_State *L );
+int luagi_move_branch( lua_State *L );
 
-int lgit_branch_upstream_get( lua_State *L );
-int lgit_branch_upstream_set( lua_State *L );
+int luagi_branch_upstream_get( lua_State *L );
+int luagi_branch_upstream_set( lua_State *L );
 
-int lgit_branches( lua_State *L );
-int lgit_branch_iter_gc( lua_State *L );
+int luagi_branches( lua_State *L );
+int luagi_branch_iter_gc( lua_State *L );
 
-int lgit_branch_is_head( lua_State *L );
+int luagi_branch_is_head( lua_State *L );
 
-static const struct luaL_Reg lgit_branch_funcs [] = {
-   { "delete", lgit_delete_branch },
-   { "move", lgit_move_branch },
-   { "get_upstream", lgit_branch_upstream_get },
-   { "set_upstream", lgit_branch_upstream_set },
-   { "name", lgit_branch_name },
-   { "is_head", lgit_branch_is_head },
-   { "__gc", lgit_branch_gc },
+static const struct luaL_Reg luagi_branch_funcs [] = {
+   { "delete", luagi_delete_branch },
+   { "move", luagi_move_branch },
+   { "get_upstream", luagi_branch_upstream_get },
+   { "set_upstream", luagi_branch_upstream_set },
+   { "name", luagi_branch_name },
+   { "is_head", luagi_branch_is_head },
+   { "__gc", luagi_branch_gc },
    { NULL, NULL }
 };
 #endif

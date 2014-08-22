@@ -20,12 +20,12 @@ int luagi_object_typeisloose( lua_State *L );
 int luagi_object__size( lua_State *L );
 int luagi_object_peel( lua_State *L );
 
-#define LGIT_OBJECT_FUNCS "is.luagi.object"
+#define LUAGI_OBJECT_FUNCS "is.luagi.object"
 
 #define checkobject_at(L, N) \
-      (git_object**) luaL_checkudata( L, N, LGIT_OBJECT_FUNCS )
+      (git_object**) luaL_checkudata( L, N, LUAGI_OBJECT_FUNCS )
 
-static const struct luaL_Reg lgit_object_funcs [] = {
+static const struct luaL_Reg luagi_object_funcs [] = {
    { "id",   luagi_object_id },
    { "type",   luagi_object_type },
    { "owner",   luagi_object_owner },

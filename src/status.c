@@ -1,5 +1,5 @@
 #include "status.h"
-#include "wien.h"
+#include "luagi.h"
 #include "diff.h"
 #include <git2/strarray.h>
 #include <git2/diff.h>
@@ -23,9 +23,9 @@
 
 #define IGN                "ignored"
 
-#define LGIT_SHOW          "show"
-#define LGIT_FLAGS         "flags"
-#define LGIT_PATHS         "paths"
+#define LUAGI_SHOW          "show"
+#define LUAGI_FLAGS         "flags"
+#define LUAGI_PATHS         "paths"
 
 #define INC_UNTRACKED      "include_untracked"
 #define INC_IGNORED        "include_ignored"
@@ -45,7 +45,7 @@
 #define L_IDX_TO_WRK       "index_to_workdir"
 #define L_HEAD_TO_IDX      "head_to_index"
 
-void  lgit_status_flags_to_table( lua_State *L, const int f )
+void  luagi_status_flags_to_table( lua_State *L, const int f )
 {      
    lua_newtable( L );
    lua_pushboolean( L, f & GIT_STATUS_INDEX_NEW );
@@ -89,7 +89,7 @@ static void free_elem( struct status_element *elem )
    free( elem );
 }
 
-static int lgit_status_callback( const char *path, unsigned int flags, void *payload)
+static int luagi_status_callback( const char *path, unsigned int flags, void *payload)
 {
    struct status_list* info = (struct status_list*) payload;
 
@@ -111,30 +111,30 @@ static int lgit_status_callback( const char *path, unsigned int flags, void *pay
    return 0;
 }
 
-static int lgit_status_walker( lua_State *L );
+static int luagi_status_walker( lua_State *L );
 //function on repos
-int lgit_status_foreach( lua_State *L )
+int luagi_status_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
 
    struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
    list->next = NULL;
    list->last = NULL;
-   if( git_status_foreach( *repo, lgit_status_callback, list ) )
+   if( git_status_foreach( *repo, luagi_status_callback, list ) )
    {
       const git_error* err = giterr_last();
       luaL_error( L, "error iterating the files %s", err->message );
    }
-   luaL_getmetatable(L, LGIT_STATUS_FOREACH);
+   luaL_getmetatable(L, LUAGI_STATUS_FOREACH);
    lua_setmetatable(L, -2);
 
-   lua_pushcclosure( L, lgit_status_walker, 1 );
+   lua_pushcclosure( L, luagi_status_walker, 1 );
    return 1;
 }
 
 static int flags_from_lua( lua_State *L, int idx );
 
-static int lgit_status_init_options( lua_State *L, int idx, git_status_options *opts )
+static int luagi_status_init_options( lua_State *L, int idx, git_status_options *opts )
 {
    if( ! lua_istable(L, idx) )
    {
@@ -143,7 +143,7 @@ static int lgit_status_init_options( lua_State *L, int idx, git_status_options *
    }
    
    // first version with integer flags
-   lua_getfield( L, idx, LGIT_SHOW );
+   lua_getfield( L, idx, LUAGI_SHOW );
    git_status_show_t show = luaL_optinteger( L, -1, 0 );
 
    // init options from lua_State
@@ -152,17 +152,17 @@ static int lgit_status_init_options( lua_State *L, int idx, git_status_options *
    {
       opts->show = show;
       opts->flags = flags_from_lua( L, idx );
-      opts->pathspec = lgit_strings_from_lua_list( L, idx );
+      opts->pathspec = luagi_strings_from_lua_list( L, idx );
    }
 
    return ret; 
 }
 
-int lgit_status_foreach_ext( lua_State *L )
+int luagi_status_foreach_ext( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_status_options opts;
-   if( lgit_status_init_options( L, 2, &opts ) )
+   if( luagi_status_init_options( L, 2, &opts ) )
    {
       luaL_error( L, "could not set up options" );
    }
@@ -170,19 +170,19 @@ int lgit_status_foreach_ext( lua_State *L )
    struct status_list* list = (struct status_list*) lua_newuserdata(L, sizeof(struct status_list ) );
    list->next = NULL;
    list->last = NULL;
-   if( git_status_foreach_ext( *repo, &opts, lgit_status_callback, list ) )
+   if( git_status_foreach_ext( *repo, &opts, luagi_status_callback, list ) )
    {
       const git_error* err = giterr_last();
       luaL_error( L, "error iterating the files %s", err->message );
    }
-   luaL_getmetatable(L, LGIT_STATUS_FOREACH);
+   luaL_getmetatable(L, LUAGI_STATUS_FOREACH);
    lua_setmetatable(L, -2);
 
-   lua_pushcclosure( L, lgit_status_walker, 1 );
+   lua_pushcclosure( L, luagi_status_walker, 1 );
    return 1;
 }
 
-int lgit_status_file ( lua_State *L )
+int luagi_status_file ( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -195,11 +195,11 @@ int lgit_status_file ( lua_State *L )
       luaL_error( L, "status for the fle %s failed: %s", path, err->message );
    }
 
-   lgit_status_flags_to_table( L, flags );
+   luagi_status_flags_to_table( L, flags );
    return 1;
 }
 
-int lgit_status_should_ignore( lua_State *L )
+int luagi_status_should_ignore( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
@@ -215,11 +215,11 @@ int lgit_status_should_ignore( lua_State *L )
    return 1;
 }
 
-int lgit_status_list_new ( lua_State *L )
+int luagi_status_list_new ( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_status_options opts;
-   if( lgit_status_init_options( L, 2, &opts ) )
+   if( luagi_status_init_options( L, 2, &opts ) )
    {
       luaL_error( L, "init options failed" );
    }
@@ -234,19 +234,19 @@ int lgit_status_list_new ( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LGIT_STATUS_FUNCS);
+   luaL_getmetatable(L, LUAGI_STATUS_FUNCS);
    lua_setmetatable(L, -2);
    return 1;
 }
 // list operations
-int lgit_status_list_entrycount( lua_State *L )
+int luagi_status_list_entrycount( lua_State *L )
 {
    git_status_list **list = checkstatuslist( L );
    lua_pushnumber( L, git_status_list_entrycount( *list ) );
    return 1;
 }
 
-int lgit_status_by_index( lua_State *L )
+int luagi_status_by_index( lua_State *L )
 {
    git_status_list **list = checkstatuslist( L );
    int idx = luaL_checkinteger( L, 2 );
@@ -264,7 +264,7 @@ int lgit_status_by_index( lua_State *L )
 
    lua_newtable( L );
 
-   lgit_status_flags_to_table( L, entry->status );
+   luagi_status_flags_to_table( L, entry->status );
    lua_setfield( L , -2, L_STATUS );
 
    // git_diff_delta
@@ -284,14 +284,14 @@ int lgit_status_by_index( lua_State *L )
    return 1;
 }
 
-int lgit_status_list_free( lua_State *L )
+int luagi_status_list_free( lua_State *L )
 {
    git_status_list **list = checkstatuslist( L );
    git_status_list_free( *list ); 
    return 0;
 }
 
-static int lgit_status_walker( lua_State *L )
+static int luagi_status_walker( lua_State *L )
 {
    struct status_list* info = (struct status_list*) lua_touserdata( L, lua_upvalueindex( 1 ) );
    if ( info != NULL && info->next != NULL )
@@ -300,7 +300,7 @@ static int lgit_status_walker( lua_State *L )
       info->next = elem->next;
       lua_pushstring( L, elem->path );
       // prepare boolean table to get rid of the integer flags
-      lgit_status_flags_to_table( L, elem->status_flags );
+      luagi_status_flags_to_table( L, elem->status_flags );
       free_elem( elem );
       return 2;
    }//iteration finished
