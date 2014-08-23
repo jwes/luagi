@@ -17,6 +17,7 @@
 #include "index.h"
 #include "object.h"
 #include "checkout.h"
+#include "stash.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -87,6 +88,11 @@ static const struct luaL_Reg repofuncs [] = {
    { "checkout_head", luagi_checkout_head },
    { "checkout_index", luagi_checkout_index },
    { "checkout_tree", luagi_checkout_tree },
+
+   //stash
+   { "stash", luagi_stash_save },
+   { "stash_for_each", luagi_stash_foreach },
+   { "stash_drop", luagi_stash_drop },
 
    { NULL, NULL },
 };
