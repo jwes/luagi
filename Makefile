@@ -13,7 +13,8 @@ FILES := src/luagi.c \
 		src/object.c \
 		src/checkout.c \
 		src/stash.c \
-		src/merge.c
+		src/merge.c \
+		src/reference.c 
 
 luagi.so: $(FILES)
 	gcc --shared -fPIC -o luagi.so \
