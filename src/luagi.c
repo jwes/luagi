@@ -18,6 +18,7 @@
 #include "object.h"
 #include "checkout.h"
 #include "stash.h"
+#include "reference.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -94,6 +95,12 @@ static const struct luaL_Reg repofuncs [] = {
    { "stash_for_each", luagi_stash_foreach },
    { "stash_drop", luagi_stash_drop },
 
+   //reference
+   { "create_reference", luagi_reference_create },
+   { "create_reference_matching", luagi_reference_create_matching },
+   { "create_symbolic_reference", luagi_reference_symbolic_create },
+   { "create_symbolic_reference_matching", luagi_reference_symbolic_create_matching },
+
    { NULL, NULL },
 };
 
@@ -139,6 +146,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_INDEX_ENTRY_FUNCS, luagi_index_entry_funcs );
    setup_funcs(L, LUAGI_INDEX_CONFLICT_FUNCS, luagi_index_conflict_funcs );
    setup_funcs(L, LUAGI_OBJECT_FUNCS, luagi_object_funcs );
+   setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

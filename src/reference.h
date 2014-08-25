@@ -50,6 +50,32 @@ int luagi_reference_is_valid_name( lua_State *L );
 #define LUAGI_REFERENCE_FUNCS "is.luagi.reference"
 
 #define check_ref_at( L, N ) \
-   (git_reference **) lua_checkudata( L, N, LUAGI_REFERENCE_FUNCS )
+   (git_reference **) luaL_checkudata( L, N, LUAGI_REFERENCE_FUNCS )
+
+static const struct luaL_Reg luagi_reference_funcs [] = {
+   { "target", luagi_reference_target },
+   { "target_peel", luagi_reference_target_peel },
+   { "symbolic_target", luagi_reference_symbolic_target },
+   { "type", luagi_reference_type },
+   { "name", luagi_reference_name },
+   { "resolve", luagi_reference_resolve },
+   { "owner", luagi_reference_owner },
+   { "set_symbolic_target", luagi_reference_symbolic_set_target },
+   { "set_target", luagi_reference_set_target },
+   { "rename", luagi_reference_rename },
+   { "delete", luagi_reference_delete },
+   { "remove", luagi_reference_remove },
+   { "list", luagi_reference_list },
+   { "foreach", luagi_reference_foreach },
+   { "foreach_name", luagi_reference_foreach_name },
+   { "is_branch", luagi_reference_is_branch },
+   { "is_remote", luagi_reference_is_remote },
+   { "is_tag",  luagi_reference_is_tag },
+   { "is_note", luagi_reference_is_note },
+   { "peel", luagi_reference_peel },
+   { "shorthand", luagi_reference_shorthand },
+   { "__gc", luagi_reference_free },
+   { NULL, NULL }
+};
 
 #endif
