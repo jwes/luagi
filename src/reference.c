@@ -6,6 +6,10 @@
 #include "luagi.h"
 #include "oid.h"
 
+#define REF_INVALID "invalid"
+#define REF_OID "oid"
+#define REF_SYMBOLIC "symbolic"
+
 int luagi_reference_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -198,7 +202,25 @@ int luagi_reference_symbolic_target( lua_State *L )
    return 1;
 }
 
-int luagi_reference_type( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_type( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   git_ref_t type = git_reference_type( *ref );
+   if( type == GIT_REF_INVALID )
+   {
+      lua_pushstring( L, REF_INVALID ); 
+   }
+   else if ( type == GIT_REF_OID )
+   {
+      lua_pushstring( L, REF_OID );
+   }
+   else
+   {
+      lua_pushstring( L, REF_SYMBOLIC );
+   }
+   return 1;
+}
+
 int luagi_reference_name( lua_State *L )
 {
    git_reference **ref = check_ref_at( L, 1 );
@@ -232,8 +254,53 @@ int luagi_reference_owner( lua_State *L )
    lua_setmetatable( L, -2 );
    return 1;
 }
-int luagi_reference_symbolic_set_target( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_set_target( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+
+int luagi_reference_symbolic_set_target( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   const char *target = luaL_checkstring( L, 2 );
+   git_signature sig;
+   if( table_to_signature( L, &sig, 3 ) )
+   {
+      ERROR_ABORT( L )
+   }
+   const char *log_message = luaL_checkstring( L, 4 );
+
+   git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
+   if( git_reference_symbolic_set_target( out, *ref, target, &sig, log_message ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_reference_set_target( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   git_oid oid;
+   if( luagi_check_oid( &oid, L, 2 ) )
+   {
+      ERROR_ABORT( L )
+   }
+   git_signature sig;
+   if( table_to_signature( L, &sig, 3 ) )
+   {
+      ERROR_ABORT( L )
+   }
+   const char *log_message = luaL_checkstring( L, 4 );
+
+   git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
+   if( git_reference_set_target( out, *ref, &oid, &sig, log_message ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
 int luagi_reference_rename( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_delete( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_remove( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
