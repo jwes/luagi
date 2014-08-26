@@ -67,7 +67,6 @@ static const struct luaL_Reg luagi_reference_funcs [] = {
    { "remove", luagi_reference_remove },
    { "list", luagi_reference_list },
    { "foreach", luagi_reference_foreach },
-   { "foreach_name", luagi_reference_foreach_name },
    { "is_branch", luagi_reference_is_branch },
    { "is_remote", luagi_reference_is_remote },
    { "is_tag",  luagi_reference_is_tag },

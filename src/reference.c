@@ -2,6 +2,7 @@
 #include <git2/refs.h>
 #include <git2/oid.h>
 #include <git2/signature.h>
+#include <git2/strarray.h>
 
 #include "luagi.h"
 #include "oid.h"
@@ -345,13 +346,102 @@ int luagi_reference_remove( lua_State *L )
    return 0;
 }
 
-int luagi_reference_list( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_foreach( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_foreach_name( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_is_branch( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_is_remote( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_is_tag( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_is_note( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_list( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_strarray array;
+   if( git_reference_list( &array, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luagi_lua_list_from_string( L, &array );
+   git_strarray_free( &array );
+   return 1;
+}
+
+static int ref_callback( git_reference *ref, void *payload )
+{
+   luagi_foreach_t *p = payload;
+
+   git_reference **out = lua_newuserdata( p->L, sizeof( git_reference *));
+   *out = ref; 
+   if( lua_pcall( p->L, 1, 1, 0 ) != LUA_OK )
+   {
+      luaL_error( p->L, "can not call ref callback function" );
+   }
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+static int name_callback( const char *name, void *payload )
+{
+   luagi_foreach_t *p = payload;
+   lua_pushstring( p->L, name );
+   if( lua_pcall( p->L, 1, 1, 0 ) != LUA_OK )
+   {
+      luaL_error( p->L, "can not call ref callback function" );
+   }
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+int luagi_reference_foreach( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   p->L = L;
+   p->callback_pos = 2;
+
+   int just_names = lua_toboolean( L, 3 );
+   
+   if( just_names )
+   {
+      if( git_reference_foreach_name( *repo, name_callback, p ))
+      {
+         ERROR_ABORT( L )
+      }
+   }
+   else
+   {
+      if( git_reference_foreach( *repo, ref_callback, p ))
+      {
+         ERROR_ABORT( L )
+      }
+   }
+   free( p );
+   return 0;   
+}
+
+static int generic_is_func( lua_State *L, int (*func)(const git_reference *ref ) )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   lua_pushboolean( L, func( *ref ) );
+   return 1;
+}
+
+int luagi_reference_is_branch( lua_State *L )
+{
+   return generic_is_func( L, git_reference_is_branch );
+}
+
+int luagi_reference_is_remote( lua_State *L )
+{
+   return generic_is_func( L, git_reference_is_remote );
+}
+
+int luagi_reference_is_tag( lua_State *L )
+{
+   return generic_is_func( L, git_reference_is_tag );
+}
+
+int luagi_reference_is_note( lua_State *L )
+{
+   return generic_is_func( L, git_reference_is_note );
+}
+
 int luagi_reference_peel( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_shorthand( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_free( lua_State *L )

@@ -42,7 +42,14 @@ int table_to_signature( lua_State *L, git_signature* sig, int position );
 const char* luagi_otype_to_string( git_otype type );
 
 int luagi_oid_fromstr( git_oid *oid, const char *ref );
+void luagi_lua_list_from_string( lua_State *L, git_strarray *array );
 git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx );
+
+typedef struct luagi_foreach_payload
+{
+   lua_State *L;
+   int callback_pos;
+} luagi_foreach_t;
 
 void dumpStack( lua_State* L );
 #ifdef STACK_DEBUG

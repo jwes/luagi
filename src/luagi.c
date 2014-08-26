@@ -246,6 +246,17 @@ git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx )
    return array;
 }
 
+void luagi_lua_list_from_string( lua_State *L, git_strarray *array )
+{
+   lua_newtable( L );
+   for( size_t i = 1; i <= array->count; i++ )
+   {
+      lua_pushstring( L, array->strings[i-1]);
+      lua_pushinteger( L, i );
+      lua_settable( L, -3 );
+   }
+}
+
 void dumpStack( lua_State *L )
 {
    int i;
