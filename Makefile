@@ -15,7 +15,8 @@ FILES := src/luagi.c \
 		src/stash.c \
 		src/merge.c \
 		src/reference.c \
-		src/oid.c
+		src/oid.c \
+		src/types.c
 
 luagi.so: $(FILES)
 	gcc --shared -fPIC -o luagi.so \

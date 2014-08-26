@@ -6,6 +6,8 @@
 
 #include "luagi.h"
 #include "oid.h"
+#include "object.h"
+#include "types.h"
 
 #define REF_INVALID "invalid"
 #define REF_OID "oid"
@@ -442,8 +444,29 @@ int luagi_reference_is_note( lua_State *L )
    return generic_is_func( L, git_reference_is_note );
 }
 
-int luagi_reference_peel( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_shorthand( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_peel( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   git_otype type = luagi_otype_from_string( luaL_checkstring( L, 2 ) );
+
+   git_object **out = lua_newuserdata( L, sizeof( git_object *) );
+
+   if( git_reference_peel( out, *ref, type ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_reference_shorthand( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   lua_pushstring( L, git_reference_shorthand( *ref ) );
+   return 1;
+}
+
 int luagi_reference_free( lua_State *L )
 {
    git_reference **ref = check_ref_at( L, 1 );
@@ -456,10 +479,35 @@ int luagi_reference_iterator( lua_State *L ){ luaL_error( L, "not yet implemente
 int luagi_reference_iterator_free( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 
 int luagi_reference_foreach_glob( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_has_log( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_ensure_log( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+
+int luagi_reference_has_log( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *refname = luaL_checkstring( L, 2 );
+
+   lua_pushboolean( L, git_reference_has_log( *repo, refname ) );
+   return 1;
+}
+
+int luagi_reference_ensure_log( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *refname = luaL_checkstring( L, 2 );
+
+   if( git_reference_ensure_log( *repo, refname ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
 int luagi_reference_normalize_name( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 
-int luagi_reference_is_valid_name( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_is_valid_name( lua_State *L )
+{
+   const char *name = luaL_checkstring( L, 1 );
+   lua_pushboolean( L, git_reference_is_valid_name( name ) );
+   return 1;
+}
 
 
