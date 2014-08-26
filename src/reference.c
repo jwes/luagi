@@ -301,9 +301,50 @@ int luagi_reference_set_target( lua_State *L )
    return 1;
 }
 
-int luagi_reference_rename( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_delete( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_remove( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_rename( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
+   git_signature sig;
+   if( table_to_signature( L, &sig, 3 ) )
+   {
+      ERROR_ABORT( L )
+   }
+   const char *log_message = luaL_checkstring( L, 4 );
+   int force = lua_toboolean( L, 5 );
+
+   git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
+   if( git_reference_rename( out, *ref, name, force, &sig, log_message ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_reference_delete( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   if( git_reference_delete( *ref ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_reference_remove( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
+
+   if( git_reference_remove( *repo, name ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
 int luagi_reference_list( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_foreach( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_foreach_name( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
@@ -313,7 +354,12 @@ int luagi_reference_is_tag( lua_State *L ){ luaL_error( L, "not yet implemented"
 int luagi_reference_is_note( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_peel( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_reference_shorthand( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_free( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_free( lua_State *L )
+{
+   git_reference **ref = check_ref_at( L, 1 );
+   git_reference_free( *ref );
+   return 0;
+}
 
 // normal from glob and just names
 int luagi_reference_iterator( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
