@@ -100,7 +100,16 @@ static const struct luaL_Reg repofuncs [] = {
    { "create_reference_matching", luagi_reference_create_matching },
    { "create_symbolic_reference", luagi_reference_symbolic_create },
    { "create_symbolic_reference_matching", luagi_reference_symbolic_create_matching },
-
+   { "lookup_reference", luagi_reference_lookup },
+   { "reference_name_to_id", luagi_reference_name_to_id },
+   { "reference_dwim", luagi_reference_dwim },
+   { "remove_reference", luagi_reference_remove },
+   { "list_references", luagi_reference_list },
+   { "foreach_reference", luagi_reference_foreach },
+   { "foreach_reference_with_glob", luagi_reference_foreach_glob },
+   { "iterate_references", luagi_reference_iterator },
+   { "reference_has_log", luagi_reference_has_log },
+   { "reference_ensure_log", luagi_reference_ensure_log },
    { NULL, NULL },
 };
 
@@ -116,6 +125,8 @@ static const struct luaL_Reg mylib [] = {
    { "is_supported_remote_url", luagi_remote_supported_url },
    //index if path is given, it does open
    { "create_index", luagi_index_new },
+   { "reference_normalize_name", luagi_reference_normalize_name },
+   { "reference_is_valid_name", luagi_reference_is_valid_name },
    { NULL, NULL } /*sentinel*/
 };
 
