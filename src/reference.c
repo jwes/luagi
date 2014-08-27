@@ -1,4 +1,5 @@
 #include "reference.h"
+#include <string.h>
 #include <git2/refs.h>
 #include <git2/oid.h>
 #include <git2/signature.h>
@@ -13,6 +14,7 @@
 #define REF_OID "oid"
 #define REF_SYMBOLIC "symbolic"
 
+#define bufsize 1024
 int luagi_reference_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -474,11 +476,83 @@ int luagi_reference_free( lua_State *L )
    return 0;
 }
 
-// normal from glob and just names
-int luagi_reference_iterator( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_reference_iterator_free( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+static int reference_iter( lua_State *L )
+{
+   git_reference_iterator **iter = checkreferenceiter_at( L, lua_upvalueindex( 1 ) );   
 
-int luagi_reference_foreach_glob( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+   git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
+   int ret =  git_reference_next( out, *iter );
+   if( ret == GIT_ITEROVER )
+   {
+      return 0;
+   }
+   else if( iter != 0 )
+   {
+      ERROR_ABORT( L )
+      return 0;
+   }
+
+   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+// normal from glob and just names
+int luagi_reference_iterator( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *glob = luaL_optstring( L, 2, NULL );
+
+   git_reference_iterator **iter = lua_newuserdata( L, sizeof( git_reference_iterator * ) );
+   int ret = 0;
+   if( glob == NULL )
+   {
+      ret = git_reference_iterator_new( iter, *repo ); 
+   } 
+   else
+   {
+      ret = git_reference_iterator_glob_new ( iter, *repo, glob );
+   }
+
+   if( ret )
+   {
+      ERROR_ABORT( L )
+      return 0;
+   }
+     
+
+   luaL_getmetatable(L, LUAGI_REFERENCE_ITER_FUNCS);
+   lua_setmetatable(L, -2);
+
+   lua_pushcclosure( L, reference_iter, -2 );
+   return 1; 
+}
+
+int luagi_reference_iterator_free( lua_State *L )
+{
+   git_reference_iterator **iter = checkreferenceiter_at( L, 1 );
+   git_reference_iterator_free( *iter );
+   return 0;
+}
+
+int luagi_reference_foreach_glob( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *glob = luaL_checkstring( L, 2 );
+
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   p->L = L;
+   p->callback_pos = 3;
+
+   if( git_reference_foreach_glob( *repo, glob, name_callback, p ))
+   {
+      ERROR_ABORT( L )
+   }
+   free( p );
+   return 0;   
+}
+
+   
 
 int luagi_reference_has_log( lua_State *L )
 {
@@ -501,7 +575,21 @@ int luagi_reference_ensure_log( lua_State *L )
    return 0;
 }
 
-int luagi_reference_normalize_name( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+int luagi_reference_normalize_name( lua_State *L )
+{
+   const char *name = luaL_checkstring( L, 1 );
+   //TODO flags
+   int flags = GIT_REF_FORMAT_NORMAL;
+   char buffer_out[ bufsize ];
+
+   memset( buffer_out, 0, bufsize );
+   if( git_reference_normalize_name( buffer_out, bufsize, name, flags ) != 0 )
+   {
+      ERROR_PUSH( L )
+   }
+   lua_pushstring( L, buffer_out );
+   return 1;
+}
 
 int luagi_reference_is_valid_name( lua_State *L )
 {

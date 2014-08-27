@@ -48,10 +48,13 @@ int luagi_reference_normalize_name( lua_State *L );
 int luagi_reference_is_valid_name( lua_State *L );
 
 #define LUAGI_REFERENCE_FUNCS "is.luagi.reference"
+#define LUAGI_REFERENCE_ITER_FUNCS "is.luagi.reference.iterator"
 
 #define check_ref_at( L, N ) \
    (git_reference **) luaL_checkudata( L, N, LUAGI_REFERENCE_FUNCS )
 
+#define checkreferenceiter_at( L, N ) \
+   (git_reference_iterator **) luaL_checkudata( L, N, LUAGI_REFERENCE_ITER_FUNCS )
 static const struct luaL_Reg luagi_reference_funcs [] = {
    { "target", luagi_reference_target },
    { "target_peel", luagi_reference_target_peel },
@@ -74,6 +77,11 @@ static const struct luaL_Reg luagi_reference_funcs [] = {
    { "peel", luagi_reference_peel },
    { "shorthand", luagi_reference_shorthand },
    { "__gc", luagi_reference_free },
+   { NULL, NULL }
+};
+
+static const struct luaL_Reg luagi_reference_iter_funcs [] = {
+   { "__gc", luagi_reference_iterator_free },
    { NULL, NULL }
 };
 

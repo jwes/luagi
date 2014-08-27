@@ -147,6 +147,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_INDEX_CONFLICT_FUNCS, luagi_index_conflict_funcs );
    setup_funcs(L, LUAGI_OBJECT_FUNCS, luagi_object_funcs );
    setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );
+   setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
