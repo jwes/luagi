@@ -5,16 +5,16 @@
 #include <git2/errors.h>
 #include "commit.h"
 #include "luagi.h"
+#include "oid.h"
 
 #define checkcommit( L ) \
    (git_commit**) luaL_checkudata( L, 1, LUAGI_COMMIT_FUNCS )
 int luagi_commit_lookup( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );
-   const char* ref = luaL_checkstring( L, 2 );
 
    git_oid oid;
-   int ret = luagi_oid_fromstr( &oid, ref);
+   int ret = luagi_check_oid( &oid, L, 2);
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -45,9 +45,7 @@ int luagi_commit_id( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    const git_oid* oid = git_commit_id( *commit );
-   char out [ GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr(out, sizeof( out ), oid ));
-   return 1;
+   return luagi_push_oid( L, oid );
 }
 
 int luagi_commit_encoding( lua_State *L )
@@ -148,9 +146,7 @@ int luagi_commit_parent_id( lua_State *L )
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
    const git_oid* oid = git_commit_parent_id( *commit, n );
-   char array [ GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr( array, sizeof( array ), oid ));
-   return 1;
+   return luagi_push_oid( L, oid );
 }
 
 int luagi_commit_nth_gen_ancestor( lua_State *L )
@@ -210,9 +206,7 @@ int luagi_commit_create( lua_State *L )
       lua_pushfstring( L, "commit failed: %d", ret );
       return 2;
    }
-   char array [ GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr( array, sizeof( array ), &oid ) ); 
-   return 1;
+   return luagi_push_oid( L, &oid );
 }
 /*
  * Needs a table
@@ -269,8 +263,6 @@ int luagi_commit_amend( lua_State *L )
       lua_pushfstring( L, "commit amend failed %d", ret );
       return 2;
    }
-   char array [GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr( array, sizeof( array ), &outid) );
-   return 1;
+   return luagi_push_oid( L, &outid );
 }
 

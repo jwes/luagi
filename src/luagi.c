@@ -228,16 +228,6 @@ const char *luagi_otype_to_string( git_otype type )
    }
 }
 
-int luagi_oid_fromstr( git_oid *oid, const char *ref )
-{
-   int len = strlen( ref );
-   if ( len < GIT_OID_MINPREFIXLEN || len > GIT_OID_HEXSZ )
-   {
-      return -21;
-   }
-   return git_oid_fromstrp( oid, ref);
-}
-
 git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx )
 {
    git_strarray array;

@@ -3,6 +3,7 @@
 #include <git2/errors.h>
 #include <git2/repository.h>
 #include "luagi.h"
+#include "oid.h"
 
 #define FORCE "force"
 #define DISABLE_PATHSPEC_MATCH "disable_pathspec_match"
@@ -189,9 +190,7 @@ int luagi_index_write_tree( lua_State *L )
          ERROR_PUSH( L )
       }
    }
-   char buf [ GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr( buf, sizeof(buf), &out ) );
-   return 1;
+   return luagi_push_oid( L, &out );
 }
 
 int luagi_index_entrycount( lua_State *L )

@@ -2,18 +2,19 @@
 #include <git2/object.h>
 #include <git2/oid.h>
 #include "luagi.h"
+#include "oid.h"
+
 int luagi_object_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const char *idstr = luaL_checkstring( L, 2 );
-   const char *typestr = luaL_checkstring( L, 3 );
 
    git_oid id;
-   if( git_oid_fromstr( &id, idstr ) )
+   if(luagi_check_oid( &id, L, 2 ) )
    {
       ERROR_PUSH( L )
    }
 
+   const char *typestr = luaL_checkstring( L, 3 );
    git_otype type = git_object_string2type( typestr );
   
    git_object **out = lua_newuserdata( L, sizeof( git_object *) );
@@ -59,9 +60,7 @@ int luagi_object_id( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   char buf[ GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr( buf, sizeof( buf ), oid ) );
-   return 1;
+   return luagi_push_oid( L, oid );
 }
 
 int luagi_object_type( lua_State *L )

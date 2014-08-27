@@ -3,6 +3,7 @@
 #include <git2/stash.h>
 #include <git2/signature.h>
 #include "luagi.h"
+#include "oid.h"
 
 int luagi_stash_save( lua_State *L )
 {
@@ -26,10 +27,7 @@ int luagi_stash_save( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   char buf[ GIT_OID_HEXSZ + 1 ];
-
-   lua_pushstring( L, git_oid_tostr( buf, sizeof( buf ), &out ) );
-   return 1;
+   return luagi_push_oid( L, &out );
 }
 struct foreach_payload
 {

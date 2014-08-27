@@ -2,6 +2,7 @@
 #include <lauxlib.h>
 #include "tree.h"
 #include <stdio.h>
+#include "oid.h"
 
 #define checktreebuilder(L) \
       (git_treebuilder**) luaL_checkudata( L, 1, LUAGI_TREE_BUILDER_FUNCS )
@@ -67,9 +68,8 @@ int luagi_tree_builder_insert( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
    const char* filename = luaL_checkstring( L, 2 );
-   const char* ref = luaL_checkstring( L, 3 );
    git_oid oid;
-   int ret = luagi_oid_fromstr( &oid, ref );
+   int ret = luagi_check_oid( &oid, L, 3 );
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -117,10 +117,7 @@ int luagi_tree_builder_write( lua_State *L )
    git_oid oid;
    
    git_treebuilder_write( &oid, *repo, *builder );
-   char array [ GIT_OID_HEXSZ + 1 ];
-   git_oid_tostr( array, sizeof(array), &oid );
-   lua_pushstring( L, array );
-   return 1;
+   return luagi_push_oid( L, &oid );
 }
 
 struct filter_payload 

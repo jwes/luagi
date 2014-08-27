@@ -10,6 +10,7 @@
 #include "object.h"
 
 #include <stdio.h>
+#include "oid.h"
 
 /*#define checktree(L) \
       (git_tree**) luaL_checkudata( L, 1, LUAGI_TREE_FUNCS )
@@ -17,10 +18,9 @@
 int luagi_tree_lookup( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );
-   const char* id_str = luaL_checkstring( L, 2 );
 
    git_oid oid;
-   int ret = luagi_oid_fromstr( &oid, id_str);
+   int ret = luagi_check_oid( &oid, L, 2 );
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -53,9 +53,7 @@ int luagi_tree_id( lua_State *L )
 {
    git_tree** tree = checktree( L );
    const git_oid* oid = git_tree_id( *tree );
-   char out[ GIT_OID_HEXSZ+1];
-   lua_pushstring( L, git_oid_tostr( out, sizeof(out), oid ));
-   return 1;
+   return luagi_push_oid( L, oid );
 }
 
 int luagi_tree_entrycount( lua_State *L )
@@ -123,23 +121,17 @@ int luagi_tree_entry_byindex( lua_State *L )
 int luagi_tree_entry_byid( lua_State *L )
 {
    git_tree** tree = checktree( L );
-   const char* idstring = luaL_checkstring( L , 2 );
-
    git_oid oid;
-   int ret = luagi_oid_fromstr( &oid, idstring );
+   int ret = luagi_check_oid( &oid, L, 2 );
    if( ret != 0 )
    {
-      lua_pushnil( L );
-      lua_pushfstring( L, "%s is no valid id", idstring );
-      return 2;
+      ERROR_PUSH( L )
    }
 
    const git_tree_entry* e = git_tree_entry_byid( *tree, &oid );
    if( e == NULL )
    {
-      lua_pushnil( L );
-      lua_pushfstring( L, "file: index %s not found", idstring );
-      return 2;
+      ERROR_PUSH( L )
    }
    return tree_entry_by_final(L, e );
 }
@@ -190,9 +182,7 @@ int luagi_tree_entry_id( lua_State *L )
    git_tree_entry** entry = checktreeentry( L, 1 );   
    const git_oid* oid = git_tree_entry_id( *entry );
 
-   char array [GIT_OID_HEXSZ + 1];
-   lua_pushstring( L, git_oid_tostr( array, sizeof(array), oid ));
-   return 1;
+   return luagi_push_oid( L, oid );
    
 }
 int luagi_tree_entry_type( lua_State *L )
