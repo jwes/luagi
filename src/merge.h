@@ -23,4 +23,12 @@ int luagi_merge_trees( lua_State *L );
 int luagi_merge_commits( lua_State *L );
 int luagi_merge( lua_State *L );
 
+#define LUAGI_MERGEHEAD_FUNCS "is.luagi.merge.head"
+
+static const struct luaL_Reg luagi_mergehead_funcs [] = {
+   { "__gc", luagi_merge_head_free },
+   { "__tostring", luagi_merge_head_id },
+   { NULL, NULL }
+};
+
 #endif

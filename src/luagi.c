@@ -19,6 +19,7 @@
 #include "checkout.h"
 #include "stash.h"
 #include "reference.h"
+#include "merge.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -110,6 +111,13 @@ static const struct luaL_Reg repofuncs [] = {
    { "iterate_references", luagi_reference_iterator },
    { "reference_has_log", luagi_reference_has_log },
    { "reference_ensure_log", luagi_reference_ensure_log },
+
+   //merge
+   { "merge_base", luagi_merge_base },
+   { "merge_base_many", luagi_merge_base_many },
+   { "merge_base_octopus", luagi_merge_base_octopus },
+   { "merge_head_from_ref", luagi_merge_head_from_ref },
+
    { NULL, NULL },
 };
 
@@ -159,6 +167,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_OBJECT_FUNCS, luagi_object_funcs );
    setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );
    setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
+   setup_funcs(L, LUAGI_MERGEHEAD_FUNCS, luagi_mergehead_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
