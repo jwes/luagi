@@ -10,6 +10,7 @@
 #include <git2/branch.h>
 #include "branch.h"
 #include "luagi.h"
+#include "commit.h"
 
 #include <stdio.h>
 

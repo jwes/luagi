@@ -25,6 +25,9 @@ int luagi_merge( lua_State *L );
 
 #define LUAGI_MERGEHEAD_FUNCS "is.luagi.merge.head"
 
+#define check_mergehead_at( L, N ) \
+   (git_merge_head **) luaL_checkudata( L, N, LUAGI_MERGEHEAD_FUNCS )
+
 static const struct luaL_Reg luagi_mergehead_funcs [] = {
    { "__gc", luagi_merge_head_free },
    { "__tostring", luagi_merge_head_id },

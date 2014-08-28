@@ -7,8 +7,6 @@
 #include "luagi.h"
 #include "oid.h"
 
-#define checkcommit( L ) \
-   (git_commit**) luaL_checkudata( L, 1, LUAGI_COMMIT_FUNCS )
 int luagi_commit_lookup( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );

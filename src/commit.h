@@ -19,6 +19,12 @@ int luagi_commit_nth_gen_ancestor( lua_State *L );
 int luagi_commit_create( lua_State *L );
 int luagi_commit_amend( lua_State *L );
 
+#define LUAGI_COMMIT_FUNCS "is.westh.luagi.commit"
+
+#define checkcommit_at( L, N ) \
+   (git_commit**) luaL_checkudata( L, N, LUAGI_COMMIT_FUNCS )
+#define checkcommit( L ) \
+   checkcommit_at( L, 1 )
 static const struct luaL_Reg luagi_commit_funcs [] = {
    { "id", luagi_commit_id },
    { "summary", luagi_commit_summary },

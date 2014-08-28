@@ -117,6 +117,12 @@ static const struct luaL_Reg repofuncs [] = {
    { "merge_base_many", luagi_merge_base_many },
    { "merge_base_octopus", luagi_merge_base_octopus },
    { "merge_head_from_ref", luagi_merge_head_from_ref },
+   { "merge_head_from_fetchhead", luagi_merge_head_from_fetchhead },
+   { "merge_head_from_id", luagi_merge_head_from_id },
+   { "merge_trees", luagi_merge_trees },
+   { "merge_commits", luagi_merge_commits },
+   { "merge", luagi_merge },
+   { "merge_file_from_index", luagi_merge_file_from_index },
 
    { NULL, NULL },
 };

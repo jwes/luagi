@@ -10,7 +10,6 @@
 #define LUAGI_TREE_ENTRY_FUNCS "is.westh.luagi.tree.entry"
 #define LUAGI_TREE_BUILDER_FUNCS "is.westh.luagi.tree.builder"
 #define LUAGI_TREE_WALK_STATICS "is.westhu.luagi.tree.walk"
-#define LUAGI_COMMIT_FUNCS "is.westh.luagi.commit"
 #define LUAGI_REMOTE_FUNCS "is.westh.luagi.remote"
 
 #define SIG_NAME "name"
