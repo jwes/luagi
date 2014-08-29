@@ -142,6 +142,7 @@ static const struct luaL_Reg mylib [] = {
    { "create_index", luagi_index_new },
    { "reference_normalize_name", luagi_reference_normalize_name },
    { "reference_is_valid_name", luagi_reference_is_valid_name },
+   { "merge_files", luagi_merge_file },
    { NULL, NULL } /*sentinel*/
 };
 

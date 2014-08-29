@@ -7,7 +7,74 @@
 #include "commit.h"
 #include "checkout.h"
 
-int luagi_merge_analysis( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+#define NONE "none"
+#define NORMAL "normal"
+#define UP_TO_DATE "up to date"
+#define FASTFORWARD "fast forward"
+#define UNBORN "unborn"
+
+#define NO_FASTFORWARD "no fast forward"
+#define FASTFORWARD_ONLY "fast forward only"
+
+#define PATH "path"
+#define CONTENT "content"
+
+int luagi_merge_analysis( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   int len =  luaL_len( L, 2 );
+   const git_merge_head *heads[ len ];
+
+   for( int i = 0; i < len; i++ )
+   {
+      lua_pushinteger( L, i );
+      lua_gettable( L, 2 );
+      heads[i] = *( check_mergehead_at( L, -1 ) );
+   }
+
+   git_merge_analysis_t anout;
+   git_merge_preference_t pout;
+
+   if( git_merge_analysis( &anout, &pout, *repo, heads, len ) )
+   {
+      ERROR_PUSH( L )
+   }
+   const char *aoutstr = NONE;
+   const char *poutstr = NONE;
+
+   switch( anout )
+   {
+      case GIT_MERGE_ANALYSIS_NONE:
+         break;
+      case GIT_MERGE_ANALYSIS_NORMAL:
+         aoutstr = NORMAL;
+         break;
+      case GIT_MERGE_ANALYSIS_UP_TO_DATE:
+         aoutstr = UP_TO_DATE;
+         break;
+      case GIT_MERGE_ANALYSIS_FASTFORWARD:
+         aoutstr = FASTFORWARD;
+         break;
+      case GIT_MERGE_ANALYSIS_UNBORN:
+         aoutstr = UNBORN;
+         break;
+   }
+   lua_pushstring( L, aoutstr );
+   switch( pout )
+   {
+      case GIT_MERGE_PREFERENCE_NONE:
+         break;
+      case GIT_MERGE_PREFERENCE_NO_FASTFORWARD:
+         poutstr = NO_FASTFORWARD;
+         break;
+      case GIT_MERGE_PREFERENCE_FASTFORWARD_ONLY:
+         poutstr = FASTFORWARD_ONLY;
+         break;
+   }
+   lua_pushstring( L, poutstr );      
+   return 2;
+}
+ 
 int luagi_merge_base( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -151,7 +218,47 @@ static int luagi_merge_init_options( lua_State *L __attribute__((unused)), int i
    return git_merge_init_options( opts, GIT_MERGE_OPTIONS_VERSION );
 }
 
-int luagi_merge_file( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+
+static int luagi_check_merge_input( lua_State *L, int index, git_merge_file_input *input )
+{
+   int ret = git_merge_file_init_input( input, GIT_MERGE_FILE_INPUT_VERSION );
+   if( ret )
+      return ret; 
+
+   luaL_checktype( L, index, LUA_TTABLE );
+   lua_getfield( L, index, PATH );
+   input->path = luaL_checkstring( L, -1 );
+
+   lua_getfield( L, index, CONTENT );
+   input->size = luaL_len( L, -1 );
+   input->ptr = luaL_checkstring( L, -1 );
+
+   return 0;
+}
+
+int luagi_merge_file( lua_State *L )
+{
+   git_merge_file_input ancestor;
+   luagi_check_merge_input( L, 1, &ancestor );
+   git_merge_file_input ours;
+   luagi_check_merge_input( L, 2, &ours );
+   git_merge_file_input theirs;
+   luagi_check_merge_input( L, 3, &theirs );
+
+   git_merge_file_options opts;
+   luagi_merge_init_file_options( L, 4, &opts );
+
+   git_merge_file_result *out = lua_newuserdata( L, sizeof( git_merge_file_result ) );
+
+   if( git_merge_file( out, &ancestor, &ours, &theirs, &opts ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable( L, LUAGI_MERGERESULT_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
 
 int luagi_merge_file_from_index( lua_State *L )
 {
