@@ -123,6 +123,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "merge_commits", luagi_merge_commits },
    { "merge", luagi_merge },
    { "merge_file_from_index", luagi_merge_file_from_index },
+   { "merge_analysis", luagi_merge_analysis },
 
    { NULL, NULL },
 };
@@ -174,6 +175,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );
    setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
    setup_funcs(L, LUAGI_MERGEHEAD_FUNCS, luagi_mergehead_funcs );
+   setup_funcs(L, LUAGI_MERGERESULT_FUNCS, luagi_mergeresult_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

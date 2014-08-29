@@ -5,6 +5,7 @@
 #include "reference.h"
 #include "index.h"
 #include "commit.h"
+#include "checkout.h"
 
 int luagi_merge_analysis( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 int luagi_merge_base( lua_State *L )
@@ -140,14 +141,43 @@ int luagi_merge_head_free( lua_State *L )
    return 0;
 }
 
+static int luagi_merge_init_file_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_merge_file_options *opts )
+{
+   return git_merge_file_init_options( opts, GIT_MERGE_FILE_OPTIONS_VERSION );
+}
+
 static int luagi_merge_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_merge_options *opts )
 {
    return git_merge_init_options( opts, GIT_MERGE_OPTIONS_VERSION );
 }
 
 int luagi_merge_file( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_merge_file_from_index( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
-int luagi_merge_file_result_free( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
+
+int luagi_merge_file_from_index( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const git_index_entry *ancestor = checkindexentry_at( L, 2 );
+   const git_index_entry *ours = checkindexentry_at( L, 3 );
+   const git_index_entry *theirs = checkindexentry_at( L, 4 );
+
+   git_merge_file_options opts;
+   luagi_merge_init_file_options( L, 5, &opts );
+   git_merge_file_result *res = lua_newuserdata( L, sizeof( git_merge_file_result ) );
+   if( git_merge_file_from_index( res, *repo, ancestor, ours, theirs, &opts ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_MERGERESULT_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_merge_file_result_free( lua_State *L )
+{
+   git_merge_file_result *result = check_mergeresult_at( L, 1 );
+   git_merge_file_result_free( result );
+   return 0;
+}
 
 int luagi_merge_trees( lua_State *L )
 {
@@ -169,6 +199,7 @@ int luagi_merge_trees( lua_State *L )
    lua_setmetatable( L, -2 );
    return 1;
 }
+
 int luagi_merge_commits( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -188,5 +219,59 @@ int luagi_merge_commits( lua_State *L )
    lua_setmetatable( L, -2 );
    return 1;
 }
-int luagi_merge( lua_State *L ){ luaL_error( L, "not yet implemented"); return 0; }
 
+int luagi_merge( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   luaL_checktype( L, 2, LUA_TTABLE );
+
+   int len =  luaL_len( L, 2 );
+   const git_merge_head *heads[ len ];
+
+   for( int i = 0; i < len; i++ )
+   {
+      lua_pushinteger( L, i );
+      lua_gettable( L, 2 );
+      heads[i] = *( check_mergehead_at( L, -1 ) );
+   }
+
+   //TODO options
+   git_merge_options mopts;
+   luagi_merge_init_options( L, 3, &mopts ); 
+   git_checkout_options copts;
+   luagi_parse_checkout_options( &copts, L, 4 ); 
+
+   if( git_merge( *repo, heads, len, &mopts, &copts ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_mergeresult_automergable( lua_State *L )
+{
+   git_merge_file_result *res = check_mergeresult_at( L, 1 );
+   lua_pushboolean( L, res->automergeable );
+   return 1;
+}
+
+int luagi_mergeresult_path( lua_State *L )
+{
+   git_merge_file_result *res = check_mergeresult_at( L, 1 );
+   lua_pushstring( L, res->path );
+   return 1;
+}
+
+int luagi_mergeresult_mode( lua_State *L )
+{
+   git_merge_file_result *res = check_mergeresult_at( L, 1 );
+   lua_pushinteger( L, res->mode );
+   return 1;
+}
+
+int luagi_mergeresult_content( lua_State *L )
+{
+   git_merge_file_result *res = check_mergeresult_at( L, 1 );
+   lua_pushstring( L, res->ptr );
+   return 1;
+}
