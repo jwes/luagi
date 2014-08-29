@@ -20,6 +20,7 @@
 #include "stash.h"
 #include "reference.h"
 #include "merge.h"
+#include "blob.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -124,7 +125,13 @@ static const struct luaL_Reg repofuncs [] = {
    { "merge", luagi_merge },
    { "merge_file_from_index", luagi_merge_file_from_index },
    { "merge_analysis", luagi_merge_analysis },
-
+   // blob
+   { "lookup_blob", luagi_blob_lookup },
+   { "lookup_blob_prefix", luagi_blob_lookup_prefix },
+   { "create_blob_from_workdir", luagi_blob_create_fromworkdir },
+   { "create_blob_from_disk", luagi_blob_create_fromdisk },
+   { "create_blob_from_chunks", luagi_blob_create_fromchunks },
+   { "create_blob_from_buffer", luagi_blob_create_frombuffer },
    { NULL, NULL },
 };
 
@@ -177,6 +184,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
    setup_funcs(L, LUAGI_MERGEHEAD_FUNCS, luagi_mergehead_funcs );
    setup_funcs(L, LUAGI_MERGERESULT_FUNCS, luagi_mergeresult_funcs );
+   setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

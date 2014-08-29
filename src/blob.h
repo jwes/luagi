@@ -1,0 +1,36 @@
+#ifndef IS_LUAGI_BLOB
+#define IS_LUAGI_BLOB
+#include <lua.h>
+#include <lauxlib.h>
+//repo
+int luagi_blob_lookup( lua_State *L );
+int luagi_blob_lookup_prefix( lua_State *L );
+int luagi_blob_create_fromworkdir( lua_State *L );
+int luagi_blob_create_fromdisk( lua_State *L );
+int luagi_blob_create_fromchunks( lua_State *L );
+int luagi_blob_create_frombuffer( lua_State *L );
+
+// blob
+int luagi_blob_free( lua_State *L );
+int luagi_blob_id( lua_State *L );
+int luagi_blob_owner( lua_State *L );
+//TODO raw functions to lua?
+
+int luagi_blob_filtered_content( lua_State *L );
+int luagi_blob_is_binary( lua_State *L );
+
+#define LUAGI_BLOB_FUNCS "is.luagi.blob"
+
+#define check_blob_at(L, N) \
+   (git_blob **) luaL_checkudata( L, N, LUAGI_BLOB_FUNCS );
+
+static const struct luaL_Reg luagi_blob_funcs [] = {
+   { "__gc", luagi_blob_free },
+   { "__tostring", luagi_blob_id },
+   { "owner", luagi_blob_owner },
+   { "filtered_content", luagi_blob_filtered_content },
+   { "is_binary", luagi_blob_is_binary },
+   { NULL, NULL }
+};
+
+#endif
