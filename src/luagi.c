@@ -83,6 +83,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "diff_index_to_workdir", luagi_diff_index_to_workdir },
    { "diff_tree_to_workdir",luagi_diff_tree_to_workdir },
    { "diff_tree_to_workdir_with_index", luagi_diff_tree_to_workdir_with_index },
+   { "diff_commit_as_email", luagi_diff_commit_as_email },
 
    { "index", luagi_repository_index },
    //treeentry
@@ -176,6 +177,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REMOTE_FUNCS, luagi_remote_funcs);
    setup_funcs(L, LUAGI_STATUS_FUNCS, luagi_status_funcs );
    setup_funcs(L, LUAGI_DIFF_FUNCS, luagi_diff_funcs );
+   setup_funcs(L, LUAGI_DIFF_STATS_FUNCS, luagi_diff_stats_funcs );
    setup_funcs(L, LUAGI_INDEX_FUNCS, luagi_index_funcs );
    setup_funcs(L, LUAGI_INDEX_ENTRY_FUNCS, luagi_index_entry_funcs );
    setup_funcs(L, LUAGI_INDEX_CONFLICT_FUNCS, luagi_index_conflict_funcs );

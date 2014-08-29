@@ -1,4 +1,5 @@
 #include <git2/blob.h>
+#include <string.h>
 #include "blob.h"
 #include "luagi.h"
 #include "oid.h"
@@ -72,8 +73,58 @@ int luagi_blob_create_fromdisk( lua_State *L )
 
    return luagi_push_oid( L, &oid );
 }
-int luagi_blob_create_fromchunks( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_blob_create_frombuffer( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+
+static int chunk_cb( char *content, size_t max_length, void *payload )
+{
+   luagi_foreach_t *p = payload;
+   lua_pushvalue( p->L, p->callback_pos );
+   lua_pushinteger( p->L, max_length );
+   
+   if( lua_pcall( p->L, 1, 1, 0 ) )
+   {
+      return 0;
+   }
+   int len = luaL_len( p->L, -1 );
+   const char *str = luaL_checkstring( p->L, -1 );
+   strncpy( content, str, len );
+   lua_pop( p->L, 1 );
+   return len; 
+}
+int luagi_blob_create_fromchunks( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+   const char *hintpath = luaL_optstring( L, 3, NULL );
+
+   luagi_foreach_t *p = malloc( sizeof(luagi_foreach_t ));
+   p->L = L,
+   p->callback_pos = 2;
+
+   git_oid oid;
+   if( git_blob_create_fromchunks( &oid, *repo, hintpath, chunk_cb, p ) )
+   {
+      free( p );
+      ERROR_PUSH( L )
+   }
+   
+   free( p );
+   return luagi_push_oid( L, &oid );
+}
+
+int luagi_blob_create_frombuffer( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   int len = luaL_len( L, 2 );
+   const char *buffer = luaL_checkstring( L, 2 );
+
+   git_oid oid;
+   if( git_blob_create_frombuffer( &oid, *repo, buffer, len ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   return luagi_push_oid( L, &oid );
+}
 
 // blob
 int luagi_blob_free( lua_State *L )
@@ -100,9 +151,38 @@ int luagi_blob_owner( lua_State *L )
    return  1;
 }
 
-//TODO raw functions to lua?
+int luagi_blob_rawsize( lua_State *L )
+{
+   git_blob **blob = check_blob_at( L, 1 );
+   lua_pushinteger( L, git_blob_rawsize( *blob ) );
+   return 1;
+}
 
-int luagi_blob_filtered_content( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_blob_rawcontent( lua_State *L )
+{
+   git_blob **blob = check_blob_at( L, 1 );
+   const void *raw = git_blob_rawcontent( *blob );
+   git_off_t size = git_blob_rawsize( *blob );
+   lua_pushlstring( L, raw, size );
+   return 1;
+}
+
+int luagi_blob_filtered_content( lua_State *L )
+{
+   git_blob **blob = check_blob_at( L, 1 );
+   const char *as_path = luaL_checkstring( L, 2 );
+   int check_for_binary = lua_toboolean( L, 3 );
+
+   git_buf out;
+   if( git_blob_filtered_content( &out, *blob, as_path, check_for_binary ) )
+   {
+      ERROR_PUSH(L)
+   }
+
+   lua_pushlstring( L, out.ptr, out.size );
+   return 1;
+}
+
 int luagi_blob_is_binary( lua_State *L )
 {
    git_blob **blob = check_blob_at( L, 1 );

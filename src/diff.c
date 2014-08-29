@@ -404,6 +404,28 @@ int luagi_diff_free( lua_State *L )
    return 0;
 }
 
+int luagi_diff_get_stats( lua_State *L )
+{
+   git_diff **diff = checkdiff_at( L, 1 );
+   git_diff_stats **out = lua_newuserdata( L, sizeof( git_diff_stats *) );
+   if( git_diff_get_stats( out, *diff ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_DIFF_STATS_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_diff_stats_files_changed( lua_State *L );
+int luagi_diff_stats_insertions( lua_State *L );
+int luagi_diff_stats_deletions( lua_State *L );
+int luagi_diff_stats_to_buf( lua_State *L );
+int luagi_diff_stats_free( lua_State *L );
+
+int luagi_diff_format_email( lua_State *L );
+int luagi_diff_commit_as_email( lua_State *L );
+
 void add_flags( lua_State *L, int idx, int32_t flags )
 {
    if( flags & GIT_DIFF_FLAG_BINARY )

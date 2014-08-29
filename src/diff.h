@@ -22,9 +22,21 @@ int luagi_diff_print( lua_State *L );
 
 int luagi_diff_free( lua_State *L );
 
-//TODO git_diff_blob*
-//TODO git_diff_buffer
-//
+int luagi_git_diff_blobs( lua_State *L );
+int luagi_git_diff_blob_to_buffer( lua_State *L );
+int luagi_git_diff_buffers( lua_State *L );
+
+//stats
+int luagi_diff_get_stats( lua_State *L );
+int luagi_diff_stats_files_changed( lua_State *L );
+int luagi_diff_stats_insertions( lua_State *L );
+int luagi_diff_stats_deletions( lua_State *L );
+int luagi_diff_stats_to_buf( lua_State *L );
+int luagi_diff_stats_free( lua_State *L );
+
+int luagi_diff_format_email( lua_State *L );
+int luagi_diff_commit_as_email( lua_State *L );
+
 static const struct luaL_Reg luagi_diff_funcs [] = {
    { "merge", luagi_diff_merge },
    { "find_similar", luagi_diff_find_similar },
@@ -33,6 +45,8 @@ static const struct luaL_Reg luagi_diff_funcs [] = {
    { "is_sorted", luagi_diff_is_sorted_icase },
    { "foreach", luagi_diff_foreach },
    { "print", luagi_diff_print },
+   { "format_email", luagi_diff_format_email },
+   { "get_stats", luagi_diff_get_stats },
    { "__gc", luagi_diff_free },
    { NULL, NULL }
 };
@@ -44,4 +58,17 @@ void diff_delta_to_table( lua_State *L, const git_diff_delta *delta );
 #define LUAGI_DIFF_FUNCS "is.westh.luagi.diff"
 #define checkdiff_at(L, N) \
       (git_diff**) luaL_checkudata( L, N, LUAGI_DIFF_FUNCS )
+
+static const struct luaL_Reg luagi_diff_stats_funcs [] = {
+   { "files_changed", luagi_diff_stats_files_changed },
+   { "insertions", luagi_diff_stats_insertions },
+   { "deletions", luagi_diff_stats_deletions },
+   { "to_buf", luagi_diff_stats_to_buf },
+   { "__gc", luagi_diff_stats_free },
+   { NULL, NULL }
+};
+
+#define LUAGI_DIFF_STATS_FUNCS "is.westh.luagi.diff.stats"
+#define checkdiffstats_at(L, N) \
+      (git_diff_stats**) luaL_checkudata( L, N, LUAGI_DIFF_STATS_FUNCS )
 #endif // IS_LUAGI_DIFF
