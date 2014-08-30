@@ -417,14 +417,52 @@ int luagi_diff_get_stats( lua_State *L )
    return 1;
 }
 
-int luagi_diff_stats_files_changed( lua_State *L );
-int luagi_diff_stats_insertions( lua_State *L );
-int luagi_diff_stats_deletions( lua_State *L );
-int luagi_diff_stats_to_buf( lua_State *L );
-int luagi_diff_stats_free( lua_State *L );
+static int stats_infos( lua_State *L, size_t (*func)( const git_diff_stats *stats ) )
+{
+   git_diff_stats **stats = checkdiffstats_at( L, 1 );
+   size_t changes = func( *stats );
+   lua_pushinteger( L, changes );
+   return 1;
+}
 
-int luagi_diff_format_email( lua_State *L );
-int luagi_diff_commit_as_email( lua_State *L );
+int luagi_diff_stats_files_changed( lua_State *L )
+{
+   return stats_infos( L, git_diff_stats_files_changed );
+}
+
+int luagi_diff_stats_insertions( lua_State *L )
+{
+   return stats_infos( L, git_diff_stats_insertions );
+}
+
+int luagi_diff_stats_deletions( lua_State *L )
+{
+   return stats_infos( L, git_diff_stats_deletions );
+}
+
+int luagi_diff_stats_to_buf( lua_State *L )
+{
+   luaL_error( L, "not yet implemented" );
+   return 0;
+}
+
+int luagi_diff_stats_free( lua_State *L )
+{
+   git_diff_stats **stats = checkdiffstats_at( L, 1 );
+   git_diff_stats_free( *stats );
+   return 0;
+}
+
+int luagi_diff_format_email( lua_State *L )
+{
+   luaL_error( L, "not yet implemented" );
+   return 0;
+}
+int luagi_diff_commit_as_email( lua_State *L )
+{
+   luaL_error( L, "not yet implemented" );
+   return 0;
+}
 
 void add_flags( lua_State *L, int idx, int32_t flags )
 {
