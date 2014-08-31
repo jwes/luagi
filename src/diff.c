@@ -1,10 +1,12 @@
 #include "diff.h" 
-#include "luagi.h" 
-#include "index.h"
 #include <git2/diff.h>
 #include <git2/errors.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "luagi.h" 
+#include "index.h"
+#include "commit.h"
 
 #define DIFF_FILE_ID "id"
 #define DIFF_FILE_PATH "path"
@@ -485,10 +487,27 @@ int luagi_diff_format_email( lua_State *L )
    lua_pushlstring( L, out.ptr, out.size );
    return 1;
 }
+
 int luagi_diff_commit_as_email( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_repository **repo = checkrepo( L, 1 );
+   git_commit **commit = checkcommit_at( L, 2 );
+
+   int patch_no = luaL_checkinteger( L, 3 );
+   int total_patches = luaL_checkinteger( L, 4 );
+
+   //TODO format flags
+   git_diff_format_email_flags_t flags = GIT_DIFF_FORMAT_EMAIL_NONE;
+   git_diff_options diff_opts;
+   options_from_lua( L, 5, &diff_opts );
+   git_buf out;
+   if( git_diff_commit_as_email( &out, *repo, *commit, patch_no, total_patches, flags, &diff_opts ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   lua_pushlstring( L, out.ptr, out.size );
+   return 1;
 }
 
 void add_flags( lua_State *L, int idx, int32_t flags )
