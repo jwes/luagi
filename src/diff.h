@@ -63,7 +63,7 @@ static const struct luaL_Reg luagi_diff_stats_funcs [] = {
    { "files_changed", luagi_diff_stats_files_changed },
    { "insertions", luagi_diff_stats_insertions },
    { "deletions", luagi_diff_stats_deletions },
-   { "to_buf", luagi_diff_stats_to_buf },
+   { "__tostring", luagi_diff_stats_to_buf },
    { "__gc", luagi_diff_stats_free },
    { NULL, NULL }
 };

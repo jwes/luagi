@@ -442,8 +442,18 @@ int luagi_diff_stats_deletions( lua_State *L )
 
 int luagi_diff_stats_to_buf( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_diff_stats **stats = checkdiffstats_at( L, 1 );
+   //TODO stats format
+   git_diff_stats_format_t format = GIT_DIFF_STATS_NONE;
+   size_t width = 0;
+
+   git_buf out;
+   if( git_diff_stats_to_buf( &out, *stats, format, width ) )
+   {
+      ERROR_PUSH( L )
+   }
+   lua_pushlstring( L, out.ptr, out.size );
+   return 1;
 }
 
 int luagi_diff_stats_free( lua_State *L )
@@ -452,11 +462,28 @@ int luagi_diff_stats_free( lua_State *L )
    git_diff_stats_free( *stats );
    return 0;
 }
+static int luagi_diff_format_email_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_diff_format_email_options *opts )
+{
+   int ret =  git_diff_format_email_init_options( opts, GIT_DIFF_FORMAT_EMAIL_OPTIONS_VERSION );
+   //TODO email format options
+   return ret;
+}
 
 int luagi_diff_format_email( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_diff **diff = checkdiff_at( L, 1 );
+
+   git_buf out;
+   git_diff_format_email_options opts;
+   luagi_diff_format_email_init_options( L, 2, &opts );
+
+   if( git_diff_format_email( &out, *diff, &opts ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   lua_pushlstring( L, out.ptr, out.size );
+   return 1;
 }
 int luagi_diff_commit_as_email( lua_State *L )
 {
