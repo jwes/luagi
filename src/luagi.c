@@ -22,6 +22,7 @@
 #include "merge.h"
 #include "blob.h"
 #include "cherrypick.h"
+#include "push.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -137,6 +138,8 @@ static const struct luaL_Reg repofuncs [] = {
    // cherrypick
    { "cherry_pick", luagi_cherry_pick },
    { "cherry_pick_commit", luagi_cherry_pick_commit },
+   //push
+   { "push", luagi_push_new },
    { NULL, NULL },
 };
 
@@ -191,6 +194,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_MERGEHEAD_FUNCS, luagi_mergehead_funcs );
    setup_funcs(L, LUAGI_MERGERESULT_FUNCS, luagi_mergeresult_funcs );
    setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
+   setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
