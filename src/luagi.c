@@ -21,6 +21,7 @@
 #include "reference.h"
 #include "merge.h"
 #include "blob.h"
+#include "cherrypick.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -133,6 +134,9 @@ static const struct luaL_Reg repofuncs [] = {
    { "create_blob_from_disk", luagi_blob_create_fromdisk },
    { "create_blob_from_chunks", luagi_blob_create_fromchunks },
    { "create_blob_from_buffer", luagi_blob_create_frombuffer },
+   // cherrypick
+   { "cherry_pick", luagi_cherry_pick },
+   { "cherry_pick_commit", luagi_cherry_pick_commit },
    { NULL, NULL },
 };
 

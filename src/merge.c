@@ -1,4 +1,3 @@
-#include <git2/merge.h>
 #include "merge.h"
 #include "luagi.h"
 #include "oid.h"
@@ -213,7 +212,7 @@ static int luagi_merge_init_file_options( lua_State *L __attribute__((unused)), 
    return git_merge_file_init_options( opts, GIT_MERGE_FILE_OPTIONS_VERSION );
 }
 
-static int luagi_merge_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_merge_options *opts )
+int luagi_merge_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_merge_options *opts )
 {
    return git_merge_init_options( opts, GIT_MERGE_OPTIONS_VERSION );
 }

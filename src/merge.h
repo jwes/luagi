@@ -2,6 +2,7 @@
 #define IS_LUAGI_MERGE
 #include <lua.h>
 #include <lauxlib.h>
+#include <git2/merge.h>
 
 int luagi_merge_analysis( lua_State *L );
 int luagi_merge_base( lua_State *L );
@@ -49,4 +50,6 @@ static const struct luaL_Reg luagi_mergeresult_funcs [] = {
    { "content", luagi_mergeresult_content },
    { NULL, NULL }
 };
+
+int luagi_merge_init_options( lua_State *L, int index, git_merge_options *opts );
 #endif
