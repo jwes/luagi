@@ -23,6 +23,7 @@
 #include "blob.h"
 #include "cherrypick.h"
 #include "push.h"
+#include "reset.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -140,6 +141,11 @@ static const struct luaL_Reg repofuncs [] = {
    { "cherry_pick_commit", luagi_cherry_pick_commit },
    //push
    { "push", luagi_push_new },
+
+   //reset
+   { "reset", luagi_reset },
+   { "reset_default", luagi_reset_default },
+
    { NULL, NULL },
 };
 

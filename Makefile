@@ -19,7 +19,8 @@ FILES := src/luagi.c \
 		src/types.c \
 		src/blob.c \
 		src/cherrypick.c \
-		src/push.c
+		src/push.c \
+		src/reset.c
 
 luagi.so: $(FILES)
 	gcc --shared -fPIC -o luagi.so \
