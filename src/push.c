@@ -37,7 +37,11 @@ int luagi_push_set_options( lua_State *L )
    return 0;
 }
 
-int luagi_push_set_callbacks( lua_State *L );
+int luagi_push_set_callbacks( lua_State *L )
+{
+   luaL_error( L, "not yet implemented" );
+   return 0;
+}
 
 int luagi_push_add_refspec( lua_State *L )
 {
@@ -82,7 +86,41 @@ int luagi_push_unpack_ok( lua_State *L )
    return 1;
 }
 
-int luagi_push_status_foreach( lua_State *L );
+static int foreach_callback( const char *ref, const char *msg, void *data )
+{
+   luagi_foreach_t *p = data;
+
+   lua_pushvalue( p->L, p->callback_pos );
+   lua_pushstring( p->L, ref );
+   lua_pushstring( p->L, msg );
+
+   if( lua_pcall( p->L, 2, 1, 0 ) )
+   {
+      ERROR_ABORT( p->L )
+      return -1;
+   }
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+int luagi_push_status_foreach( lua_State *L )
+{
+   git_push **push = checkpush_at( L, 1 );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   p->L = L;
+   p->callback_pos = 2;
+
+   if( git_push_status_foreach( *push, foreach_callback, p ) )
+   {
+      ERROR_ABORT( L )
+   }
+
+   free( p );
+   return 0;
+}
 
 int luagi_push_free( lua_State *L )
 {
