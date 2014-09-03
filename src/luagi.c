@@ -24,6 +24,7 @@
 #include "cherrypick.h"
 #include "push.h"
 #include "reset.h"
+#include "revert.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -145,7 +146,9 @@ static const struct luaL_Reg repofuncs [] = {
    //reset
    { "reset", luagi_reset },
    { "reset_default", luagi_reset_default },
-
+   //revert
+   { "revert", luagi_revert },
+   { "revert_commit", luagi_revert_commit },
    { NULL, NULL },
 };
 
