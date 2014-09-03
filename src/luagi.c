@@ -25,6 +25,7 @@
 #include "push.h"
 #include "reset.h"
 #include "revert.h"
+#include "tag.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -149,6 +150,20 @@ static const struct luaL_Reg repofuncs [] = {
    //revert
    { "revert", luagi_revert },
    { "revert_commit", luagi_revert_commit },
+   //tag
+   { "lookup_tag", luagi_tag_lookup },
+   { "lookup_tag_prefix", luagi_tag_lookup_prefix },
+   { "create_tag", luagi_tag_create },
+   { "create_tag_annotation", luagi_tag_annotation_create },
+   { "create_tag_from_buffer", luagi_tag_create_frombuffer },
+   { "create_tag_lightweight", luagi_tag_create_lightweight },
+   { "delete_tag", luagi_tag_delete },
+
+   { "list_tags", luagi_tag_list },
+   { "list_tags_matching", luagi_tag_list_match },
+   { "foreach_tag", luagi_tag_foreach },
+
+
    { NULL, NULL },
 };
 
@@ -204,6 +219,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_MERGERESULT_FUNCS, luagi_mergeresult_funcs );
    setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
    setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
+   setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

@@ -1,31 +1,36 @@
-FILES := src/luagi.c \
-		src/common.c \
-		src/branch.c \
-		src/tree.c \
-		src/commit.c \
-		src/tree_builder.c \
-		src/clone.c \
-		src/remote.c \
-      src/transport.c \
-		src/status.c \
-		src/diff.c \
-		src/index.c \
-		src/object.c \
-		src/checkout.c \
-		src/stash.c \
-		src/merge.c \
-		src/reference.c \
-		src/oid.c \
-		src/types.c \
-		src/blob.c \
-		src/cherrypick.c \
-		src/push.c \
-		src/reset.c \
-		src/revert.c
+FILES := luagi.o \
+		common.o \
+		branch.o \
+		tree.o \
+		commit.o \
+		tree_builder.o \
+		clone.o \
+		remote.o \
+      transport.o \
+		status.o \
+		diff.o \
+		index.o \
+		object.o \
+		checkout.o \
+		stash.o \
+		merge.o \
+		reference.o \
+		oid.o \
+		types.o \
+		blob.o \
+		cherrypick.o \
+		push.o \
+		reset.o \
+		revert.o \
+		tag.o
 
+CFLAGS:=-fPIC -g -Wall -Wextra -Werror -std=c11
+LIBS:=-lc -lgit2 -llua 
+VPATH:=src
+CC=gcc
+
+all: luagi.so
 luagi.so: $(FILES)
-	gcc --shared -fPIC -o luagi.so \
-	$(FILES) \
-		-g -Wall -Wextra -Werror -std=c11 \
-		-lc -lgit2 -llua 
+	$(CC) --shared -o $@ $^
+	
 
