@@ -5,12 +5,13 @@
 #include <git2/strarray.h>
 #include <git2/errors.h>
 
-#define REPO_NAME "is.westhu.luagi.repo"
-#define LUAGI_TREE_FUNCS "is.westh.luagi.tree"
-#define LUAGI_TREE_ENTRY_FUNCS "is.westh.luagi.tree.entry"
-#define LUAGI_TREE_BUILDER_FUNCS "is.westh.luagi.tree.builder"
-#define LUAGI_TREE_WALK_STATICS "is.westhu.luagi.tree.walk"
-#define LUAGI_REMOTE_FUNCS "is.westh.luagi.remote"
+#define REPO_NAME "is.luagi.repo"
+#define LUAGI_TREE_FUNCS "is.luagi.tree"
+#define LUAGI_TREE_ENTRY_FUNCS "is.luagi.tree.entry"
+#define LUAGI_TREE_BUILDER_FUNCS "is.luagi.tree.builder"
+#define LUAGI_TREE_WALK_STATICS "is.luagi.tree.walk"
+#define LUAGI_REMOTE_FUNCS "is.luagi.remote"
+#define LUAGI_STRARRAY "is.luagi.strarray"
 
 #define SIG_NAME "name"
 #define SIG_EMAIL "email"

@@ -192,12 +192,40 @@ void setup_funcs( lua_State *L, const char *meta_name, const luaL_Reg *funcs )
    lua_setfield( L, -2, "__index");
    luaL_setfuncs( L, funcs, 0);
 }
+static int luagi_strarray_at( lua_State *L )
+{
+   git_strarray *array = luaL_checkudata( L, 1, LUAGI_STRARRAY );
+   unsigned int index = luaL_checkinteger( L, 2 );
+   //
+   // lua indices start with 1
+   if( index > array->count || index <= 0 )
+   {
+      lua_pushnil( L );
+      lua_pushstring( L, "index out of bounds" );
+      return 2;
+   }
+   
+   lua_pushstring( L, array->strings[index] );
+   return 1;
+}
 
+static int luagi_strarray_free( lua_State *L )
+{
+   git_strarray *array = luaL_checkudata( L, 1, LUAGI_STRARRAY );
+   git_strarray_free( array );
+   return 0;
+}
 int luaopen_luagi(lua_State *L)
 {
    /* metatable for the branch iterator */
    luaL_newmetatable( L, LUAGI_BRANCH_STATICS );
    lua_pushcfunction( L, luagi_branch_iter_gc);
+   lua_setfield( L, -2, "__gc" );
+
+   luaL_newmetatable( L, LUAGI_STRARRAY );
+   lua_pushcfunction( L, luagi_strarray_at );
+   lua_setfield( L, -2, "__index" );
+   lua_pushcfunction( L, luagi_strarray_free );
    lua_setfield( L, -2, "__gc" );
 
    setup_funcs(L, LUAGI_TREE_FUNCS, luagi_tree_funcs);

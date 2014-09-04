@@ -115,9 +115,64 @@ int luagi_tag_delete( lua_State *L )
    return 0;
 }
 
-int luagi_tag_list( lua_State *L );
-int luagi_tag_list_match( lua_State *L );
-int luagi_tag_foreach( lua_State *L );
+int luagi_tag_list( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_strarray *data = lua_newuserdata( L, sizeof( git_strarray ) );
+   if( git_tag_list( data, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_STRARRAY );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+   
+int luagi_tag_list_match( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *pattern = luaL_checkstring( L, 2 );
+
+   git_strarray *data = lua_newuserdata( L, sizeof( git_strarray ) );
+   if( git_tag_list_match( data, pattern, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_STRARRAY );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+static int foreach_cb( const char *name, git_oid *oid, void *payload )
+{
+   luagi_foreach_t *p = payload; 
+   lua_pushvalue( p->L, p->callback_pos );
+
+   lua_pushstring( p->L, name );
+   luagi_push_oid( p->L, oid );
+
+   if( lua_pcall( p->L, 2, 1, 0 ) )
+   {
+      luaL_error( p->L, "call to tag foreach callback failed" );
+      return 0;
+   }
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+int luagi_tag_foreach( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+
+   if( git_tag_foreach( *repo, foreach_cb, p ) )
+   {
+      ERROR_ABORT( L )
+   }
+   free( p );
+   return 0;
+}
 
 
 int luagi_tag_free( lua_State *L )
