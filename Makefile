@@ -21,8 +21,8 @@ FILES := luagi.o \
 		cherrypick.o \
 		push.o \
 		reset.o \
-		revert.o \
 		tag.o
+#revert.o \
 
 CFLAGS:=-fPIC -g -Wall -Wextra -Werror -std=c11
 LIBS:=-lc -lgit2 -llua 
@@ -31,6 +31,8 @@ CC=gcc
 
 all: luagi.so
 luagi.so: $(FILES)
-	$(CC) --shared -o $@ $^
+	$(CC) --shared -o $@ $^ $(LIBS)
 	
-
+clean:
+	rm $(FILES)
+	rm luagi.so

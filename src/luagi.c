@@ -24,7 +24,7 @@
 #include "cherrypick.h"
 #include "push.h"
 #include "reset.h"
-#include "revert.h"
+//#include "revert.h"
 #include "tag.h"
 
 static int luagi_open( lua_State *L )
@@ -147,9 +147,11 @@ static const struct luaL_Reg repofuncs [] = {
    //reset
    { "reset", luagi_reset },
    { "reset_default", luagi_reset_default },
+   /*
    //revert
    { "revert", luagi_revert },
    { "revert_commit", luagi_revert_commit },
+   */
    //tag
    { "lookup_tag", luagi_tag_lookup },
    { "lookup_tag_prefix", luagi_tag_lookup_prefix },
