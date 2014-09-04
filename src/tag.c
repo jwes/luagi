@@ -87,21 +87,130 @@ int luagi_tag_create_frombuffer( lua_State *L )
    return luagi_push_oid( L, &out );
 }
 
-int luagi_tag_create_lightweight( lua_State *L );
-int luagi_tag_delete( lua_State *L );
+int luagi_tag_create_lightweight( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *tag_name = luaL_checkstring( L, 2 );
+   git_object **target = checkobject_at( L, 3 );
+   int force = lua_toboolean( L, 4 );
+
+   git_oid oid;
+   if( git_tag_create_lightweight( &oid, *repo, tag_name, *target, force ) )
+   {
+      ERROR_PUSH( L )
+   }
+   
+   return luagi_push_oid( L, &oid );
+}
+
+int luagi_tag_delete( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *tag_name = luaL_checkstring( L, 2 );
+
+   if( git_tag_delete( *repo, tag_name ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
 
 int luagi_tag_list( lua_State *L );
 int luagi_tag_list_match( lua_State *L );
 int luagi_tag_foreach( lua_State *L );
 
 
-int luagi_tag_free( lua_State *L );
-int luagi_tag_id( lua_State *L );
-int luagi_tag_owner( lua_State *L );
-int luagi_tag_target( lua_State *L );
-int luagi_tag_target_id( lua_State *L );
-int luagi_tag_target_type( lua_State *L );
-int luagi_tag_name( lua_State *L );
-int luagi_tag_tagger( lua_State *L );
-int luagi_tag_message( lua_State *L );
-int luagi_tag_peel( lua_State *L );
+int luagi_tag_free( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+   git_tag_free( *tag );
+   return 0;
+}
+
+int luagi_tag_id( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+
+   const git_oid *oid = git_tag_id( *tag );
+   return luagi_push_oid( L, oid );
+}
+
+int luagi_tag_owner( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+   git_repository **repo = lua_newuserdata( L, sizeof( git_repository * ) );
+
+   *repo = git_tag_owner( *tag );
+   luaL_getmetatable( L, REPO_NAME );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_tag_target( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+   git_object **target = lua_newuserdata( L, sizeof( git_object * ) );
+
+   if( git_tag_target( target, *tag ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+   
+int luagi_tag_target_id( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+
+   const git_oid *oid = git_tag_target_id( *tag );
+   return luagi_push_oid( L, oid );
+}
+
+int luagi_tag_target_type( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+
+   git_otype type = git_tag_target_type( *tag );
+   lua_pushstring( L, luagi_otype_to_string( type ) );
+   return 1;
+}
+
+int luagi_tag_name( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+   lua_pushstring( L, git_tag_name( *tag ) );
+   return 1;
+}
+
+int luagi_tag_tagger( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+   const git_signature *sig = git_tag_tagger( *tag );
+   signature_to_table( L, sig );
+   return 1;
+}
+
+int luagi_tag_message( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+
+   lua_pushstring( L, git_tag_message( *tag ) );
+   return 1;
+}
+
+int luagi_tag_peel( lua_State *L )
+{
+   git_tag **tag = checktag_at( L, 1 );
+   git_object **object = lua_newuserdata( L, sizeof( git_object * ) );
+
+   if( git_tag_peel( object, *tag ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
