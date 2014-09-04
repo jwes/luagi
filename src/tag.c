@@ -164,8 +164,10 @@ static int foreach_cb( const char *name, git_oid *oid, void *payload )
 int luagi_tag_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
-
+   p->L = L;
+   p->callback_pos = 2;
    if( git_tag_foreach( *repo, foreach_cb, p ) )
    {
       ERROR_ABORT( L )
