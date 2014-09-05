@@ -5,7 +5,6 @@
 
 int luagi_submodule_lookup( lua_State *L );
 int luagi_submodule_foreach( lua_State *L );
-int luagi_submodule_open( lua_State *L );
 int luagi_submodule_add_setup( lua_State *L );
 int luagi_submodule_resolve_url( lua_State *L );
 int luagi_submodule_reload_all( lua_State *L );
@@ -15,6 +14,7 @@ int luagi_submodule_reload_all( lua_State *L );
 #define checksubmodule_at( L, N ) \
    (git_submodule **) luaL_checkudata( L, N, LUAGI_SUBMODULE_FUNCS )
 
+int luagi_submodule_open( lua_State *L );
 int luagi_submodule_free( lua_State *L );
 int luagi_submodule_add_finalize( lua_State *L );
 int luagi_submodule_owner( lua_State *L );
@@ -66,6 +66,7 @@ static const struct luaL_Reg luagi_submodule_funcs [] = {
    { "location", luagi_submodule_location },
    { "add_to_index", luagi_submodule_add_to_index },
    { "save", luagi_submodule_save },
+   { "open_repository", luagi_submodule_open },
    { NULL, NULL }
 };
 #endif

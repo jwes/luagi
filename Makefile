@@ -21,7 +21,8 @@ FILES := luagi.o \
 		cherrypick.o \
 		push.o \
 		reset.o \
-		tag.o
+		tag.o \
+		submodule.o
 #revert.o \
 
 CFLAGS:=-fPIC -g -Wall -Wextra -Werror -std=c11

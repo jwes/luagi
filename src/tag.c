@@ -154,7 +154,7 @@ static int foreach_cb( const char *name, git_oid *oid, void *payload )
    if( lua_pcall( p->L, 2, 1, 0 ) )
    {
       luaL_error( p->L, "call to tag foreach callback failed" );
-      return 0;
+      return 1;
    }
    int ret = luaL_checkinteger( p->L, -1 );
    lua_pop( p->L, 1 );

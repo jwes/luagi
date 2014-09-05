@@ -168,7 +168,6 @@ static const struct luaL_Reg repofuncs [] = {
 
    { "lookup_submodule",  luagi_submodule_lookup },
    { "foreach_submodule", luagi_submodule_foreach },
-   { "open_submodule", luagi_submodule_open },
    { "add_submodule_setup", luagi_submodule_add_setup },
    { "resolve_submodule_url", luagi_submodule_resolve_url },
    { "reload_all_submodules", luagi_submodule_reload_all },
