@@ -26,6 +26,7 @@
 #include "reset.h"
 //#include "revert.h"
 #include "tag.h"
+#include "submodule.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -165,6 +166,12 @@ static const struct luaL_Reg repofuncs [] = {
    { "list_tags_matching", luagi_tag_list_match },
    { "foreach_tag", luagi_tag_foreach },
 
+   { "lookup_submodule",  luagi_submodule_lookup },
+   { "foreach_submodule", luagi_submodule_foreach },
+   { "open_submodule", luagi_submodule_open },
+   { "add_submodule_setup", luagi_submodule_add_setup },
+   { "resolve_submodule_url", luagi_submodule_resolve_url },
+   { "reload_all_submodules", luagi_submodule_reload_all },
 
    { NULL, NULL },
 };
@@ -250,6 +257,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
    setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
    setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );
+   setup_funcs(L, LUAGI_SUBMODULE_FUNCS, luagi_submodule_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
