@@ -9,6 +9,17 @@
 #define IGNORE_UNTRACKED "untracked"
 #define IGNORE_DIRTY "dirty"
 #define IGNORE_ALL "all"
+#define IGNORE_DEFAULT "default"
+
+#define UPDATE_CHECKOUT "checkout"
+#define UPDATE_REBASE "rebase"
+#define UPDATE_MERGE "merge"
+#define UPDATE_NONE "none"
+
+#define RECURSE_YES "yes"
+#define RECURSE_NO "no"
+#define RECURSE_ONDEMAND "on_demand"
+
 
 int luagi_submodule_lookup( lua_State *L )
 {
@@ -231,6 +242,9 @@ static int luagi_sub_push_ignore( lua_State *L, git_submodule_ignore_t ignore )
       case GIT_SUBMODULE_IGNORE_ALL: 
          lua_pushstring( L, IGNORE_ALL );
          break;
+      case GIT_SUBMODULE_IGNORE_DEFAULT: 
+         lua_pushstring( L, IGNORE_DEFAULT );
+         break;
    }
    return 1;
 }
@@ -249,10 +263,11 @@ static git_submodule_ignore_t luagi_sub_check_ignore( lua_State *L, int index )
          return GIT_SUBMODULE_IGNORE_NONE;
       case 'u':
          return GIT_SUBMODULE_IGNORE_UNTRACKED;
-      default:
-         luaL_error( L, "wrong value for ignore" );
       case 'r':
          return GIT_SUBMODULE_IGNORE_RESET;
+      default:
+         return GIT_SUBMODULE_IGNORE_DEFAULT;
+       
    }         
 }
 
@@ -272,25 +287,123 @@ int luagi_submodule_set_ignore( lua_State *L )
    return luagi_sub_push_ignore( L, old );
 }
 
+static int luagi_sub_push_update( lua_State *L, git_submodule_update_t update )
+{
+   switch ( update )
+   {
+      default:
+      case GIT_SUBMODULE_UPDATE_NONE:
+              // none is none, use IGNORE define
+         lua_pushstring( L, IGNORE_NONE );
+         break;
+      case GIT_SUBMODULE_UPDATE_CHECKOUT:
+         lua_pushstring( L, UPDATE_CHECKOUT );
+         break;
+      case GIT_SUBMODULE_UPDATE_MERGE:
+         lua_pushstring( L, UPDATE_MERGE );
+         break;
+      case GIT_SUBMODULE_UPDATE_REBASE:
+         lua_pushstring( L, UPDATE_REBASE );
+         break;
+      case GIT_SUBMODULE_UPDATE_DEFAULT:
+         lua_pushstring( L, IGNORE_DEFAULT );
+         break;
+   }
+   return 1;
+}
+
+static git_submodule_update_t luagi_sub_check_update( lua_State *L, int index )
+{
+   const char *update = luaL_checkstring( L, index );
+   
+   switch( update[0] )
+   {
+      case 'c':
+         return GIT_SUBMODULE_UPDATE_CHECKOUT;
+      case 'm':
+         return GIT_SUBMODULE_UPDATE_MERGE;
+      case 'n':
+         return GIT_SUBMODULE_UPDATE_NONE;
+      case 'r':
+         if( update[2] == 'b' )
+         {
+            return GIT_SUBMODULE_UPDATE_REBASE;
+         }
+         else
+         {
+            return GIT_SUBMODULE_UPDATE_RESET;
+         }
+      default:
+         return GIT_SUBMODULE_UPDATE_DEFAULT;
+   }         
+   return GIT_SUBMODULE_UPDATE_DEFAULT;
+}
+
 int luagi_submodule_update( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_submodule_update_t t = git_submodule_update( *sub );
+   return luagi_sub_push_update( L, t );
 }
 int luagi_submodule_set_update( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_submodule_update_t value = luagi_sub_check_update( L, 2 );
+   git_submodule_update_t t = git_submodule_set_update( *sub, value );
+   return luagi_sub_push_update( L, t );
 }
+
+static int luagi_sub_push_recurse( lua_State *L, git_submodule_recurse_t recurse )
+{
+   switch ( recurse )
+   {
+      default:
+      case GIT_SUBMODULE_RECURSE_NO:
+         lua_pushstring( L, RECURSE_NO );
+         break;
+      case GIT_SUBMODULE_RECURSE_YES:
+         lua_pushstring( L, RECURSE_YES );
+         break;
+      case GIT_SUBMODULE_RECURSE_ONDEMAND:
+         lua_pushstring( L, RECURSE_ONDEMAND );
+         break;
+   }
+   return 1;
+}
+
+static git_submodule_recurse_t luagi_sub_check_recurse( lua_State *L, int index )
+{
+   const char *recurse = luaL_checkstring( L, index );
+   
+   switch( recurse[0] )
+   {
+      case 'y':
+         return GIT_SUBMODULE_RECURSE_YES;
+      case 'n':
+         return GIT_SUBMODULE_RECURSE_NO;
+      case 'o':
+         return GIT_SUBMODULE_RECURSE_ONDEMAND;
+      default:
+      case 'r':
+         return GIT_SUBMODULE_RECURSE_RESET;
+   }         
+}
+
+
+
 int luagi_submodule_fetch_recurse_submodules( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_submodule_recurse_t t = git_submodule_fetch_recurse_submodules( *sub );
+   return luagi_sub_push_recurse( L, t );
 }
+
 int luagi_submodule_set_fetch_recurse_submodules( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_submodule_recurse_t recurse = luagi_sub_check_recurse( L, 2 );
+   git_submodule_recurse_t t = git_submodule_set_fetch_recurse_submodules( *sub, recurse );
+   return luagi_sub_push_recurse( L, t );
 }
 
 int luagi_submodule_init( lua_State *L )
