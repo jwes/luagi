@@ -22,8 +22,10 @@ FILES := luagi.o \
 		push.o \
 		reset.o \
 		tag.o \
-		submodule.o
+		submodule.o \
+		graph.o \
 #revert.o \
+#
 
 CFLAGS:=-fPIC -g -Wall -Wextra -Werror -std=c11
 LIBS:=-lc -lgit2 -llua 

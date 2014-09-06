@@ -27,6 +27,7 @@
 //#include "revert.h"
 #include "tag.h"
 #include "submodule.h"
+#include "graph.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -171,6 +172,10 @@ static const struct luaL_Reg repofuncs [] = {
    { "add_submodule_setup", luagi_submodule_add_setup },
    { "resolve_submodule_url", luagi_submodule_resolve_url },
    { "reload_all_submodules", luagi_submodule_reload_all },
+
+   //graph
+   { "graph_ahead_behind", luagi_graph_ahead_behind },
+   { "graph_descendant_of", luagi_graph_descendant_of },
 
    { NULL, NULL },
 };
