@@ -24,6 +24,7 @@ FILES := luagi.o \
 		tag.o \
 		submodule.o \
 		graph.o \
+		note.o \
 #revert.o \
 #
 

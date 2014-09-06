@@ -28,6 +28,7 @@
 #include "tag.h"
 #include "submodule.h"
 #include "graph.h"
+#include "note.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -176,6 +177,14 @@ static const struct luaL_Reg repofuncs [] = {
    //graph
    { "graph_ahead_behind", luagi_graph_ahead_behind },
    { "graph_descendant_of", luagi_graph_descendant_of },
+   //note
+   { "notes", luagi_note_iterator },
+   { "foreach_note", luagi_note_foreach },
+
+   { "read_note", luagi_note_read },
+   { "create_note", luagi_note_create },
+   { "remove_note", luagi_note_remove },
+   { "note_default_ref", luagi_note_default_ref },
 
    { NULL, NULL },
 };
@@ -241,6 +250,10 @@ int luaopen_luagi(lua_State *L)
    lua_pushcfunction( L, luagi_strarray_free );
    lua_setfield( L, -2, "__gc" );
 
+   luaL_newmetatable( L, LUAGI_NOTE_ITER_FUNCS );
+   lua_pushcfunction( L, luagi_note_iterator_free );
+   lua_setfield( L, -2, "__gc" );
+
    setup_funcs(L, LUAGI_TREE_FUNCS, luagi_tree_funcs);
    setup_funcs(L, LUAGI_TREE_ENTRY_FUNCS, luagi_tree_entry_funcs);
    setup_funcs(L, LUAGI_TREE_BUILDER_FUNCS, luagi_tree_builder_funcs);
@@ -262,6 +275,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
    setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );
    setup_funcs(L, LUAGI_SUBMODULE_FUNCS, luagi_submodule_funcs );
+   setup_funcs(L, LUAGI_NOTE_FUNCS, luagi_note_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
