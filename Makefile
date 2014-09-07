@@ -25,6 +25,7 @@ FILES := luagi.o \
 		submodule.o \
 		graph.o \
 		note.o \
+		blame.o \
 #revert.o \
 #
 

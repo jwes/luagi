@@ -29,6 +29,7 @@
 #include "submodule.h"
 #include "graph.h"
 #include "note.h"
+#include "blame.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -186,6 +187,8 @@ static const struct luaL_Reg repofuncs [] = {
    { "remove_note", luagi_note_remove },
    { "note_default_ref", luagi_note_default_ref },
 
+   { "blame_file", luagi_blame_file },
+
    { NULL, NULL },
 };
 
@@ -276,6 +279,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );
    setup_funcs(L, LUAGI_SUBMODULE_FUNCS, luagi_submodule_funcs );
    setup_funcs(L, LUAGI_NOTE_FUNCS, luagi_note_funcs );
+   setup_funcs(L, LUAGI_BLAME_FUNCS, luagi_blame_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
