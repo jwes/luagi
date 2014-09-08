@@ -30,6 +30,7 @@
 #include "graph.h"
 #include "note.h"
 #include "blame.h"
+#include "ignore.h"
 
 static int luagi_open( lua_State *L )
 {
@@ -188,6 +189,10 @@ static const struct luaL_Reg repofuncs [] = {
    { "note_default_ref", luagi_note_default_ref },
 
    { "blame_file", luagi_blame_file },
+
+   { "add_ignore_rules", luagi_ignore_add_rules },
+   { "clear_internal_ignore_rules", luagi_ignore_clear_internal_rules },
+   { "is_path_ignored", luagi_ignore_path_is_ignored },
 
    { NULL, NULL },
 };

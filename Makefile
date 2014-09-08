@@ -26,6 +26,7 @@ FILES := luagi.o \
 		graph.o \
 		note.o \
 		blame.o \
+		ignore.o \
 #revert.o \
 #
 
