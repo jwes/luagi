@@ -1,10 +1,10 @@
 #include <lua.h>
 #include <lauxlib.h>
-#include <git2/repository.h>  
 #include <git2/signature.h>   
 
 #include <string.h>
 #include "luagi.h"
+#include "repository.h"
 #include "common.h"
 #include "branch.h"
 #include "tree.h"
@@ -31,34 +31,6 @@
 #include "note.h"
 #include "blame.h"
 #include "ignore.h"
-
-static int luagi_open( lua_State *L )
-{
-   git_repository **repo;
-
-   const char *path = luaL_checkstring( L, 1 );
-   repo = (git_repository **) lua_newuserdata(L, sizeof(git_repository *) );
-   
-   const int ret = git_repository_open( repo, path );
-
-   if( ret < 0 )
-   {
-      lua_pushnil(L);
-      lua_pushnumber(L, ret);
-      return 2;
-   }
-
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
-static int luagi_gc( lua_State *L )
-{
-   git_repository **repo = checkrepo(L, 1);
-   git_repository_free( *repo );
-   return 0;
-}
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },

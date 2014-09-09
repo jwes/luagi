@@ -1,4 +1,5 @@
 FILES := luagi.o \
+		repository.o \
 		common.o \
 		branch.o \
 		tree.o \
@@ -35,10 +36,14 @@ LIBS:=-lc -lgit2 -llua
 VPATH:=src
 CC=gcc
 
-all: luagi.so
+all: luagi.so test
+test:
+	lua tst/luagi.lua
+
 luagi.so: $(FILES)
 	$(CC) --shared -o $@ $^ $(LIBS)
 	
+
 clean:
 	rm $(FILES)
 	rm luagi.so
