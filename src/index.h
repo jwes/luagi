@@ -37,7 +37,6 @@ int luagi_index_conflict_cleanup( lua_State *L );
 int luagi_index_has_conflicts( lua_State *L );
 int luagi_index_conflict_iterator( lua_State *L );
 int luagi_index_conflict_free( lua_State *L );
-int luagi_repository_index( lua_State *L );
 
 #define LUAGI_INDEX_FUNCS "is.westhu.luagi.index"
 #define LUAGI_INDEX_ENTRY_FUNCS "is.westhu.luagi.index.entry"

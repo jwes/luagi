@@ -535,19 +535,3 @@ int luagi_index_conflict_iterator( lua_State *L )
    return 1; 
 }
 
-int luagi_repository_index( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   git_index ** index = lua_newuserdata( L, sizeof( git_index *) );
-
-   if( git_repository_index( index, *repo ) )
-   {
-      ERROR_PUSH( L )
-   }
-
-   luaL_getmetatable(L, LUAGI_INDEX_FUNCS);
-   lua_setmetatable(L, -2);
-
-   return 1;
-}
-
