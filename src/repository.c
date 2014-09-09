@@ -6,6 +6,8 @@
 #include "luagi.h"
 #include "reference.h"
 #include "index.h"
+#include "types.h"
+#include "oid.h"
 
 int luagi_open( lua_State *L )
 {
@@ -246,16 +248,176 @@ int luagi_repository_state_cleanup( lua_State *L )
    }
    return 0;
 }
+static int fetchhead_cb( const char *ref_name,
+                        const char *remote_url,
+                        const git_oid *oid,
+                        unsigned int is_merge,
+                        void *payload )
+{
+   luagi_foreach_t *p = payload;
 
-int luagi_repository_fetchhead_foreach( lua_State *L );
-int luagi_repository_mergehead_foreach( lua_State *L );
-int luagi_repository_hashfile( lua_State *L );
-int luagi_repository_set_head( lua_State *L );
-int luagi_repository_set_head_detached( lua_State *L );
-int luagi_repository_detach_head( lua_State *L );
-int luagi_repository_state( lua_State *L );
-int luagi_repository_set_namespace( lua_State *L );
-int luagi_repository_get_namespace( lua_State *L );
-int luagi_repository_is_shallow( lua_State *L );
+   lua_pushvalue( p->L, p->callback_pos );
+   lua_pushstring( p->L, ref_name );
+   lua_pushstring( p->L, remote_url );
+   luagi_push_oid( p->L, oid );
+   lua_pushboolean( p->L, is_merge );
+
+   if( lua_pcall( p->L, 5, 1, 0 ) )
+   {
+      luaL_error( p->L, "error calling fetchhead callback" );
+      return 1;
+   }
+
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+int luagi_repository_fetchhead_foreach( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+   p->L = L;
+   p->callback_pos = 2;
+
+   if( git_repository_fetchhead_foreach( *repo, fetchhead_cb, p ) )
+   {
+      ERROR_ABORT( p->L )
+   }
+
+   free( p );
+   return 0;
+}
+
+static int mergehead_cb( const git_oid *oid, void *payload )
+{
+   luagi_foreach_t *p = payload;
+   lua_pushvalue( p->L, p->callback_pos );
+   luagi_push_oid( p->L, oid );
+
+   if( lua_pcall( p->L, 1, 1, 0 ) )
+   {
+      luaL_error( p->L, "error calling fetchhead callback" );
+      return 1;
+   }
+
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
+int luagi_repository_mergehead_foreach( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+   p->L = L;
+   p->callback_pos = 2;
+
+   if( git_repository_mergehead_foreach( *repo, mergehead_cb, p ) )
+   {
+      ERROR_ABORT( p->L )
+   }
+
+   free( p );
+   return 0;
+}
+
+int luagi_repository_hashfile( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *path = luaL_checkstring( L, 2 );
+   git_otype type = luagi_otype_from_string( luaL_checkstring( L, 3 ) );
+   const char *as_path = luaL_optstring( L, 4, NULL );
+
+   git_oid oid;
+   if( git_repository_hashfile( &oid, *repo, path, type, as_path ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   return luagi_push_oid( L, &oid );
+}
+
+int luagi_repository_set_head( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *refname = luaL_checkstring( L, 2 );
+   git_signature sig;
+   table_to_signature( L, &sig, 3 );
+   const char *log_message = luaL_checkstring( L, 4 );
+
+   if( git_repository_set_head( *repo, refname, &sig, log_message ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_repository_set_head_detached( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_oid oid;
+   luagi_check_oid( &oid, L, 2 );
+   git_signature sig;
+   table_to_signature( L, &sig, 3 );
+   const char *log_message = luaL_checkstring( L, 4 );
+
+   if( git_repository_set_head_detached( *repo, &oid, &sig, log_message ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_repository_detach_head( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_signature sig;
+   table_to_signature( L, &sig, 3 );
+   const char *log_message = luaL_checkstring( L, 4 );
+
+   if( git_repository_detach_head( *repo, &sig, log_message ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_repository_state( lua_State *L )
+{
+   luaL_error( L, "not yet implemented" );
+   return 0;
+}
+
+int luagi_repository_set_namespace( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *namespace = luaL_checkstring( L, 2 );
+
+   if( git_repository_set_namespace( *repo, namespace ) )
+   {
+      ERROR_ABORT( L );
+   }
+   return 0;
+}
+
+int luagi_repository_get_namespace( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   const char *namespace = git_repository_get_namespace( *repo );
+
+   lua_pushstring( L, namespace );
+   return 1;
+}
+
+int luagi_repository_is_shallow( lua_State *L )
+{
+   return luagi_generic_is( L, git_repository_is_shallow );
+}
+
 
 
