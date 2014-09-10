@@ -125,7 +125,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "reset", luagi_reset },
    { "reset_default", luagi_reset_default },
    /*
-   //revert
+   //revert TODO
    { "revert", luagi_revert },
    { "revert_commit", luagi_revert_commit },
    */
@@ -166,6 +166,32 @@ static const struct luaL_Reg repofuncs [] = {
    { "clear_internal_ignore_rules", luagi_ignore_clear_internal_rules },
    { "is_path_ignored", luagi_ignore_path_is_ignored },
 
+   { "head", luagi_repository_head },
+   { "is_head_detached", luagi_repository_head_detatched },
+   { "is_head_unborn", luagi_repository_head_unborn },
+   { "is_empty", luagi_repository_is_empty },
+   { "is_bare", luagi_repository_is_bare },
+   { "is_shallow",luagi_repository_is_shallow },
+   { "path", luagi_repository_path },
+   { "workdir", luagi_repository_workdir },
+   { "set_workdir", luagi_repository_set_workdir },
+   { "config",  luagi_repository_config },
+   { "config_snapshot", luagi_repository_config_snapshot },
+   { "odb", luagi_repository_odb },
+   { "refdb", luagi_repository_refdb },
+   { "message", luagi_repository_message },
+   { "remove_message", luagi_repository_message_remove },
+   { "cleanup_state", luagi_repository_state_cleanup },
+   { "foreach_fetchhead", luagi_repository_fetchhead_foreach },
+   { "foreach_mergehead", luagi_repository_mergehead_foreach },
+   { "hashfile", luagi_repository_hashfile },
+   { "set_head", luagi_repository_set_head },
+   { "set_head_detached", luagi_repository_set_head_detached },
+   { "detach_head", luagi_repository_detach_head },
+   { "state", luagi_repository_state },
+   { "set_namespace", luagi_repository_set_namespace },
+   { "get_namespache", luagi_repository_get_namespace },
+
    { NULL, NULL },
 };
 
@@ -184,6 +210,13 @@ static const struct luaL_Reg mylib [] = {
    { "reference_normalize_name", luagi_reference_normalize_name },
    { "reference_is_valid_name", luagi_reference_is_valid_name },
    { "merge_files", luagi_merge_file },
+   { "wrap_odb", luagi_repository_wrap_odb },
+   { "discover", luagi_repository_discover },
+   { "open_ext", luagi_repository_open_ext },
+   { "open_bare",luagi_repository_open_bare },
+   { "init", luagi_repository_init },
+   { "init_ext",luagi_repository_init_ext },
+
    { NULL, NULL } /*sentinel*/
 };
 

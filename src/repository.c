@@ -39,6 +39,7 @@ int luagi_gc( lua_State *L )
 
 int luagi_repository_wrap_odb( lua_State *L )
 {
+   //TODO odb
    luaL_error( L, "not yet implemented" );
    return 0;
 }
@@ -59,11 +60,28 @@ int luagi_repository_discover( lua_State *L )
    lua_pushlstring( L, out.ptr, out.size );
    return 1;
 }
+static unsigned int luagi_open_flags_from_table( lua_State *L, int index )
+{
+   luaL_checktype( L, index, LUA_TTABLE );
+
+   //TODO OPEN FLAGS
+   return 0;
+}
 
 int luagi_repository_open_ext( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   const char *path = luaL_checkstring( L, 1 );
+   unsigned int flags = luagi_open_flags_from_table( L, 2 );
+   const char *ceiling_dirs = luaL_optstring( L, 3, NULL );
+
+   git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
+   if( git_repository_open_ext( repo, path, flags, ceiling_dirs ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, REPO_NAME );
+   lua_setmetatable( L, -2 );
+   return 1;
 }
 
 int luagi_repository_open_bare( lua_State *L )
@@ -96,10 +114,30 @@ int luagi_repository_init( lua_State *L )
    return 1;
 }
 
+static int luagi_repo_init_init_options( lua_State *L, int index, git_repository_init_options *opts )
+{
+   luaL_checktype( L, index, LUA_TTABLE );
+   int ret = git_repository_init_init_options( opts, GIT_REPOSITORY_INIT_OPTIONS_VERSION );
+
+   //TODO options
+   return ret;
+}
+
 int luagi_repository_init_ext( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   const char *path = luaL_checkstring( L, 1 );
+   git_repository_init_options opts;
+   luagi_repo_init_init_options( L, 2, &opts );
+
+   git_repository **repo = lua_newuserdata( L, sizeof( git_repository * ) );
+
+   if( git_repository_init_ext( repo, path, &opts ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, REPO_NAME );
+   lua_setmetatable( L, -2 );
+   return 1;
 }
 
 int luagi_repository_head( lua_State *L )
@@ -175,24 +213,28 @@ int luagi_repository_is_bare( lua_State *L )
 
 int luagi_repository_config( lua_State *L )
 {
+   //TODO config
    luaL_error( L, "not yet implemented" );
    return 0;
 }
 
 int luagi_repository_config_snapshot( lua_State *L )
 {
+   //TODO config
    luaL_error( L, "not yet implemented" );
    return 0;
 }
 
 int luagi_repository_odb( lua_State *L )
 {
+   //TODO odb
    luaL_error( L, "not yet implemented" );
    return 0;
 }
 
 int luagi_repository_refdb( lua_State *L )
 {
+   //TODO refdb
    luaL_error( L, "not yet implemented" );
    return 0;
 }
@@ -387,10 +429,19 @@ int luagi_repository_detach_head( lua_State *L )
    return 0;
 }
 
+static int push_state( lua_State *L, int state )
+{
+   lua_pushinteger( L, state );
+   return 1;
+}
+
 int luagi_repository_state( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_repository **repo = checkrepo( L, 1 );
+
+   int state = git_repository_state( *repo );
+
+   return push_state( L, state );
 }
 
 int luagi_repository_set_namespace( lua_State *L )
