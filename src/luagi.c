@@ -31,6 +31,7 @@
 #include "note.h"
 #include "blame.h"
 #include "ignore.h"
+#include "odb.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -216,6 +217,8 @@ static const struct luaL_Reg mylib [] = {
    { "open_bare",luagi_repository_open_bare },
    { "init", luagi_repository_init },
    { "init_ext",luagi_repository_init_ext },
+   { "new_odb", luagi_odb_new },
+   { "open_odb", luagi_odb_open },
 
    { NULL, NULL } /*sentinel*/
 };
@@ -290,6 +293,9 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_SUBMODULE_FUNCS, luagi_submodule_funcs );
    setup_funcs(L, LUAGI_NOTE_FUNCS, luagi_note_funcs );
    setup_funcs(L, LUAGI_BLAME_FUNCS, luagi_blame_funcs );
+   setup_funcs(L, LUAGI_ODB_FUNCS, luagi_odb_funcs );
+   setup_funcs(L, LUAGI_ODB_STREAM_FUNCS, luagi_odb_stream_funcs );
+   setup_funcs(L, LUAGI_ODB_OBJECT_FUNCS, luagi_odb_object_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

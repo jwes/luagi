@@ -28,6 +28,7 @@ FILES := luagi.o \
 		note.o \
 		blame.o \
 		ignore.o \
+		odb.o \
 #revert.o \
 #
 
