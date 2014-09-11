@@ -8,6 +8,7 @@
 #include "index.h"
 #include "types.h"
 #include "oid.h"
+#include "odb.h"
 
 int luagi_open( lua_State *L )
 {
@@ -39,9 +40,18 @@ int luagi_gc( lua_State *L )
 
 int luagi_repository_wrap_odb( lua_State *L )
 {
-   //TODO odb
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_odb **odb = checkodb_at( L, 1 );
+
+   git_repository **repo = lua_newuserdata( L, sizeof( git_repository * ) );
+
+   if( git_repository_wrap_odb( repo, *odb ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable( L, REPO_NAME );
+   lua_setmetatable( L, -2 );
+   return 1;
 }
 
 int luagi_repository_discover( lua_State *L )
@@ -227,9 +237,18 @@ int luagi_repository_config_snapshot( lua_State *L )
 
 int luagi_repository_odb( lua_State *L )
 {
-   //TODO odb
-   luaL_error( L, "not yet implemented" );
-   return 0;
+
+   git_repository **repo = checkrepo( L, 1 );
+   git_odb **odb = lua_newuserdata( L, sizeof( git_odb *) );
+
+   if( git_repository_odb( odb, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable( L, LUAGI_ODB_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
 }
 
 int luagi_repository_refdb( lua_State *L )
