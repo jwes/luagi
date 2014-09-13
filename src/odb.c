@@ -231,9 +231,53 @@ int luagi_odb_num_backends( lua_State *L )
 int luagi_odb_get_backend( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
 
 
-int luagi_odb_stream_write( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_stream_finalize_write( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_stream_read( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_odb_stream_write( lua_State *L )
+{
+   git_odb_stream **stream = checkodbstream_at( L, 1 );
+   int len = luaL_len( L, 2 );
+   const char *buffer = luaL_checkstring( L, 2 );
+
+   if( git_odb_stream_write( *stream, buffer, len ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_odb_stream_finalize_write( lua_State *L )
+{
+   git_odb_stream **stream = checkodbstream_at( L, 1 );
+   git_oid oid;
+
+   if( git_odb_stream_finalize_write( &oid, *stream ) )
+   {
+      ERROR_PUSH( L )
+   }
+   return luagi_push_oid( L, &oid );
+}
+
+#define bufsize 2048
+int luagi_odb_stream_read( lua_State *L )
+{
+   git_odb_stream **stream = checkodbstream_at( L, 1 );
+
+   char buffer [ bufsize ];
+   int bytes = git_odb_stream_read( *stream, buffer, bufsize );
+
+   if( bytes < 0 )
+   {
+      ERROR_ABORT( L )
+      return 0;
+   }
+   else if( bytes == 0 )
+   {
+      return 0;
+   }
+
+   lua_pushlstring( L, buffer, bytes );
+   return 1;
+}
+
 
 int luagi_odb_stream_free( lua_State *L )
 {
@@ -242,8 +286,39 @@ int luagi_odb_stream_free( lua_State *L )
    return 0;
 }
 
-int luagi_odb_object_free( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_object_id( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_object_data( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_object_size( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_odb_object_free( lua_State *L )
+{
+   git_odb_object **obj = checkodbobject_at( L, 1 );
+   git_odb_object_free( *obj );
+   return 0;
+}
+
+int luagi_odb_object_id( lua_State *L )
+{
+   git_odb_object **obj = checkodbobject_at( L, 1 );
+   const git_oid *oid = git_odb_object_id( *obj );
+   if( oid == NULL )
+   {
+      ERROR_PUSH( L )
+   }
+
+   return luagi_push_oid( L, oid );
+}
+   
+int luagi_odb_object_data( lua_State *L )
+{
+   git_odb_object **obj = checkodbobject_at( L, 1 );
+   const char *data = git_odb_object_data( *obj );
+
+   lua_pushstring( L, data );
+   return 1;
+}
+
+int luagi_odb_object_size( lua_State *L )
+{
+   git_odb_object **obj = checkodbobject_at( L, 1 );
+   lua_pushinteger( L, git_odb_object_size( *obj ) );
+   return 1;
+}
+
 int luagi_odb_object_type( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
