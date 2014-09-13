@@ -52,8 +52,6 @@ static const struct luaL_Reg luagi_odb_funcs [] = {
    { "open_rstream", luagi_odb_open_rstream },
 
    { "write_pack", luagi_odb_write_pack },
-   { "hash", luagi_odb_hash },
-   { "hashfile", luagi_odb_hashfile },
 
    { "add_backend", luagi_odb_add_backend },
    { "add_alternate", luagi_odb_add_alternate },

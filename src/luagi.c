@@ -220,6 +220,8 @@ static const struct luaL_Reg mylib [] = {
    { "new_odb", luagi_odb_new },
    { "open_odb", luagi_odb_open },
 
+   { "hash", luagi_odb_hash },
+   { "hashfile", luagi_odb_hashfile },
    { NULL, NULL } /*sentinel*/
 };
 

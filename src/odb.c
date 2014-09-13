@@ -188,12 +188,46 @@ int luagi_odb_open_rstream( lua_State *L )
 } 
 
 int luagi_odb_write_pack( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_hash( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_hashfile( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_odb_hash( lua_State *L )
+{
+   int len = luaL_len( L, 1 );
+   const char *data = luaL_checkstring( L, 1 );
+   git_otype type = luagi_otype_from_string( luaL_checkstring( L, 2 ) );
+
+   git_oid oid;
+   if( git_odb_hash( &oid, data, len, type ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   return luagi_push_oid( L, &oid );
+}
+
+int luagi_odb_hashfile( lua_State *L )
+{
+   const char *path = luaL_checkstring( L, 1 );
+
+   git_otype type = luagi_otype_from_string( luaL_checkstring( L, 2 ) );
+
+   git_oid oid;
+   if( git_odb_hashfile( &oid, path, type ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   return luagi_push_oid( L, &oid );
+}
 
 int luagi_odb_add_backend( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
 int luagi_odb_add_alternate( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_num_backends( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+
+int luagi_odb_num_backends( lua_State *L )
+{
+   git_odb **odb = checkodb_at( L, 1 );
+   lua_pushinteger( L, git_odb_num_backends( *odb ) );
+   return 1;
+}
+
 int luagi_odb_get_backend( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
 
 
