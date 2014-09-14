@@ -73,8 +73,44 @@ int luagi_odb_read( lua_State *L )
    return 1;
 }
 
-int luagi_odb_read_prefix( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
-int luagi_odb_read_header( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_odb_read_prefix( lua_State *L )
+{
+   git_odb **odb = checkodb_at( L, 1 );
+   git_oid oid;
+   int len;
+   luagi_check_oid_prefix( &oid, &len, L, 2 );
+
+   git_odb_object **obj = lua_newuserdata( L, sizeof( git_odb_object *) );
+
+   if( git_odb_read_prefix( obj, *odb, &oid, len ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable( L, LUAGI_ODB_OBJECT_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
+int luagi_odb_read_header( lua_State *L )
+{
+   git_odb **odb = checkodb_at( L, 1 );
+   git_oid oid;
+   luagi_check_oid( &oid, L, 2 );
+
+   size_t len_out;
+   git_otype type;
+
+   if( git_odb_read_header( &len_out, &type, *odb, &oid ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   lua_pushinteger( L, len_out );
+   lua_pushstring( L, luagi_string_from_otype( type ) );
+   return 2;
+}
+
 int luagi_odb_exists( lua_State *L )
 {
    git_odb **odb = checkodb_at( L, 1 );
@@ -85,7 +121,23 @@ int luagi_odb_exists( lua_State *L )
    return 1;
 }
 
-int luagi_odb_exists_prefix( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_odb_exists_prefix( lua_State *L )
+{
+   git_odb **odb = checkodb_at( L, 1 );
+   git_oid oid, out;
+   int len;
+   luagi_check_oid_prefix( &oid, &len,  L, 2 );
+
+   int ret = git_odb_exists_prefix( &out, *odb, &oid, len );
+   if( ret < 0 )
+   {
+      ERROR_PUSH( L )
+   }
+
+   lua_pushboolean( L, ret );
+   return 1;
+}
+
 int luagi_odb_refresh( lua_State *L )
 {
    git_odb **odb = checkodb_at( L, 1 );
@@ -321,4 +373,12 @@ int luagi_odb_object_size( lua_State *L )
    return 1;
 }
 
-int luagi_odb_object_type( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
+int luagi_odb_object_type( lua_State *L )
+{
+   git_odb_object **obj = checkodbobject_at( L, 1 );
+
+   git_otype t = git_odb_object_type( *obj );
+   lua_pushstring( L, luagi_string_from_otype( t ) );
+   return 1;
+}
+
