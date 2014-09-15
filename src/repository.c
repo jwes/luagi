@@ -9,6 +9,7 @@
 #include "types.h"
 #include "oid.h"
 #include "odb.h"
+#include "refdb.h"
 
 int luagi_open( lua_State *L )
 {
@@ -253,9 +254,16 @@ int luagi_repository_odb( lua_State *L )
 
 int luagi_repository_refdb( lua_State *L )
 {
-   //TODO refdb
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   git_repository **repo = checkrepo( L, 1 );
+   git_refdb **refdb = lua_newuserdata( L, sizeof( git_refdb * ) );
+
+   if( git_repository_refdb( refdb, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
 }
 
 int luagi_repository_index( lua_State *L )

@@ -32,6 +32,7 @@
 #include "blame.h"
 #include "ignore.h"
 #include "odb.h"
+#include "refdb.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -192,7 +193,9 @@ static const struct luaL_Reg repofuncs [] = {
    { "state", luagi_repository_state },
    { "set_namespace", luagi_repository_set_namespace },
    { "get_namespache", luagi_repository_get_namespace },
-
+   //refdb
+   { "new_refdb", luagi_refdb_new },
+   { "open_refdb", luagi_refdb_open },
    { NULL, NULL },
 };
 
@@ -298,6 +301,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_ODB_FUNCS, luagi_odb_funcs );
    setup_funcs(L, LUAGI_ODB_STREAM_FUNCS, luagi_odb_stream_funcs );
    setup_funcs(L, LUAGI_ODB_OBJECT_FUNCS, luagi_odb_object_funcs );
+   setup_funcs(L, LUAGI_REFDB_FUNCS, luagi_refdb_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

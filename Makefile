@@ -29,6 +29,7 @@ FILES := luagi.o \
 		blame.o \
 		ignore.o \
 		odb.o \
+		refdb.o \
 #revert.o \
 #
 
