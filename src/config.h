@@ -60,9 +60,13 @@ static const struct luaL_Reg luagi_config_iterator_funcs [] = {
    { "__gc", luagi_config_iterator_free },
    { NULL, NULL }
 };
+
 #define LUAGI_CONFIG_FUNCS "is.luagi.config"
 #define checkconfig_at( L, N ) \
    luaL_checkudata( L, N, LUAGI_CONFIG_FUNCS )
+
+#define checkconfig( L ) \
+    checkconfig_at( L, 1 )
 
 static const struct luaL_Reg luagi_config_funcs [] = {
 	{ "add_file_ondisk", luagi_config_add_file_ondisk },
