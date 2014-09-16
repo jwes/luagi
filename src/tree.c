@@ -285,7 +285,7 @@ int luagi_tree_walk( lua_State *L )
 {
    git_tree** tree = checktree( L );
    const char* direction = luaL_optstring( L, 2, LUAGI_TREE_PRE );
-   git_treewalk_mode mode;
+   git_treewalk_mode mode = GIT_TREEWALK_PRE;
    if( strncmp( direction, LUAGI_TREE_PRE, 3 ) == 0 )
    {
       mode = GIT_TREEWALK_PRE;
@@ -297,8 +297,8 @@ int luagi_tree_walk( lua_State *L )
       luaL_error( L, "wrong order, user 'pre' or 'post'" );
    }
    struct walk_info* info = (struct walk_info*) lua_newuserdata(L, sizeof(struct walk_info ) );
-   luaL_getmetatable(L, LUAGI_TREE_WALK_STATICS);
-   lua_setmetatable(L, -2);
+   luaL_getmetatable( L, LUAGI_TREE_WALK_STATICS );
+   lua_setmetatable( L, -2 );
 
    info->next = NULL;
    info->last = NULL;

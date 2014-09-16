@@ -20,7 +20,7 @@
 int luagi_create_branch( lua_State *L )
 {
    git_repository** repo = checkrepo(L, 1);
-   char* branch_name = luaL_checkstring(L, 2);
+   const char* branch_name = luaL_checkstring(L, 2);
    git_commit** target = ( git_commit** ) luaL_checkudata( L, 3, LUAGI_COMMIT_FUNCS);
    int force = lua_toboolean(L, 4);
    git_signature sig;
