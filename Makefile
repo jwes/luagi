@@ -30,6 +30,7 @@ FILES := luagi.o \
 		ignore.o \
 		odb.o \
 		refdb.o \
+		config.o \
 #revert.o \
 #
 

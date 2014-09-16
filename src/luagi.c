@@ -33,6 +33,7 @@
 #include "ignore.h"
 #include "odb.h"
 #include "refdb.h"
+#include "config.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -225,6 +226,15 @@ static const struct luaL_Reg mylib [] = {
 
    { "hash", luagi_odb_hash },
    { "hashfile", luagi_odb_hashfile },
+   //config
+   { "find_global_config", luagi_config_find_global },
+   { "find_xdg_config", luagi_config_find_xdg },
+   { "find_system_config", luagi_config_find_system },
+
+   { "open_default_config", luagi_config_open_default },
+   { "new_config", luagi_config_new },
+   { "open_ondisk_config", luagi_config_open_ondisk },
+
    { NULL, NULL } /*sentinel*/
 };
 
@@ -302,6 +312,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_ODB_STREAM_FUNCS, luagi_odb_stream_funcs );
    setup_funcs(L, LUAGI_ODB_OBJECT_FUNCS, luagi_odb_object_funcs );
    setup_funcs(L, LUAGI_REFDB_FUNCS, luagi_refdb_funcs );
+   setup_funcs(L, LUAGI_CONFIG_FUNCS, luagi_config_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
