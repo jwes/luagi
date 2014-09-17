@@ -11,6 +11,8 @@
 #include "odb.h"
 #include "refdb.h"
 
+#include "config.h"
+
 int luagi_open( lua_State *L )
 {
    git_repository **repo;
@@ -222,18 +224,29 @@ int luagi_repository_is_bare( lua_State *L )
    return luagi_generic_is( L, git_repository_is_bare );
 }
 
+int luagi_get_config( lua_State *L, int (*func)( git_config **out, git_repository *repo ))
+{
+   git_repository **repo = checkrepo( L, 1 );
+
+   git_config **out = lua_newuserdata( L, sizeof( git_config *) );
+
+   if( func( out, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+
 int luagi_repository_config( lua_State *L )
 {
-   //TODO config
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   return luagi_get_config( L, git_repository_config );
 }
 
 int luagi_repository_config_snapshot( lua_State *L )
 {
-   //TODO config
-   luaL_error( L, "not yet implemented" );
-   return 0;
+   return luagi_get_config( L, git_repository_config_snapshot );
 }
 
 int luagi_repository_odb( lua_State *L )
