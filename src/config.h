@@ -56,11 +56,7 @@ int luagi_config_backend_foreach_match( lua_State *L );
 
 int luagi_config_free( lua_State *L );
 
-static const struct luaL_Reg luagi_config_iterator_funcs [] = {
-   { "__gc", luagi_config_iterator_free },
-   { NULL, NULL }
-};
-
+#define LUAGI_CONFIG_ITERATOR_FUNCS "is.luagi.config.iterator"
 #define LUAGI_CONFIG_FUNCS "is.luagi.config"
 #define checkconfig_at( L, N ) \
    luaL_checkudata( L, N, LUAGI_CONFIG_FUNCS )
@@ -99,9 +95,6 @@ static const struct luaL_Reg luagi_config_funcs [] = {
    { "foreach_match", luagi_config_foreach_match },
 
    { "get_mapped", luagi_config_get_mapped },
-   { "parse_bool", luagi_config_parse_bool },
-   { "parse_int32", luagi_config_parse_int32 },
-   { "parse_int64", luagi_config_parse_int64 },
 
    { "backend_foreach_match",luagi_config_backend_foreach_match },
    { "__gc", luagi_config_free },

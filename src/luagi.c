@@ -235,6 +235,9 @@ static const struct luaL_Reg mylib [] = {
    { "new_config", luagi_config_new },
    { "open_ondisk_config", luagi_config_open_ondisk },
 
+   { "parse_bool", luagi_config_parse_bool },
+   { "parse_int32", luagi_config_parse_int32 },
+   { "parse_int64", luagi_config_parse_int64 },
    { NULL, NULL } /*sentinel*/
 };
 
@@ -283,6 +286,10 @@ int luaopen_luagi(lua_State *L)
 
    luaL_newmetatable( L, LUAGI_NOTE_ITER_FUNCS );
    lua_pushcfunction( L, luagi_note_iterator_free );
+   lua_setfield( L, -2, "__gc" );
+
+   luaL_newmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
+   lua_pushcfunction( L, luagi_config_iterator_free );
    lua_setfield( L, -2, "__gc" );
 
    setup_funcs(L, LUAGI_TREE_FUNCS, luagi_tree_funcs);
