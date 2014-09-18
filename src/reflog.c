@@ -2,6 +2,11 @@
 #include "luagi.h"
 #include "oid.h"
 
+#define KEY_OLD "old"
+#define KEY_NEW "new"
+#define KEY_COMMITTER "committer"
+#define KEY_MESSAGE "message"
+
 int luagi_reflog_read( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -108,13 +113,26 @@ int luagi_reflog_drop( lua_State *L )
    
 int luagi_reflog_entry_totable( lua_State *L, const git_reflog_entry *entry )
 {
-   const git_oid *oid = git_reflog_entry_id_old( entry );
+   lua_newtable( L );
+   const git_oid *old = git_reflog_entry_id_old( entry );
 
-   int ret = luagi_push_oid( L, oid );
+   luagi_push_oid( L, old );
+   lua_setfield( L, 1, KEY_OLD );
 
+   const git_oid *new = git_reflog_entry_id_new( entry );
+   luagi_push_oid( L, new );
+   lua_setfield( L, 1, KEY_NEW );
+
+   const git_signature *committer = git_reflog_entry_committer( entry );
+   signature_to_table( L, committer );
+   lua_setfield( L, 1, KEY_COMMITTER );
+
+   const char *message = git_reflog_entry_message( entry );
+   lua_pushstring( L, message );
+   lua_setfield( L, 1, KEY_MESSAGE );
 
    //TODO 
-   return ret;
+   return 1;
 }
 
 int luagi_reflog_free( lua_State *L )
