@@ -30,6 +30,7 @@ set( SRC_FILES
 
    ${SRC_DIR}/refdb.c
    ${SRC_DIR}/reference.c
+   ${SRC_DIR}/reflog.c
    ${SRC_DIR}/remote.c
    ${SRC_DIR}/repository.c
    ${SRC_DIR}/reset.c
