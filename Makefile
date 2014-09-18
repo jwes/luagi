@@ -31,10 +31,11 @@ FILES := luagi.o \
 		odb.o \
 		refdb.o \
 		config.o \
+		reflog.o \
 #revert.o \
 #
 
-CFLAGS:=-fPIC -g -Wall -Wextra -Werror -std=c11
+CFLAGS:=-fPIC -g -Wall -Wextra -Werror -std=c11 -D_XOPEN_SOURCE=800
 LIBS:=-lc -lgit2 -llua 
 VPATH:=src
 CC=gcc

@@ -34,6 +34,7 @@
 #include "odb.h"
 #include "refdb.h"
 #include "config.h"
+#include "reflog.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -197,6 +198,10 @@ static const struct luaL_Reg repofuncs [] = {
    //refdb
    { "new_refdb", luagi_refdb_new },
    { "open_refdb", luagi_refdb_open },
+   //reflog
+   { "read_reflog", luagi_reflog_read },
+   { "rename_reflog", luagi_reflog_rename },
+   { "delete_reflog", luagi_reflog_delete },
    { NULL, NULL },
 };
 
