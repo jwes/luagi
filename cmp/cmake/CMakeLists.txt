@@ -7,7 +7,7 @@ enable_testing()
 set( LIB_NAME ${PROJECT_NAME} )
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
-set( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Modules" )
+set( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules" )
 set( ROOT "${CMAKE_SOURCE_DIR}/../.." )
 set( INC_DIR "${ROOT}/inc" )
 set( SRC_DIR "${ROOT}/src" )

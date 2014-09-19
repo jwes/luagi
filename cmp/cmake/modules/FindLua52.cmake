@@ -36,6 +36,8 @@ FIND_PATH(LUA52_INCLUDE_DIR lua.h
   /opt/local # DarwinPorts
   /opt/csw # Blastwave
   /opt
+  /usr
+  /usr/local
 )
 
 FIND_LIBRARY(LUA52_LIBRARY
@@ -50,6 +52,8 @@ FIND_LIBRARY(LUA52_LIBRARY
   /opt/local
   /opt/csw
   /opt
+  /usr
+  /usr/local
 )
 
 IF(LUA52_LIBRARY)

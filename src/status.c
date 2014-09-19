@@ -9,6 +9,7 @@
 #include <string.h>
 #undef __USE_BSD
 
+
 #define INEW               "index_new"
 #define IMOD               "index_modified"
 #define IDEL               "index_deleted"
