@@ -1,22 +1,25 @@
-# Luagi
-
-<img src="etc/luagi_color_logo.svg" alt="luagi color logo" style="width:250;height:250">
+= Luagi
 
 A lua binding for libgit 2
 
-## Dependencies
+image::etc/luagi_color_logo.svg[Logo,250,250]
+
+== Dependencies
 
 libgit2 and Lua is necessary to compile the source.
 Currently, the source is built against libgit2 0.21.0 Lua 5.2.
 
-## Cmake Build
+== Cmake Build
 
-    $ mkdir bld
-    $ cd bld
-    $ cmake ../cmp/cmake
-    $ make
+[source,bash]
+----
+$ mkdir bld
+$ cd bld
+$ cmake ../cmp/cmake
+$ make
+----
 
-## TODO
+== TODO
 
 * automated tests for the library *with busted ;-)*
 * documentation
