@@ -131,7 +131,6 @@ int luagi_reflog_entry_totable( lua_State *L, const git_reflog_entry *entry )
    lua_pushstring( L, message );
    lua_setfield( L, 1, KEY_MESSAGE );
 
-   //TODO 
    return 1;
 }
 

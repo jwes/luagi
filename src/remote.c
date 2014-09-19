@@ -6,6 +6,13 @@
 #include "remote.h"
 #include "luagi.h"
 #include "transport.h"
+#include "oid.h"
+
+#define KEY_NAME "name"
+#define KEY_OID "oid"
+#define KEY_LOID "loid"
+#define KEY_TARGET "target"
+#define KEY_LOCAL "local"
 
 int luagi_remote_list( lua_State *L )
 { 
@@ -20,13 +27,11 @@ int luagi_remote_list( lua_State *L )
       return 2;
    }
    lua_newtable( L );
-   int pos = 0;
    for( unsigned int i = 0; i < array.count; i++ )
    {
-      lua_pushstring( L, array.strings[pos] );
       lua_pushinteger( L, i + 1 );
-      lua_settable( L, -2 );
-      pos += strlen( array.strings[pos]);
+      lua_pushstring( L, array.strings[i] );
+      lua_settable( L, -3 );
    }
    return 1; 
 }
@@ -313,10 +318,10 @@ int luagi_remote_get_refspec( lua_State *L )
 int luagi_remote_connect( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
-   const char* direction = luaL_checkstring( L, 2 );
+   const char* direction = luaL_optstring( L, 2, NULL );
 
    git_direction dir = GIT_DIRECTION_FETCH;
-   if( strncmp( PUSH, direction, strlen( PUSH ) ) == 0 )
+   if( direction != NULL && strncmp( PUSH, direction, strlen( PUSH ) ) == 0 )
    {
       dir = GIT_DIRECTION_PUSH;
    }
@@ -331,10 +336,49 @@ int luagi_remote_connect( lua_State *L )
 
 int luagi_remote_ls( lua_State *L )
 { 
-// TODO type git_remote_head? 
-   lua_pushnil( L ); 
-   lua_pushstring( L, "not yet implemented" );
-   return 2; 
+   git_remote **remote = checkremote( L );
+
+   if( ! git_remote_connected( *remote ) )
+   {
+      lua_pushnil( L );
+      lua_pushstring( L, "remote has to be connected" );
+      return 2;
+   }
+
+   const git_remote_head **heads;
+   size_t size;
+   if( git_remote_ls( &heads, &size, *remote ) )
+   {
+      ERROR_PUSH( L )
+   }
+   //return a table
+   lua_newtable( L );
+   for( size_t i = 0; i < size; ++i )
+   {
+      lua_pushinteger( L, i + 1 );
+      lua_newtable( L );
+      const git_remote_head *head = heads[i];
+
+      lua_pushboolean( L, head->local );
+      lua_setfield( L, -2, KEY_LOCAL );
+
+      luagi_push_oid( L, &head->oid );
+      lua_setfield( L, -2, KEY_OID );
+
+      luagi_push_oid( L, &head->loid );
+      lua_setfield( L, -2, KEY_LOID );
+
+      lua_pushstring( L, head->name );
+      lua_setfield( L, -2, KEY_NAME );
+
+      if( head->symref_target )
+      {
+         lua_pushstring( L, head->symref_target );
+         lua_setfield( L, -2, KEY_TARGET );
+      }
+      lua_settable( L, -3 );
+   }
+   return 1; 
 }
 int luagi_remote_download( lua_State *L )
 { 
