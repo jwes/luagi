@@ -2,7 +2,7 @@
 
 A lua binding for libgit 2
 
-image::etc/luagi_color_logo.svg[Logo,250,250]
+image::https://cdn.rawgit.com/jwes/luagi/master/etc/luagi_color_logo.svg[Logo,250,250]
 
 == Dependencies
 
