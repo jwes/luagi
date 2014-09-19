@@ -1,3 +1,7 @@
+# Luagi
+
+<img src="etc/luagi_color_logo.svg" alt="luagi color logo" style="width:250;height:250">
+
 A lua binding for libgit 2
 
 ## Dependencies
