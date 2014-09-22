@@ -1,17 +1,6 @@
 #include <string.h>
 #include "types.h"
-
-#define ANY "any"
-#define BAD "bad"
-#define _EXT1 "_ext1"
-#define COMMIT "commit"
-#define TREE "tree"
-#define BLOB "blob"
-#define TAG "tag"
-#define _EXT2 "_ext2"
-#define OFS_DELTA "ofs_delta"
-#define REF_DELTA "ref_delta"
-
+#include "defines.h"
 git_otype luagi_otype_from_string( const char *str )
 {
    git_otype ret = GIT_OBJ_BAD;

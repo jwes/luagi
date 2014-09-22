@@ -2,7 +2,6 @@
 #include "blame.h"
 #include "luagi.h"
 
-#define BLAME_LINES_IN_HUNK "lines_in_hunk"
 
 static int luagi_blame_init_options( lua_State *L __attribute__((unused)),
                                      int index __attribute__((unused)),

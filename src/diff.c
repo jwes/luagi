@@ -8,38 +8,6 @@
 #include "index.h"
 #include "commit.h"
 
-#define DIFF_FILE_ID "id"
-#define DIFF_FILE_PATH "path"
-#define DIFF_FILE_SIZE "size"
-#define DIFF_FILE_FLAGS "flags"
-#define DIFF_FILE_MODE "mode"
-
-#define DIFF_DELTA_STATUS "status"
-#define DIFF_DELTA_FLAGS "flags"
-#define DIFF_DELTA_SIMI "similarity"
-#define DIFF_DELTA_NFILES "number_of_files"
-#define DIFF_DELTA_OLD_FILE "old_file"
-#define DIFF_DELTA_NEW_FILE "new_file"
-
-#define BINARY "binary"
-#define NOT_BINARY "not_binary"
-#define VALID_ID "valid_id"
-
-#define PATCH "patch"
-#define PATCH_HEADER "patch_header"
-#define RAW "raw"
-#define NAME_ONLY "name_only"
-#define NAME_STATUS "name_status"
-
-#define D_ADDED "added"
-#define D_DELETED "deleted"
-#define D_MODIFIED "modified"
-#define D_RENAMED "renamed"
-#define D_COPIED "copied"
-#define D_IGNORED "ignored"
-#define D_UNTRACKED "untracked"
-#define D_TYPECHANGE "typechange"
-
 void options_from_lua( lua_State *L, int idx, git_diff_options *opts )
 {
    lua_isboolean( L, idx );

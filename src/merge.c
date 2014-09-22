@@ -6,18 +6,6 @@
 #include "commit.h"
 #include "checkout.h"
 
-#define NONE "none"
-#define NORMAL "normal"
-#define UP_TO_DATE "up to date"
-#define FASTFORWARD "fast forward"
-#define UNBORN "unborn"
-
-#define NO_FASTFORWARD "no fast forward"
-#define FASTFORWARD_ONLY "fast forward only"
-
-#define PATH "path"
-#define CONTENT "content"
-
 int luagi_merge_analysis( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );

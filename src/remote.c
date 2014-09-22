@@ -8,12 +8,6 @@
 #include "transport.h"
 #include "oid.h"
 
-#define KEY_NAME "name"
-#define KEY_OID "oid"
-#define KEY_LOID "loid"
-#define KEY_TARGET "target"
-#define KEY_LOCAL "local"
-
 int luagi_remote_list( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );

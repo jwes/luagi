@@ -10,10 +10,6 @@
 #include "object.h"
 #include "types.h"
 
-#define REF_INVALID "invalid"
-#define REF_OID "oid"
-#define REF_SYMBOLIC "symbolic"
-
 #define bufsize 1024
 int luagi_reference_lookup( lua_State *L )
 {

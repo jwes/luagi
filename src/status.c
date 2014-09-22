@@ -9,43 +9,6 @@
 #include <string.h>
 #undef __USE_BSD
 
-
-#define INEW               "index_new"
-#define IMOD               "index_modified"
-#define IDEL               "index_deleted"
-#define IREN               "index_renamed"
-#define ITYP               "index_typechange"
-
-#define WNEW               "workdir_new"
-#define WMOD               "workdir_modified"
-#define WDEL               "workdir_deleted"
-#define WTYP               "workdir_typechange"
-#define WREN               "workdir_renamed"
-
-#define IGN                "ignored"
-
-#define LUAGI_SHOW          "show"
-#define LUAGI_FLAGS         "flags"
-#define LUAGI_PATHS         "paths"
-
-#define INC_UNTRACKED      "include_untracked"
-#define INC_IGNORED        "include_ignored"
-#define INC_UNMODIFIED     "include_unmodified"
-#define EX_SUBMODULES      "exclude_submoduled"
-#define REC_UNTRACKED_DIRS "recurse_untracked_dirs"
-#define DISABLE_PATHSPEC   "diable_pathspec_match"
-#define REC_IGNORED_DIRS   "recurse_ignored_dirs"
-#define REN_HEAD_TO_IDX    "rename_head_to_index"
-#define REN_IDX_TO_WDIR    "rename_index_to_workdir"
-#define SORT_SENSI         "sort_case_sensitively"
-#define SORT_INSENSI       "sort_case_insensitively"
-#define REN_FROM_REWRITE   "renames_from_rewrites"
-#define NO_REFRESH         "no_refresh"
-
-#define L_STATUS           "index_to_workdir"
-#define L_IDX_TO_WRK       "index_to_workdir"
-#define L_HEAD_TO_IDX      "head_to_index"
-
 void  luagi_status_flags_to_table( lua_State *L, const int f )
 {      
    lua_newtable( L );

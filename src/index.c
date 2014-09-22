@@ -5,15 +5,6 @@
 #include "luagi.h"
 #include "oid.h"
 
-#define FORCE "force"
-#define DISABLE_PATHSPEC_MATCH "disable_pathspec_match"
-#define CHECK_PATHSPEC "check_pathspec"
-
-#define IGNORE_CASE "ignore_case"
-#define NO_FILEMODE "no_filemode"
-#define NO_SYMLINKS "no_symlinks"
-#define FROM_OWNER "from_owner"
-
 int luagi_index_new( lua_State *L )
 {
    const char *path = luaL_optstring( L, 1, NULL );

@@ -5,9 +5,6 @@
 #include "luagi.h"
 #include <string.h>
 
-#define SSH "ssh"
-#define HTTP "http"
-
 /* TODO: git_transport_register and git_transport_unregister */
 
 int luagi_transport_new( lua_State *L )

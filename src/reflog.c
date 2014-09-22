@@ -2,11 +2,6 @@
 #include "luagi.h"
 #include "oid.h"
 
-#define KEY_OLD "old"
-#define KEY_NEW "new"
-#define KEY_COMMITTER "committer"
-#define KEY_MESSAGE "message"
-
 int luagi_reflog_read( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );

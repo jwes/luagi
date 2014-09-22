@@ -5,22 +5,6 @@
 #include "luagi.h"
 #include "oid.h"
 
-#define IGNORE_NONE "none"
-#define IGNORE_UNTRACKED "untracked"
-#define IGNORE_DIRTY "dirty"
-#define IGNORE_ALL "all"
-#define IGNORE_DEFAULT "default"
-
-#define UPDATE_CHECKOUT "checkout"
-#define UPDATE_REBASE "rebase"
-#define UPDATE_MERGE "merge"
-#define UPDATE_NONE "none"
-
-#define RECURSE_YES "yes"
-#define RECURSE_NO "no"
-#define RECURSE_ONDEMAND "on_demand"
-
-
 int luagi_submodule_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );

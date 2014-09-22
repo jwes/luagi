@@ -7,10 +7,6 @@
 #include <git2/reset.h>
 #include <lauxlib.h>
 
-#define SOFT "soft"
-#define MIXED "mixed"
-#define HARD "hard"
-
 static git_reset_t luagi_check_resettype( lua_State *L, int index )
 {
    const char *reset_mode = luaL_checkstring( L, index );

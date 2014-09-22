@@ -5,6 +5,8 @@
 #include <git2/strarray.h>
 #include <git2/errors.h>
 
+#include "defines.h"
+
 #define REPO_NAME "is.luagi.repo"
 #define LUAGI_TREE_FUNCS "is.luagi.tree"
 #define LUAGI_TREE_ENTRY_FUNCS "is.luagi.tree.entry"
@@ -12,11 +14,6 @@
 #define LUAGI_TREE_WALK_STATICS "is.luagi.tree.walk"
 #define LUAGI_REMOTE_FUNCS "is.luagi.remote"
 #define LUAGI_STRARRAY "is.luagi.strarray"
-
-#define SIG_NAME "name"
-#define SIG_EMAIL "email"
-#define SIG_TIME "time"
-#define SIG_TIME_OFF "time_offset"
 
 #define ERROR_ABORT( L ) \
    const git_error *err = giterr_last(); \

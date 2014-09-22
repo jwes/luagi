@@ -335,27 +335,27 @@ int signature_to_table( lua_State *L, const git_signature *sig )
 {
    lua_newtable( L );
    lua_pushstring( L, sig->name );
-   lua_setfield( L, -2, SIG_NAME );
+   lua_setfield( L, -2, KEY_NAME );
    lua_pushstring( L, sig->email );
-   lua_setfield( L, -2, SIG_EMAIL );
+   lua_setfield( L, -2, KEY_EMAIL );
    git_time time = sig->when;
 
    lua_pushnumber( L, time.time );
-   lua_setfield( L, -2, SIG_TIME );
+   lua_setfield( L, -2, KEY_TIME );
 
    lua_pushnumber( L, time.offset );
-   lua_setfield( L, -2, SIG_TIME_OFF );
+   lua_setfield( L, -2, KEY_TIME_OFF );
    return 0;
 }
 int table_to_signature( lua_State *L, git_signature *sig, int tablepos )
 {
-   lua_getfield( L, tablepos, SIG_NAME );
+   lua_getfield( L, tablepos, KEY_NAME );
    const char *name = luaL_checkstring( L, -1 );
-   lua_getfield( L, tablepos, SIG_EMAIL );
+   lua_getfield( L, tablepos, KEY_EMAIL );
    const char *email = luaL_checkstring( L, -1 );
-   lua_getfield( L, tablepos, SIG_TIME );
+   lua_getfield( L, tablepos, KEY_TIME );
    git_time_t time = (git_time_t ) lua_tointeger( L, -1 );
-   lua_getfield( L, tablepos, SIG_TIME_OFF );
+   lua_getfield( L, tablepos, KEY_TIME_OFF );
    int offset = lua_tointeger( L, -1 );
 
    if( time == 0 )
@@ -373,24 +373,24 @@ const char *luagi_otype_to_string( git_otype type )
    {
       case GIT_OBJ_ANY:
       default:
-         return "any";
+         return VALUE_ANY; 
       case GIT_OBJ_BAD:
-         return "invalid";
+         return VALUE_INVALID;
       case GIT_OBJ__EXT1:
       case GIT_OBJ__EXT2:
-         return "reserved for future use";
+         return VALUE_RESERVED; 
       case GIT_OBJ_COMMIT:
-         return "commit";
+         return VALUE_COMMIT;
       case GIT_OBJ_TREE:
-         return "tree";
+         return VALUE_TREE;
       case GIT_OBJ_BLOB:
-         return "blob";
+         return VALUE_BLOB;
       case GIT_OBJ_TAG:
-         return "tag";
+         return VALUE_TAG;
       case GIT_OBJ_OFS_DELTA:
-         return "ofs delta";
+         return VALUE_OFS_DELTA;
       case GIT_OBJ_REF_DELTA:
-         return "ref delta";
+         return VALUE_REF_DELTA;
    }
 }
 
