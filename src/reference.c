@@ -209,15 +209,15 @@ int luagi_reference_type( lua_State *L )
    git_ref_t type = git_reference_type( *ref );
    if( type == GIT_REF_INVALID )
    {
-      lua_pushstring( L, REF_INVALID ); 
+      lua_pushstring( L, INVALID ); 
    }
    else if ( type == GIT_REF_OID )
    {
-      lua_pushstring( L, REF_OID );
+      lua_pushstring( L, OID );
    }
    else
    {
-      lua_pushstring( L, REF_SYMBOLIC );
+      lua_pushstring( L, SYMBOLIC );
    }
    return 1;
 }

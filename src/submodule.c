@@ -215,19 +215,19 @@ static int luagi_sub_push_ignore( lua_State *L, git_submodule_ignore_t ignore )
    {
       default:
       case GIT_SUBMODULE_IGNORE_NONE: 
-         lua_pushstring( L, IGNORE_NONE );
+         lua_pushstring( L, NONE );
          break;
       case GIT_SUBMODULE_IGNORE_UNTRACKED: 
-         lua_pushstring( L, IGNORE_UNTRACKED );
+         lua_pushstring( L, UNTRACKED );
          break;
       case GIT_SUBMODULE_IGNORE_DIRTY: 
-         lua_pushstring( L, IGNORE_DIRTY );
+         lua_pushstring( L, DIRTY );
          break;
       case GIT_SUBMODULE_IGNORE_ALL: 
-         lua_pushstring( L, IGNORE_ALL );
+         lua_pushstring( L, ALL );
          break;
       case GIT_SUBMODULE_IGNORE_DEFAULT: 
-         lua_pushstring( L, IGNORE_DEFAULT );
+         lua_pushstring( L, DEFAULT );
          break;
    }
    return 1;
@@ -278,19 +278,19 @@ static int luagi_sub_push_update( lua_State *L, git_submodule_update_t update )
       default:
       case GIT_SUBMODULE_UPDATE_NONE:
               // none is none, use IGNORE define
-         lua_pushstring( L, IGNORE_NONE );
+         lua_pushstring( L, NONE );
          break;
       case GIT_SUBMODULE_UPDATE_CHECKOUT:
-         lua_pushstring( L, UPDATE_CHECKOUT );
+         lua_pushstring( L, CHECKOUT );
          break;
       case GIT_SUBMODULE_UPDATE_MERGE:
-         lua_pushstring( L, UPDATE_MERGE );
+         lua_pushstring( L, MERGE );
          break;
       case GIT_SUBMODULE_UPDATE_REBASE:
-         lua_pushstring( L, UPDATE_REBASE );
+         lua_pushstring( L, REBASE );
          break;
       case GIT_SUBMODULE_UPDATE_DEFAULT:
-         lua_pushstring( L, IGNORE_DEFAULT );
+         lua_pushstring( L, DEFAULT );
          break;
    }
    return 1;

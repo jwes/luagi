@@ -493,7 +493,7 @@ void add_flags( lua_State *L, int idx, int32_t flags )
    if( flags & GIT_DIFF_FLAG_VALID_ID )
    {
       lua_pushboolean( L, 1 );
-      lua_setfield( L, idx, VALID_ID );
+      lua_setfield( L, idx, ID );
    }
 }
 
@@ -502,18 +502,18 @@ void diff_file_to_table( lua_State *L, const git_diff_file file )
    lua_newtable( L );
    char buf [GIT_OID_HEXSZ+1];
    lua_pushstring( L, git_oid_tostr( buf, GIT_OID_HEXSZ+1, &(file.id) ) );
-   lua_setfield( L, -2, DIFF_FILE_ID );
+   lua_setfield( L, -2, ID );
 
    lua_pushstring( L, file.path );
-   lua_setfield( L, -2, DIFF_FILE_PATH );
+   lua_setfield( L, -2, PATH );
   
    lua_pushinteger( L, file.size );
-   lua_setfield( L, -2, DIFF_FILE_SIZE );
+   lua_setfield( L, -2, SIZE );
 
    add_flags( L, -2, file.flags );
 
    lua_pushinteger( L, file.mode );
-   lua_setfield( L, -2, DIFF_FILE_MODE );
+   lua_setfield( L, -2, MODE );
 
    debugStack( L );
 }
@@ -524,21 +524,21 @@ void diff_delta_to_table( lua_State *L, const git_diff_delta *delta )
    lua_newtable( L );
 
    lua_pushinteger( L, delta->status );
-   lua_setfield( L, -2, DIFF_DELTA_STATUS );
+   lua_setfield( L, -2, STATUS );
 
    add_flags( L, -2, delta->flags );
 
    lua_pushinteger( L, delta->similarity );
-   lua_setfield( L, -2, DIFF_DELTA_SIMI );
+   lua_setfield( L, -2, SIMI );
 
    lua_pushinteger( L, delta->nfiles );
-   lua_setfield( L, -2, DIFF_DELTA_NFILES );
+   lua_setfield( L, -2, NFILES );
    
    diff_file_to_table( L, delta->old_file );
-   lua_setfield( L, -2, DIFF_DELTA_OLD_FILE );
+   lua_setfield( L, -2, OLD_FILE );
 
    diff_file_to_table( L, delta->new_file );
-   lua_setfield( L, -2, DIFF_DELTA_NEW_FILE );
+   lua_setfield( L, -2, NEW_FILE );
   
    debugStack( L );
 
@@ -547,35 +547,35 @@ void diff_delta_to_table( lua_State *L, const git_diff_delta *delta )
 static git_delta_t delta_t_from_string( const char *type )
 {
    git_delta_t t = GIT_DELTA_UNMODIFIED;
-   if( strncmp( type, D_ADDED, strlen( D_ADDED ) ) )
+   if( strncmp( type, ADDED, strlen( ADDED ) ) )
    {
       t = GIT_DELTA_ADDED;
    }
-   else if( strncmp( type, D_DELETED, strlen( D_DELETED ) ) )
+   else if( strncmp( type, DELETED, strlen( DELETED ) ) )
    {
       t = GIT_DELTA_DELETED;
    }
-   else if( strncmp( type, D_MODIFIED, strlen( D_MODIFIED ) ) )
+   else if( strncmp( type, MODIFIED, strlen( MODIFIED ) ) )
    {
       t = GIT_DELTA_MODIFIED;
    }
-   else if( strncmp( type, D_RENAMED, strlen( D_RENAMED ) ) )
+   else if( strncmp( type, RENAMED, strlen( RENAMED ) ) )
    {
       t = GIT_DELTA_RENAMED;
    }
-   else if( strncmp( type, D_COPIED, strlen( D_COPIED ) ) )
+   else if( strncmp( type, COPIED, strlen( COPIED ) ) )
    {
       t = GIT_DELTA_COPIED;
    }
-   else if( strncmp( type, D_IGNORED, strlen( D_IGNORED ) ) )
+   else if( strncmp( type, IGNORED, strlen( IGNORED ) ) )
    {
       t = GIT_DELTA_IGNORED;
    }
-   else if( strncmp( type, D_UNTRACKED, strlen( D_UNTRACKED ) ) )
+   else if( strncmp( type, UNTRACKED, strlen( UNTRACKED ) ) )
    {
       t = GIT_DELTA_UNTRACKED;
    }
-   else if( strncmp( type, D_TYPECHANGE, strlen( D_TYPECHANGE ) ) )
+   else if( strncmp( type, TYPECHANGE, strlen( TYPECHANGE ) ) )
    {
       t = GIT_DELTA_TYPECHANGE;
    }

@@ -33,7 +33,7 @@ void  luagi_status_flags_to_table( lua_State *L, const int f )
    lua_pushboolean( L, f & GIT_STATUS_WT_RENAMED );
    lua_setfield( L, -2, WREN );
    lua_pushboolean( L, f & GIT_STATUS_IGNORED );
-   lua_setfield( L, -2, IGN );
+   lua_setfield( L, -2, IGNORED );
 }
 
 struct status_element {
@@ -107,7 +107,7 @@ static int luagi_status_init_options( lua_State *L, int idx, git_status_options 
    }
    
    // first version with integer flags
-   lua_getfield( L, idx, LUAGI_SHOW );
+   lua_getfield( L, idx, SHOW );
    git_status_show_t show = luaL_optinteger( L, -1, 0 );
 
    // init options from lua_State
@@ -229,20 +229,20 @@ int luagi_status_by_index( lua_State *L )
    lua_newtable( L );
 
    luagi_status_flags_to_table( L, entry->status );
-   lua_setfield( L , -2, L_STATUS );
+   lua_setfield( L , -2, STATUS );
 
    // git_diff_delta
 
    if( entry->head_to_index != NULL )
    {
       diff_delta_to_table( L, entry->head_to_index );
-      lua_setfield( L , -2, L_HEAD_TO_IDX );
+      lua_setfield( L , -2, HEAD_TO_IDX );
    }
 
    if( entry->index_to_workdir != NULL )
    {
       diff_delta_to_table( L, entry->index_to_workdir );
-      lua_setfield( L , -2, L_IDX_TO_WRK );
+      lua_setfield( L , -2, IDX_TO_WRK );
    }
    
    return 1;

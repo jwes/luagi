@@ -354,21 +354,21 @@ int luagi_remote_ls( lua_State *L )
       const git_remote_head *head = heads[i];
 
       lua_pushboolean( L, head->local );
-      lua_setfield( L, -2, KEY_LOCAL );
+      lua_setfield( L, -2, LOCAL );
 
       luagi_push_oid( L, &head->oid );
-      lua_setfield( L, -2, KEY_OID );
+      lua_setfield( L, -2, OID );
 
       luagi_push_oid( L, &head->loid );
-      lua_setfield( L, -2, KEY_LOID );
+      lua_setfield( L, -2, LOID );
 
       lua_pushstring( L, head->name );
-      lua_setfield( L, -2, KEY_NAME );
+      lua_setfield( L, -2, NAME );
 
       if( head->symref_target )
       {
          lua_pushstring( L, head->symref_target );
-         lua_setfield( L, -2, KEY_TARGET );
+         lua_setfield( L, -2, TARGET );
       }
       lua_settable( L, -3 );
    }

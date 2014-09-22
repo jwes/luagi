@@ -4,6 +4,7 @@
 #include <lua.h>
 #include <lauxlib.h>
 
+extern int luagi_indexer_new( lua_State *L );
 //general
 int luagi_odb_new( lua_State *L );
 int luagi_odb_open( lua_State *L );
@@ -57,6 +58,8 @@ static const struct luaL_Reg luagi_odb_funcs [] = {
    { "add_alternate", luagi_odb_add_alternate },
    { "num_backends", luagi_odb_num_backends },
    { "get_backend", luagi_odb_get_backend },
+
+   { "indexer", luagi_indexer_new },
    { NULL, NULL }
 };
 

@@ -41,6 +41,7 @@ const char* luagi_otype_to_string( git_otype type );
 void luagi_lua_list_from_string( lua_State *L, git_strarray *array );
 git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx );
 
+int luagi_push_transfer_stats( lua_State *L, const git_transfer_progress *stats );
 typedef struct luagi_foreach_payload
 {
    lua_State *L;

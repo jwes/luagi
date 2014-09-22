@@ -16,6 +16,7 @@ set( SRC_FILES
 
    ${SRC_DIR}/ignore.c
    ${SRC_DIR}/index.c
+   ${SRC_DIR}/indexer.c
 
    ${SRC_DIR}/luagi.c
 

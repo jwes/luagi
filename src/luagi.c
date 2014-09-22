@@ -35,6 +35,7 @@
 #include "refdb.h"
 #include "config.h"
 #include "reflog.h"
+#include "indexer.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -325,6 +326,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_ODB_OBJECT_FUNCS, luagi_odb_object_funcs );
    setup_funcs(L, LUAGI_REFDB_FUNCS, luagi_refdb_funcs );
    setup_funcs(L, LUAGI_CONFIG_FUNCS, luagi_config_funcs );
+   setup_funcs(L, LUAGI_INDEXER_FUNCS, luagi_indexer_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
@@ -335,27 +337,27 @@ int signature_to_table( lua_State *L, const git_signature *sig )
 {
    lua_newtable( L );
    lua_pushstring( L, sig->name );
-   lua_setfield( L, -2, KEY_NAME );
+   lua_setfield( L, -2, NAME );
    lua_pushstring( L, sig->email );
-   lua_setfield( L, -2, KEY_EMAIL );
+   lua_setfield( L, -2, EMAIL );
    git_time time = sig->when;
 
    lua_pushnumber( L, time.time );
-   lua_setfield( L, -2, KEY_TIME );
+   lua_setfield( L, -2, TIME );
 
    lua_pushnumber( L, time.offset );
-   lua_setfield( L, -2, KEY_TIME_OFF );
+   lua_setfield( L, -2, TIME_OFF );
    return 0;
 }
 int table_to_signature( lua_State *L, git_signature *sig, int tablepos )
 {
-   lua_getfield( L, tablepos, KEY_NAME );
+   lua_getfield( L, tablepos, NAME );
    const char *name = luaL_checkstring( L, -1 );
-   lua_getfield( L, tablepos, KEY_EMAIL );
+   lua_getfield( L, tablepos, EMAIL );
    const char *email = luaL_checkstring( L, -1 );
-   lua_getfield( L, tablepos, KEY_TIME );
+   lua_getfield( L, tablepos, TIME );
    git_time_t time = (git_time_t ) lua_tointeger( L, -1 );
-   lua_getfield( L, tablepos, KEY_TIME_OFF );
+   lua_getfield( L, tablepos, TIME_OFF );
    int offset = lua_tointeger( L, -1 );
 
    if( time == 0 )
@@ -373,24 +375,25 @@ const char *luagi_otype_to_string( git_otype type )
    {
       case GIT_OBJ_ANY:
       default:
-         return VALUE_ANY; 
+         return ANY; 
       case GIT_OBJ_BAD:
-         return VALUE_INVALID;
+         return INVALID;
       case GIT_OBJ__EXT1:
+         return _EXT1; 
       case GIT_OBJ__EXT2:
-         return VALUE_RESERVED; 
+         return _EXT2; 
       case GIT_OBJ_COMMIT:
-         return VALUE_COMMIT;
+         return COMMIT;
       case GIT_OBJ_TREE:
-         return VALUE_TREE;
+         return TREE;
       case GIT_OBJ_BLOB:
-         return VALUE_BLOB;
+         return BLOB;
       case GIT_OBJ_TAG:
-         return VALUE_TAG;
+         return TAG;
       case GIT_OBJ_OFS_DELTA:
-         return VALUE_OFS_DELTA;
+         return OFS_DELTA;
       case GIT_OBJ_REF_DELTA:
-         return VALUE_REF_DELTA;
+         return REF_DELTA;
    }
 }
 
@@ -452,4 +455,25 @@ void dumpStack( lua_State *L )
       printf(" "); /* put a separator */
    }
    printf("\n"); /* end the listing */
+}
+
+int luagi_push_transfer_stats( lua_State *L, const git_transfer_progress *stats )
+{
+   lua_newtable( L );
+   lua_pushinteger( L,  stats->total_objects );
+   lua_setfield( L, -2, TOTAL );
+   lua_pushinteger( L,  stats->indexed_objects );
+   lua_setfield( L, -2, INDEXED );
+   lua_pushinteger( L,  stats->received_objects );
+   lua_setfield( L, -2, RECEIVED );
+   lua_pushinteger( L,  stats->local_objects );
+   lua_setfield( L, -2, LOCAL );
+   lua_pushinteger( L,  stats->total_deltas );
+   lua_setfield( L, -2, DELTA );
+   lua_pushinteger( L,  stats->indexed_deltas );
+   lua_setfield( L, -2, INDEXED_DELTAS );
+   lua_pushinteger( L,  stats->received_bytes );
+   lua_setfield( L, -2, BYTES );
+   
+   return 1;
 }
