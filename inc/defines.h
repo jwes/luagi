@@ -151,4 +151,16 @@
 #define HTTP "http"
 
 #define BLAME_LINES_IN_HUNK "lines_in_hunk"
+
+#define DIRECTION "direction"
+#define STRING "representation"
+#define SRC "src"
+#define DEST "dest"
+#define PUSH "push"
+#define FETCH "fetch"
+#define UNKNOWN "unknown"
+#define FORCE "force"
+#define ALL "all"
+#define NONE "none"
+#define AUTO "auto"
 #endif

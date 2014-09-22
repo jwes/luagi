@@ -44,18 +44,6 @@ int luagi_remote_is_valid_name( lua_State *L );
 int luagi_remote_valid_url( lua_State *L );
 int luagi_remote_supported_url( lua_State *L );
 
-#define DIRECTION "direction"
-#define STRING "representation"
-#define SRC "src"
-#define DEST "dest"
-#define PUSH "push"
-#define FETCH "fetch"
-#define UNKNOWN "unknown"
-#define FORCE "force"
-#define ALL "all"
-#define NONE "none"
-#define AUTO "auto"
-
 static const struct luaL_Reg luagi_remote_funcs [] = {
    { "save",               luagi_remote_save                    },
    { "owner",              luagi_remote_owner                   },
