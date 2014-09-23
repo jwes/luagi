@@ -25,6 +25,9 @@ int luagi_blob_is_binary( lua_State *L );
 #define check_blob_at(L, N) \
    (git_blob **) luaL_checkudata( L, N, LUAGI_BLOB_FUNCS );
 
+extern int luagi_patch_from_blobs( lua_State *L );
+extern int luagi_patch_from_blob_and_buffer( lua_State *L );
+
 static const struct luaL_Reg luagi_blob_funcs [] = {
    { "__gc", luagi_blob_free },
    { "__tostring", luagi_blob_id },
@@ -34,6 +37,8 @@ static const struct luaL_Reg luagi_blob_funcs [] = {
    { "is_binary", luagi_blob_is_binary },
    { "raw_size", luagi_blob_rawsize },
    { "raw_content", luagi_blob_rawcontent },
+   { "patch", luagi_patch_from_blobs },
+   { "patch_with_buffer", luagi_patch_from_blob_and_buffer },
    { NULL, NULL }
 };
 

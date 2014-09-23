@@ -36,6 +36,7 @@
 #include "config.h"
 #include "reflog.h"
 #include "indexer.h"
+#include "patch.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -244,6 +245,8 @@ static const struct luaL_Reg mylib [] = {
    { "parse_bool", luagi_config_parse_bool },
    { "parse_int32", luagi_config_parse_int32 },
    { "parse_int64", luagi_config_parse_int64 },
+
+   { "patch_buffers", luagi_patch_from_buffers },
    { NULL, NULL } /*sentinel*/
 };
 
@@ -327,6 +330,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REFDB_FUNCS, luagi_refdb_funcs );
    setup_funcs(L, LUAGI_CONFIG_FUNCS, luagi_config_funcs );
    setup_funcs(L, LUAGI_INDEXER_FUNCS, luagi_indexer_funcs );
+   setup_funcs(L, LUAGI_PATCH_FUNCS, luagi_patch_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );

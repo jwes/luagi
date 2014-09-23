@@ -37,6 +37,8 @@ int luagi_diff_stats_free( lua_State *L );
 int luagi_diff_format_email( lua_State *L );
 int luagi_diff_commit_as_email( lua_State *L );
 
+extern int luagi_patch_from_diff( lua_State *L );
+
 static const struct luaL_Reg luagi_diff_funcs [] = {
    { "merge", luagi_diff_merge },
    { "find_similar", luagi_diff_find_similar },
@@ -47,6 +49,7 @@ static const struct luaL_Reg luagi_diff_funcs [] = {
    { "print", luagi_diff_print },
    { "format_email", luagi_diff_format_email },
    { "get_stats", luagi_diff_get_stats },
+   { "patch", luagi_patch_from_diff },
    { "__gc", luagi_diff_free },
    { NULL, NULL }
 };
