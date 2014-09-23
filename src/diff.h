@@ -58,6 +58,17 @@ static const struct luaL_Reg luagi_diff_funcs [] = {
 void diff_file_to_table( lua_State *L, const git_diff_file file );
 void diff_delta_to_table( lua_State *L, const git_diff_delta *delta );
 
+struct foreach_f
+{
+   lua_State *L;
+   int use_hunks;
+   int use_lines;
+};
+
+int diff_line_callback( const git_diff_delta *delta,
+                const git_diff_hunk *hunk,
+                const git_diff_line *line,
+                void *payload);
 #define LUAGI_DIFF_FUNCS "is.westh.luagi.diff"
 #define checkdiff_at(L, N) \
       (git_diff**) luaL_checkudata( L, N, LUAGI_DIFF_FUNCS )

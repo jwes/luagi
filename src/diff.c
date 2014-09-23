@@ -187,13 +187,6 @@ int luagi_diff_is_sorted_icase( lua_State *L )
    return 1; 
 }
 
-struct foreach_f
-{
-   lua_State *L;
-   int use_hunks;
-   int use_lines;
-};
-
 static int diff_file_callback( const git_diff_delta *delta,
                  float progress,
                  void *payload)
@@ -245,7 +238,7 @@ static int diff_hunk_callback( const git_diff_delta *delta,
    return ret;
 }
 
-static int diff_line_callback( const git_diff_delta *delta,
+int diff_line_callback( const git_diff_delta *delta,
                 const git_diff_hunk *hunk,
                 const git_diff_line *line,
                 void *payload)
