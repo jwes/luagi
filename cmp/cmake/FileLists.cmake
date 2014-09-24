@@ -27,6 +27,7 @@ set( SRC_FILES
    ${SRC_DIR}/odb.c
    ${SRC_DIR}/oid.c
 
+   ${SRC_DIR}/pack.c
    ${SRC_DIR}/patch.c
    ${SRC_DIR}/push.c
 
