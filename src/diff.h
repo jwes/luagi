@@ -57,6 +57,9 @@ static const struct luaL_Reg luagi_diff_funcs [] = {
 //helper
 void diff_file_to_table( lua_State *L, const git_diff_file file );
 void diff_delta_to_table( lua_State *L, const git_diff_delta *delta );
+void diff_hunk_to_table( lua_State *L, const git_diff_hunk *hunk );
+void diff_line_to_table( lua_State *L, const git_diff_line *line );
+int luagi_diff_init_options( lua_State *L, int index, git_diff_options *opts );
 
 struct foreach_f
 {

@@ -29,10 +29,12 @@ int luagi_patch_from_blobs( lua_State *L )
    git_blob **new = check_blob_at( L, 3 );
    const char *new_as_path = luaL_optstring( L, 4, NULL );
 
-   //TODO git_diff_options
+   git_diff_options opts;
+   luagi_diff_init_options( L, 5, &opts ); 
+
    git_patch **out = lua_newuserdata( L, sizeof( git_patch *) );
    if( git_patch_from_blobs( out, *old, old_as_path, 
-                               *new, new_as_path, NULL ) )
+                               *new, new_as_path, &opts ) )
    {
       ERROR_PUSH( L )
    }
@@ -50,10 +52,12 @@ int luagi_patch_from_blob_and_buffer( lua_State *L )
    const char *new = luaL_checkstring( L, 3 );
    const char *new_as_path = luaL_optstring( L, 4, NULL );
 
-   //TODO git_diff_options
+   git_diff_options opts;
+   luagi_diff_init_options( L, 5, &opts ); 
+
    git_patch **out = lua_newuserdata( L, sizeof( git_patch *) );
    if( git_patch_from_blob_and_buffer( out, *old, old_as_path, 
-                               new, new_len, new_as_path, NULL ) )
+                               new, new_len, new_as_path, &opts ) )
    {
       ERROR_PUSH( L )
    }
@@ -72,10 +76,12 @@ int luagi_patch_from_buffers( lua_State *L )
    const char *new = luaL_checkstring( L, 3 );
    const char *new_as_path = luaL_optstring( L, 4, NULL );
 
-   //TODO git_diff_options
+   git_diff_options opts;
+   luagi_diff_init_options( L, 5, &opts ); 
+
    git_patch **out = lua_newuserdata( L, sizeof( git_patch *) );
    if( git_patch_from_buffers( out, old, old_len, old_as_path, 
-                               new, new_len, new_as_path, NULL ) )
+                               new, new_len, new_as_path, &opts ) )
    {
       ERROR_PUSH( L )
    }
@@ -93,9 +99,11 @@ int luagi_patch_free( lua_State *L )
 
 int luagi_patch_get_delta( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   //TODO export git_diff_delta to diff.h
-   return 0;
+   git_patch **patch = checkpatch( L );
+
+   const git_diff_delta *delta = git_patch_get_delta( *patch );
+   diff_delta_to_table( L, delta );
+   return 1;
 }
    
 int luagi_patch_num_hunks( lua_State *L )
@@ -122,9 +130,20 @@ int luagi_patch_line_stats( lua_State *L )
 
 int luagi_patch_get_hunk( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   //TODO export git_diff_hunk to diff.h
-   return 0;
+   git_patch **patch = checkpatch( L );
+   size_t hunk_idx = luaL_checkinteger( L, 2 );
+
+   const git_diff_hunk *out;
+   size_t lines_in_hunk;
+
+   if( git_patch_get_hunk( &out, &lines_in_hunk, *patch, hunk_idx ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   diff_hunk_to_table( L, out );
+   lua_pushinteger( L, lines_in_hunk );
+   return 2;
 }
 int luagi_patch_num_lines_in_hunk( lua_State *L )
 {
@@ -137,9 +156,20 @@ int luagi_patch_num_lines_in_hunk( lua_State *L )
 
 int luagi_patch_get_line_in_hunk( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   //TODO export git_diff_line to diff.h
-   return 0;
+   git_patch **patch = checkpatch( L );
+
+   size_t hunk_idx = luaL_checkinteger( L, 2 );
+   size_t line_of_hunk = luaL_checkinteger( L, 3 );
+
+   const git_diff_line *out;
+
+   if( git_patch_get_line_in_hunk( &out, *patch, hunk_idx, line_of_hunk ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   diff_line_to_table( L, out );
+   return 1;
 }
 
 int luagi_patch_size( lua_State *L )
@@ -160,7 +190,10 @@ int luagi_patch_print( lua_State *L )
 {
    git_patch **patch =checkpatch( L );
    
+   luaL_checktype( L, 2, LUA_TFUNCTION );
    struct foreach_f *f = malloc( sizeof( struct foreach_f ) );
+   f->L = L;
+   f->use_lines = 2;
 
    int ret = git_patch_print( *patch, diff_line_callback, f );
    free( f );

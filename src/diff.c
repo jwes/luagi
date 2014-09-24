@@ -8,10 +8,12 @@
 #include "index.h"
 #include "commit.h"
 
-void options_from_lua( lua_State *L, int idx, git_diff_options *opts )
+int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
 {
    lua_isboolean( L, idx );
-   git_diff_init_options( opts, GIT_DIFF_OPTIONS_VERSION );
+   int ret = git_diff_init_options( opts, GIT_DIFF_OPTIONS_VERSION );
+   //TODO options
+   return ret;
 }
 
 int luagi_diff_tree_to_tree( lua_State *L )
@@ -21,7 +23,7 @@ int luagi_diff_tree_to_tree( lua_State *L )
    git_tree **new_tree = checktree_at( L, 3 );
 
    git_diff_options opts;
-   options_from_lua( L, 4, &opts );
+   luagi_diff_init_options( L, 4, &opts );
    
    git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
 
@@ -46,7 +48,7 @@ int luagi_diff_tree_to_index( lua_State *L )
    git_index **index = checkindex_at( L, 3 );
 
    git_diff_options opts;
-   options_from_lua( L, 4, &opts );
+   luagi_diff_init_options( L, 4, &opts );
 
    git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
 
@@ -69,7 +71,7 @@ int luagi_diff_index_to_workdir( lua_State *L )
    git_index **index = checkindex_at( L, 2 );
 
    git_diff_options opts;
-   options_from_lua( L, 3, &opts );
+   luagi_diff_init_options( L, 3, &opts );
    
    git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
 
@@ -92,7 +94,7 @@ static int tree_to_workdir( lua_State *L, int (*func)(git_diff **diff, git_repos
    git_tree **tree = checktree_at( L, 2 );
 
    git_diff_options opts;
-   options_from_lua( L, 3, &opts );
+   luagi_diff_init_options( L, 3, &opts );
    
    git_diff **diff = (git_diff **) lua_newuserdata( L, sizeof( git_diff *) );
 
@@ -212,6 +214,47 @@ static int diff_file_callback( const git_diff_delta *delta,
    return ret;
 }
 
+void diff_line_to_table( lua_State *L, const git_diff_line *line )
+{
+   lua_newtable( L );
+   lua_pushfstring( L, "%c", line->origin ); 
+   lua_setfield( L, -2, ORIGIN ); 
+   lua_pushinteger( L, line->old_lineno );
+   lua_setfield( L, -2, OLD_LINENO ); 
+   lua_pushinteger( L, line->new_lineno );
+   lua_setfield( L, -2, NEW_LINENO ); 
+   lua_pushinteger( L, line->num_lines );
+   lua_setfield( L, -2, LINES ); 
+   
+   if( line->content && *line->content )
+   {
+      char content [ line->content_len + 1 ];
+      memcpy( content, line->content, line->content_len );
+      content[ line->content_len ] = 0;
+      lua_pushstring( L, content ); 
+      lua_setfield( L, -2, CONTENT );
+   }
+
+}
+
+void diff_hunk_to_table( lua_State *L, const git_diff_hunk *hunk )
+{
+   lua_newtable( L );
+   lua_pushinteger( L, hunk->old_start );
+   lua_setfield( L, -2, OLD_START );
+   lua_pushinteger( L, hunk->old_lines );
+   lua_setfield( L, -2, OLD_LINES );
+
+   lua_pushinteger( L, hunk->new_start );
+   lua_setfield( L, -2, NEW_START );
+   lua_pushinteger( L, hunk->new_lines );
+   lua_setfield( L, -2, NEW_LINES );
+   lua_pushstring( L, hunk->header );
+   lua_setfield( L, -2, HEADER );
+ 
+}
+
+
 static int diff_hunk_callback( const git_diff_delta *delta,
                 const git_diff_hunk *hunk,
                 void *payload)
@@ -223,13 +266,9 @@ static int diff_hunk_callback( const git_diff_delta *delta,
    lua_pushvalue( f->L, f->use_hunks );
    diff_delta_to_table( f->L, delta );
 
-   lua_pushinteger( f->L, hunk->old_start );
-   lua_pushinteger( f->L, hunk->old_lines );
-   lua_pushinteger( f->L, hunk->new_start );
-   lua_pushinteger( f->L, hunk->new_lines );
-   lua_pushstring( f->L, hunk->header );
-   
-   if( lua_pcall( f->L, 6, 1, 0 ) )
+   diff_hunk_to_table( f->L, hunk );
+  
+   if( lua_pcall( f->L, 2, 1, 0 ) )
    {
       luaL_error( f->L, "can not call hunk callback" );
    }
@@ -253,33 +292,10 @@ int diff_line_callback( const git_diff_delta *delta,
    lua_pushvalue( f->L, f->use_lines );
    diff_delta_to_table( f->L, delta );
 
-   if( hunk && hunk->header && *hunk->header )
-   {
-      lua_pushstring( f->L, hunk->header );
-   }
-   else
-   {
-      lua_pushnil( f->L );
-   }
+   diff_hunk_to_table( f->L, hunk );
 
-   lua_pushfstring( f->L, "%c", line->origin ); 
-   lua_pushinteger( f->L, line->old_lineno );
-   lua_pushinteger( f->L, line->new_lineno );
-   lua_pushinteger( f->L, line->num_lines );
-   
-   if( line->content && *line->content )
-   {
-      char content [ line->content_len + 1 ];
-      memcpy( content, line->content, line->content_len );
-      content[ line->content_len ] = 0;
-      lua_pushstring( f->L, content ); 
-   }
-   else
-   {
-      lua_pushnil( f->L );
-   }
-
-   if( lua_pcall( f->L, 7, 1, 0 ) )
+   diff_line_to_table( f->L, line );
+   if( lua_pcall( f->L, 3, 1, 0 ) )
    {
       luaL_error( f->L, "can not call line callback" );
    }
@@ -326,7 +342,7 @@ int luagi_diff_print( lua_State *L )
    git_diff_format_t format = GIT_DIFF_FORMAT_PATCH;
    const char *format_str = luaL_checkstring( L, 2 );
 
-   if( strncmp( format_str, PATCH_HEADER, sizeof( PATCH_HEADER ) ) ) 
+   if( strncmp( format_str, PATCH, sizeof( PATCH ) ) ) 
    {
         format = GIT_DIFF_FORMAT_PATCH; 
    }
@@ -460,7 +476,7 @@ int luagi_diff_commit_as_email( lua_State *L )
    //TODO format flags
    git_diff_format_email_flags_t flags = GIT_DIFF_FORMAT_EMAIL_NONE;
    git_diff_options diff_opts;
-   options_from_lua( L, 5, &diff_opts );
+   luagi_diff_init_options( L, 5, &diff_opts );
    git_buf out;
    if( git_diff_commit_as_email( &out, *repo, *commit, patch_no, total_patches, flags, &diff_opts ) )
    {

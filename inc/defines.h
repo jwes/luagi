@@ -27,7 +27,7 @@
 #define VALID_ID "valid_id"
 
 #define PATCH "patch"
-#define PATCH_HEADER "patch_header"
+#define HEADER "header"
 #define RAW "raw"
 #define NAME_ONLY "name_only"
 #define NAME_STATUS "name_status"
@@ -156,4 +156,14 @@
 #define BYTES "bytes"
 #define RECEIVED "received"
 #define INDEXED "indexed"
+
+#define ORIGIN "origin"
+#define OLD_LINENO "old linenr"
+#define NEW_LINENO "old linenr"
+#define LINES "lines"
+
+#define OLD_START "old start"
+#define OLD_LINES "old lines"
+#define NEW_START "new start"
+#define NEW_LINES "new lines"
 #endif
