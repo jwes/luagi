@@ -4,7 +4,19 @@
 #include "oid.h"
 #include "luagi.h"
 
-int luagi_packbuilder_new( lua_State *L );
+int luagi_packbuilder_new( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+   git_packbuilder **out = lua_newuserdata( L, sizeof( git_packbuilder *) );
+
+   if( git_packbuilder_new( out, *repo ) )
+   {
+      ERROR_PUSH( L )
+   }
+   luaL_getmetatable( L, LUAGI_PACK_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
 
 static int generic_insert( lua_State *L, int (*func)( git_packbuilder *pb, const git_oid *oid ) )
 {
@@ -87,10 +99,38 @@ int luagi_packbuilder_hash( lua_State *L )
    return luagi_push_oid( L, oid );
 }
 
+static int packbuilder_cb( void *buf, size_t size, void *payload )
+{
+   luagi_foreach_t *p = payload;
+
+   lua_pushvalue( p->L, p->callback_pos );
+   lua_pushlstring( p->L, buf, size );
+
+   if( lua_pcall( p->L, 1, 1, 0 ) )
+   {
+      luaL_error( p->L, "error calling callback function" );
+      return -1;
+   }
+   int ret = luaL_checkinteger( p->L, -1 );
+   lua_pop( p->L, 1 );
+   return ret;
+}
+
 int luagi_packbuilder_foreach( lua_State *L )
 {
-   luaL_error( L, "not yet implemented" );
-   //TODO callbacks 
+   git_packbuilder **pack = checkpack( L );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   p->L = L;
+   p->callback_pos = 2;
+
+   int ret = git_packbuilder_foreach( *pack, packbuilder_cb, p );
+   free( p );
+   if( ret )
+   {
+      ERROR_ABORT( L )
+   }
    return 0;
 }
 
