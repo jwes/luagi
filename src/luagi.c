@@ -38,6 +38,7 @@
 #include "indexer.h"
 #include "patch.h"
 #include "pack.h"
+#include "revwalk.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -207,6 +208,8 @@ static const struct luaL_Reg repofuncs [] = {
    { "delete_reflog", luagi_reflog_delete },
    //pack
    { "new_packbuilder", luagi_packbuilder_new },
+   //revwalk
+   { "revwalk", luagi_revwalk_new },
    { NULL, NULL },
 };
 
@@ -335,6 +338,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_INDEXER_FUNCS, luagi_indexer_funcs );
    setup_funcs(L, LUAGI_PATCH_FUNCS, luagi_patch_funcs );
    setup_funcs(L, LUAGI_PACK_FUNCS, luagi_pack_funcs );
+   setup_funcs(L, LUAGI_REVWALK_FUNCS, luagi_revwalk_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
