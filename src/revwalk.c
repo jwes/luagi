@@ -63,15 +63,143 @@ int luagi_revwalk_push_head( lua_State *L )
    return 0;
 }
 
-int luagi_revwalk_hide( lua_State *L );
-int luagi_revwalk_hide_glob( lua_State *L );
-int luagi_revwalk_hide_head( lua_State *L );
-int luagi_revwalk_push_ref( lua_State *L );
-int luagi_revwalk_hide_ref( lua_State *L );
-int luagi_revwalk_next( lua_State *L );
-int luagi_revwalk_sorting( lua_State *L );
-int luagi_revwalk_push_range( lua_State *L );
-int luagi_revwalk_simplify_first_parent( lua_State *L );
-int luagi_revwalk_free( lua_State *L );
-int luagi_revwalk_repository( lua_State *L );
-int luagi_revwalk_add_hide_callback( lua_State *L );
+int luagi_revwalk_hide( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   git_oid oid;
+   luagi_check_oid( &oid, L, 2 );
+
+   if( git_revwalk_hide( *rev, &oid ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_revwalk_hide_glob( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   const char *glob = luaL_checkstring( L, 2 );
+
+   if( git_revwalk_hide_glob( *rev, glob ) )
+   {
+        ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_revwalk_hide_head( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+
+   if( git_revwalk_hide_head( *rev ) )
+
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+
+int luagi_revwalk_push_ref( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   const char *ref = luaL_checkstring( L, 2 );
+
+   if( git_revwalk_push_ref( *rev, ref ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+   
+int luagi_revwalk_hide_ref( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   const char *ref = luaL_checkstring( L, 2 );
+
+   if( git_revwalk_hide_ref( *rev, ref ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_revwalk_next( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   git_oid out;
+
+   if( git_revwalk_next( &out, *rev ) )
+   {
+      ERROR_PUSH( L )
+   }
+
+   return luagi_push_oid( L, &out );
+}
+
+int luagi_revwalk_sorting( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   //TODO sorting mode
+   unsigned int sorting_mode = luaL_checkinteger( L, 2 );
+
+   git_revwalk_sorting( *rev, sorting_mode );
+
+   return 0;
+}
+
+int luagi_revwalk_push_range( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+   const char *range = luaL_checkstring( L, 2 );
+
+   if( git_revwalk_push_range( *rev, range ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_revwalk_simplify_first_parent( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+
+   git_revwalk_simplify_first_parent( *rev );
+
+   return 0;
+}
+
+int luagi_revwalk_free( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+
+   git_revwalk_free( *rev );
+
+   return 0;
+}
+
+int luagi_revwalk_repository( lua_State *L )
+{
+   git_revwalk **rev = checkrevwalk( L );
+
+   git_repository **repo = lua_newuserdata( L, sizeof( git_repository * ) );
+
+   *repo = git_revwalk_repository( *rev );
+   if( *repo == NULL )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luaL_getmetatable( L, LUAGI_REVWALK_FUNCS );
+   lua_setmetatable( L, -2 );
+   return 1;
+}
+   
+int luagi_revwalk_add_hide_callback( lua_State *L )
+{
+   //TODO callbacks
+   luaL_error( L, "not yet implemented" );
+   return 0;
+}
+
