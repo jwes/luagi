@@ -112,9 +112,42 @@ static int luagi_hunk_to_table( lua_State *L, const git_blame_hunk *hunk )
 {
    lua_newtable( L );
    lua_pushinteger( L, hunk->lines_in_hunk );
-   lua_setfield( L, -2, BLAME_LINES_IN_HUNK ); 
+   lua_setfield( L, -2, LINES_IN_HUNK ); 
 
-   // TODO to table
+   //create the table final
+   lua_newtable( L );
+   luagi_push_oid( L, &hunk->final_commit_id );
+   lua_setfield( L, -2, OID );
+
+   lua_pushinteger( L, hunk->final_start_line_number );
+   lua_setfield( L, -2, START_LINE_NUMBER );
+
+   signature_to_table( L, hunk->final_signature );
+   lua_setfield( L, -2, SIGNATURE );
+
+   //set the table final
+   lua_setfield( L, -2, FINAL );
+
+   //create the table orig
+   lua_newtable( L );
+   luagi_push_oid( L, &hunk->orig_commit_id );
+   lua_setfield( L, -2, OID );
+
+   lua_pushstring( L, hunk->orig_path );
+   lua_setfield( L, -2, PATH );
+
+   lua_pushinteger( L, hunk->orig_start_line_number );
+   lua_setfield( L, -2, START_LINE_NUMBER );
+
+   signature_to_table( L, hunk->orig_signature );
+   lua_setfield( L, -2, SIGNATURE );
+
+   //set the table orig
+   lua_setfield( L, -2, ORIG );
+
+   lua_pushboolean( L, hunk->boundary );
+   lua_setfield( L, -2, IS_BOUNDARY );
+
    return 1;
 }
 

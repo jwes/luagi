@@ -7,12 +7,91 @@
 #include "luagi.h" 
 #include "index.h"
 #include "commit.h"
-
 int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
 {
    lua_isboolean( L, idx );
    int ret = git_diff_init_options( opts, GIT_DIFF_OPTIONS_VERSION );
-   //TODO options
+
+   add_flag( opts->flags, L, idx,
+            NORMAL,
+            GIT_DIFF_NORMAL );
+   add_flag( opts->flags, L, idx,
+            REVERSE,
+            GIT_DIFF_REVERSE );
+   add_flag( opts->flags, L, idx,
+            INCLUDE_IGNORED,
+            GIT_DIFF_INCLUDE_IGNORED );
+   add_flag( opts->flags, L, idx,
+            RECURSE_IGNORED_DIRS,
+            GIT_DIFF_RECURSE_IGNORED_DIRS );
+   add_flag( opts->flags, L, idx,
+            INCLUDE_UNTRACKED,
+            GIT_DIFF_INCLUDE_UNTRACKED );
+   add_flag( opts->flags, L, idx,
+            RECURSE_UNTRACKED_DIRS,
+            GIT_DIFF_RECURSE_UNTRACKED_DIRS );
+   add_flag( opts->flags, L, idx,
+            INCLUDE_UNMODIFIED,
+            GIT_DIFF_INCLUDE_UNMODIFIED );
+   add_flag( opts->flags, L, idx,
+            INCLUDE_TYPECHANGE,
+            GIT_DIFF_INCLUDE_TYPECHANGE );
+   add_flag( opts->flags, L, idx,
+            INCLUDE_TYPECHANGE_TREES,
+            GIT_DIFF_INCLUDE_TYPECHANGE_TREES );
+   add_flag( opts->flags, L, idx,
+            IGNORE_FILEMODE,
+            GIT_DIFF_IGNORE_FILEMODE );
+   add_flag( opts->flags, L, idx,
+            IGNORE_SUBMODULES,
+            GIT_DIFF_IGNORE_SUBMODULES );
+   add_flag( opts->flags, L, idx,
+            IGNORE_CASE,
+            GIT_DIFF_IGNORE_CASE );
+   add_flag( opts->flags, L, idx,
+            DISABLE_PATHSPEC_MATCH,
+            GIT_DIFF_DISABLE_PATHSPEC_MATCH );
+   add_flag( opts->flags, L, idx,
+            SKIP_BINARY_CHECK,
+            GIT_DIFF_SKIP_BINARY_CHECK );
+   add_flag( opts->flags, L, idx,
+            ENABLE_FAST_UNTRACKED_DIRS,
+            GIT_DIFF_ENABLE_FAST_UNTRACKED_DIRS );
+   add_flag( opts->flags, L, idx,
+            UPDATE_INDEX,
+            GIT_DIFF_UPDATE_INDEX );
+   add_flag( opts->flags, L, idx,
+            FORCE_TEXT,
+            GIT_DIFF_FORCE_TEXT );
+   add_flag( opts->flags, L, idx,
+            FORCE_BINARY,
+            GIT_DIFF_FORCE_BINARY );
+   add_flag( opts->flags, L, idx,
+            IGNORE_WHITESPACE,
+            GIT_DIFF_IGNORE_WHITESPACE );
+   add_flag( opts->flags, L, idx,
+            IGNORE_WHITESPACE_CHANGE,
+            GIT_DIFF_IGNORE_WHITESPACE_CHANGE );
+   add_flag( opts->flags, L, idx,
+            IGNORE_WHITESPACE_EOL,
+            GIT_DIFF_IGNORE_WHITESPACE_EOL );
+   add_flag( opts->flags, L, idx,
+            SHOW_UNTRACKED_CONTENT,
+            GIT_DIFF_SHOW_UNTRACKED_CONTENT );
+   add_flag( opts->flags, L, idx,
+            SHOW_UNMODIFIED,
+            GIT_DIFF_SHOW_UNMODIFIED );
+   add_flag( opts->flags, L, idx,
+            PATIENCE,
+            GIT_DIFF_PATIENCE );
+   add_flag( opts->flags, L, idx,
+            MINIMAL,
+            GIT_DIFF_MINIMAL );
+   add_flag( opts->flags, L, idx,
+            SHOW_BINARY,
+            GIT_DIFF_SHOW_BINARY );
+
+   // TODO options
    return ret;
 }
 
