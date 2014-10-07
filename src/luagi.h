@@ -54,4 +54,11 @@ void dumpStack( lua_State* L );
 #else
 #define debugStack( L );
 #endif
+
+#define add_flag( out,  L, idx, name, flag ) \
+   lua_getfield( L, idx, name ); \
+   if( lua_toboolean( L, -1 ) ) \
+   { \
+      out |= flag; \
+   } 
 #endif

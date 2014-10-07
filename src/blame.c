@@ -1,14 +1,64 @@
 #include <git2/blame.h>
 #include "blame.h"
 #include "luagi.h"
-
-
+#include "oid.h"
 static int luagi_blame_init_options( lua_State *L __attribute__((unused)),
                                      int index __attribute__((unused)),
                                      git_blame_options *opts )
 {
    int ret = git_blame_init_options( opts, GIT_BLAME_OPTIONS_VERSION );
-   // TODO options
+
+   add_flag( opts->flags, L, index, 
+            NORMAL, 
+            GIT_BLAME_NORMAL );
+   add_flag( opts->flags, L, index, 
+            COPIES_IN_SAME_FILE, 
+            GIT_BLAME_TRACK_COPIES_SAME_FILE );
+   add_flag( opts->flags, L, index, 
+            COPIES_IN_SAME_COMMIT_MOVES, 
+            GIT_BLAME_TRACK_COPIES_SAME_COMMIT_MOVES );
+   add_flag( opts->flags, L, index, 
+            COPIES_IN_SAME_COMMIT_COPIES, 
+            GIT_BLAME_TRACK_COPIES_SAME_COMMIT_COPIES );
+   add_flag( opts->flags, L, index, 
+            COPIES_ANY_COMMIT_COPIES, 
+            GIT_BLAME_TRACK_COPIES_ANY_COMMIT_COPIES );
+   add_flag( opts->flags, L, index, 
+             FIRST_PARENT,
+             GIT_BLAME_FIRST_PARENT );
+
+   lua_getfield( L, index, MIN_MATCH );
+   int16_t min_match = luaL_optinteger( L, -1, -1 );
+   if( min_match >= 0 )
+   {
+      opts->min_match_characters = min_match;
+   }
+
+   lua_getfield( L, index, NEWEST );
+   if( ! lua_isnil( L, -1 ) )
+   {
+      luagi_check_oid( &opts->newest_commit, L, -1 );
+   }
+   
+   lua_getfield( L, index, OLDEST );
+   if( ! lua_isnil( L, -1 ) )
+   {
+      luagi_check_oid( &opts->oldest_commit, L, -1 );
+   }
+
+   lua_getfield( L, index, MIN_LINE );
+   int32_t min_line = luaL_optinteger( L, -1, -1 );
+   if( min_line >= 0 )
+   {
+      opts->min_line = min_line;
+   }
+   
+   lua_getfield( L, index, MAX_LINE );
+   int32_t max_line = luaL_optinteger( L, -1, -1 );
+   if( max_line >= 0 )
+   {
+      opts->max_line = max_line;
+   }
 
    return ret;
 }

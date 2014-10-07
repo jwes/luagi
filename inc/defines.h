@@ -166,4 +166,15 @@
 #define OLD_LINES "old lines"
 #define NEW_START "new start"
 #define NEW_LINES "new lines"
+
+#define MIN_MATCH "min_match"
+#define NEWEST "newest"
+#define OLDEST "oldest"
+#define MIN_LINE "min_line"
+#define MAX_LINE "max_line"
+#define COPIES_IN_SAME_COMMIT_MOVES "copies_in_same_commit_moves"
+#define COPIES_IN_SAME_COMMIT_COPIES "copies_in_same_commit_copies"
+#define COPIES_ANY_COMMIT_COPIES "copies_in_any_commit_copies"
+#define FIRST_PARENT "first_parent"
+#define COPIES_IN_SAME_FILE "copies_in_same_file"
 #endif

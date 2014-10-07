@@ -271,59 +271,46 @@ static int luagi_status_walker( lua_State *L )
    return 0;
 }
 
-static int add_flag( lua_State *L, int idx, const char *flag_name, git_status_opt_t flag)
-{
-   lua_getfield( L, idx, flag_name );
-   if( lua_toboolean( L, -1 ) )
-   {
-      return flag;
-   }
-   else
-   {
-      return 0;
-   }
-}
-
 static int flags_from_lua( lua_State *L, int idx )
 {
    int flags = 0;
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    INC_UNTRACKED, 
                    GIT_STATUS_OPT_INCLUDE_UNTRACKED );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    INC_IGNORED, 
                    GIT_STATUS_OPT_INCLUDE_IGNORED );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    INC_UNMODIFIED, 
                    GIT_STATUS_OPT_INCLUDE_UNMODIFIED );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    EX_SUBMODULES, 
                    GIT_STATUS_OPT_EXCLUDE_SUBMODULES );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    REC_UNTRACKED_DIRS, 
                    GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    DISABLE_PATHSPEC, 
                    GIT_STATUS_OPT_DISABLE_PATHSPEC_MATCH );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    REC_IGNORED_DIRS, 
                    GIT_STATUS_OPT_RECURSE_IGNORED_DIRS );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    REN_HEAD_TO_IDX, 
                    GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    REN_IDX_TO_WDIR, 
                    GIT_STATUS_OPT_RENAMES_INDEX_TO_WORKDIR );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    SORT_SENSI, 
                    GIT_STATUS_OPT_SORT_CASE_SENSITIVELY );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    SORT_INSENSI, 
                    GIT_STATUS_OPT_SORT_CASE_INSENSITIVELY );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    REN_FROM_REWRITE, 
                    GIT_STATUS_OPT_RENAMES_FROM_REWRITES );
-   flags = flags | add_flag( L, idx, 
+   add_flag( flags, L, idx, 
                    NO_REFRESH, 
                    GIT_STATUS_OPT_NO_REFRESH );
    return flags;
