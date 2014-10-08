@@ -250,5 +250,18 @@
 #define STYLE_DIFF3 "style_diff3"
 #define STYLE_MERGE "style_merge"
 
+#define CROSS_FS "cross_fs"
+#define BARE "bare"
+#define NO_REINIT "no_reinit"
+#define NO_DOTGIT_DIR "no_dotgit_dir"
+#define MKDIR "mkdir"
+#define MKPATH "mkpath"
+#define EXTERNAL_TEMPLATE "external_template"
+
+#define WORKDIR_PATH "workdir_path"
+#define DESCRIPTION "description"
+#define TEMPLATE_PATH "template_path"
+#define INITIAL_HEAD "initial_head"
+#define ORIGIN_URL "origin_url"
 
 #endif

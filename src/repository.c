@@ -77,8 +77,12 @@ static unsigned int luagi_open_flags_from_table( lua_State *L, int index )
 {
    luaL_checktype( L, index, LUA_TTABLE );
 
-   //TODO OPEN FLAGS
-   return 0;
+   unsigned int flags = GIT_REPOSITORY_OPEN_NO_SEARCH;
+
+   add_flag( flags, L, index, CROSS_FS, GIT_REPOSITORY_OPEN_CROSS_FS );
+   add_flag( flags, L, index, BARE, GIT_REPOSITORY_OPEN_BARE );
+
+   return flags;
 }
 
 int luagi_repository_open_ext( lua_State *L )
@@ -132,7 +136,67 @@ static int luagi_repo_init_init_options( lua_State *L, int index, git_repository
    luaL_checktype( L, index, LUA_TTABLE );
    int ret = git_repository_init_init_options( opts, GIT_REPOSITORY_INIT_OPTIONS_VERSION );
 
-   //TODO options
+   add_flag( opts->flags, L, index, BARE, GIT_REPOSITORY_INIT_BARE );
+   add_flag( opts->flags, L, index, NO_REINIT, GIT_REPOSITORY_INIT_NO_REINIT );
+   add_flag( opts->flags, L, index, NO_DOTGIT_DIR, GIT_REPOSITORY_INIT_NO_DOTGIT_DIR );
+   add_flag( opts->flags, L, index, MKDIR, GIT_REPOSITORY_INIT_MKDIR );
+   add_flag( opts->flags, L, index, MKPATH, GIT_REPOSITORY_INIT_MKPATH );
+   add_flag( opts->flags, L, index, EXTERNAL_TEMPLATE, GIT_REPOSITORY_INIT_EXTERNAL_TEMPLATE );
+
+   lua_getfield( L, index, MODE );
+   const char *mode = luaL_optstring( L, -1, NULL );
+   if( mode && *mode )
+   {
+      switch( *mode )
+      {
+         case 'g':
+            opts->mode = GIT_REPOSITORY_INIT_SHARED_GROUP;
+            break;
+         case 'a':
+            opts->mode = GIT_REPOSITORY_INIT_SHARED_ALL;
+            break;
+         default:
+         case 'u':
+            opts->mode = GIT_REPOSITORY_INIT_SHARED_UMASK;
+            break;
+      }
+   }
+
+   lua_getfield( L, index, WORKDIR_PATH );
+   const char *wpath = luaL_optstring( L, -1, NULL );
+   if( wpath && *wpath )
+   {
+      opts->workdir_path = wpath;
+   }
+
+   lua_getfield( L, index, DESCRIPTION );
+   const char *description = luaL_optstring( L, -1, NULL );
+   if( description && *description )
+   {
+      opts->description = description;
+   }
+
+   lua_getfield( L, index, TEMPLATE_PATH );
+   const char *template_path = luaL_optstring( L, -1, NULL );
+   if( template_path && *template_path )
+   {
+      opts->template_path = template_path;
+   }
+
+   lua_getfield( L, index, INITIAL_HEAD );
+   const char *initial_head = luaL_optstring( L, -1, NULL );
+   if( initial_head && *initial_head )
+   {
+      opts->initial_head = initial_head;
+   }
+
+   lua_getfield( L, index, ORIGIN_URL );
+   const char *origin_url = luaL_optstring( L, -1, NULL );
+   if( origin_url && *origin_url )
+   {
+      opts->origin_url = origin_url;
+   }
+
    return ret;
 }
 
