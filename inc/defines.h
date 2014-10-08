@@ -239,5 +239,16 @@
 #define SUMMARY "summary"
 #define AUTHOR "author"
 
+#define FILE_FAVOR "file_favor"
+#define FIND_RENAMES "find_renames"
+#define TARGET_LIMIT "target_limit"
+#define OUR_LABEL "our_label"
+#define THEIR_LABEL "their_label"
+#define ANCESTOR_LABEL "ancestor_label"
+
+#define SIMPLIFY_ALNUM "simplify_alnum"
+#define STYLE_DIFF3 "style_diff3"
+#define STYLE_MERGE "style_merge"
+
 
 #endif

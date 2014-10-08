@@ -194,15 +194,89 @@ int luagi_merge_head_free( lua_State *L )
    git_merge_head_free( *head );
    return 0;
 }
+static void luagi_set_file_favor( git_merge_file_favor_t *favor, const char *favorstr )
+{
+   if( favorstr && *favorstr )
+   {
+      switch( *favorstr )
+      {
+         case 'n'://ormal
+            *favor = GIT_MERGE_FILE_FAVOR_NORMAL;
+            break;
+         case 'o'://urs
+            *favor = GIT_MERGE_FILE_FAVOR_OURS;
+            break;
+         case 't'://heirs
+            *favor = GIT_MERGE_FILE_FAVOR_THEIRS;
+            break;
+         case 'u'://nion
+            *favor = GIT_MERGE_FILE_FAVOR_UNION;
+            break;
+      }
+   }
+}
 
 static int luagi_merge_init_file_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_merge_file_options *opts )
 {
-   return git_merge_file_init_options( opts, GIT_MERGE_FILE_OPTIONS_VERSION );
+   int ret = git_merge_file_init_options( opts, GIT_MERGE_FILE_OPTIONS_VERSION );
+
+   lua_getfield( L, index, ANCESTOR_LABEL );
+   const char *ancestor = luaL_optstring( L, -1, NULL );
+   if( ancestor )
+   {
+      opts->ancestor_label = ancestor;
+   }
+
+   lua_getfield( L, index, OUR_LABEL );
+   const char *our = luaL_optstring( L, -1, NULL );
+   if( our )
+   {
+      opts->our_label = our;
+   }
+
+   lua_getfield( L, index, THEIR_LABEL );
+   const char *their = luaL_optstring( L, -1, NULL );
+   if( their )
+   {
+      opts->their_label = their;
+   }
+
+   add_flag( opts->flags, L, index, DEFAULT, GIT_MERGE_FILE_DEFAULT );
+   add_flag( opts->flags, L, index, STYLE_MERGE, GIT_MERGE_FILE_STYLE_MERGE );
+   add_flag( opts->flags, L, index, STYLE_DIFF3, GIT_MERGE_FILE_STYLE_DIFF3 );
+   add_flag( opts->flags, L, index, SIMPLIFY_ALNUM, GIT_MERGE_FILE_SIMPLIFY_ALNUM );
+   
+   lua_getfield( L, index, FILE_FAVOR );
+   const char * favor = luaL_optstring( L, -1, NULL );
+   luagi_set_file_favor( &opts->favor, favor );
+
+   return ret;
 }
 
 int luagi_merge_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_merge_options *opts )
 {
-   return git_merge_init_options( opts, GIT_MERGE_OPTIONS_VERSION );
+   int ret =  git_merge_init_options( opts, GIT_MERGE_OPTIONS_VERSION );
+
+   add_flag( opts->flags, L, index, FIND_RENAMES, GIT_MERGE_TREE_FIND_RENAMES );
+
+   lua_getfield( L, index, RENAME_THRESHOLD );
+   if( lua_type( L, -1 ) == LUA_TNUMBER )
+   {
+      opts->rename_threshold = luaL_checkinteger( L, -1 );
+   }
+
+   lua_getfield( L, index, TARGET_LIMIT );
+   if( lua_type( L, -1 ) == LUA_TNUMBER )
+   {
+      opts->target_limit = luaL_checkinteger( L, -1 );
+   }
+   //TODO similarity metric
+
+   lua_getfield( L, index, FILE_FAVOR );
+   const char * favor = luaL_optstring( L, -1, NULL );
+   luagi_set_file_favor( &opts->file_favor, favor );
+
+   return ret;
 }
 
 
@@ -279,7 +353,7 @@ int luagi_merge_trees( lua_State *L )
    git_tree **ancestor_tree = checktree_at( L, 2 );
    git_tree **our_tree = checktree_at( L, 3 );
    git_tree **their_tree = checktree_at( L, 4 );
-   //TODO options
+
    git_merge_options opts;
    luagi_merge_init_options( L, 5, &opts );
    
@@ -299,7 +373,6 @@ int luagi_merge_commits( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    git_commit **our = checkcommit_at( L, 2 );
    git_commit **their = checkcommit_at( L, 3 );
-   //TODO options
    git_merge_options opts;
    luagi_merge_init_options( L, 4, &opts );
    
@@ -329,7 +402,6 @@ int luagi_merge( lua_State *L )
       heads[i] = *( check_mergehead_at( L, -1 ) );
    }
 
-   //TODO options
    git_merge_options mopts;
    luagi_merge_init_options( L, 3, &mopts ); 
    git_checkout_options copts;
