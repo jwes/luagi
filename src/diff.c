@@ -7,6 +7,9 @@
 #include "luagi.h" 
 #include "index.h"
 #include "commit.h"
+#include "submodule.h"
+#include "oid.h"
+
 int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
 {
    lua_isboolean( L, idx );
@@ -91,7 +94,48 @@ int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
             SHOW_BINARY,
             GIT_DIFF_SHOW_BINARY );
 
-   // TODO options
+   lua_getfield( L, idx, IGNORE_SUBMODULES_TYPE );
+   opts->ignore_submodules = luagi_sub_check_ignore( L, -1 );
+
+   lua_getfield( L, idx, PATHSPEC );
+   opts->pathspec = luagi_strings_from_lua_list( L, -1 );
+
+   //TODO notify_cb
+
+   lua_getfield( L, idx, CONTEXT_LINES );
+   int context_lines = luaL_optinteger(L, -1, -1 );
+   if( context_lines >= 0 )
+   {
+      opts->context_lines = context_lines;
+   }
+
+   lua_getfield( L, idx, INTERHUNK_LINES );
+   int ihunk = luaL_optinteger( L, -1, -1 );
+   if( ihunk >= 0 )
+   {
+      opts->interhunk_lines = ihunk;
+   }
+
+   lua_getfield( L, idx, ID_ABBREV );
+   int ida = luaL_optinteger( L, -1, -1 );
+   if( ida >= 0 )
+   {
+      opts->id_abbrev = ida;
+   }
+
+   lua_getfield( L, idx, MAX_SIZE );
+   git_off_t msize = luaL_optinteger( L, -1, -1 );
+   if( msize >= 0 )
+   {
+      opts->max_size = msize;
+   }
+
+   lua_getfield( L, idx, OLD_PREFIX );
+   opts->old_prefix = luaL_checkstring( L, -1 );
+
+   lua_getfield( L, idx, NEW_PREFIX );
+   opts->new_prefix = luaL_checkstring( L, -1 );
+
    return ret;
 }
 
@@ -215,13 +259,98 @@ int luagi_diff_merge( lua_State *L )
    return 0; 
 }
 
+static int luagi_diff_find_init_options( lua_State *L, int index, git_diff_find_options *opts )
+{
+   int ret = git_diff_find_init_options( opts, GIT_DIFF_FIND_OPTIONS_VERSION );
+
+   add_flag( opts->flags, L, index,
+            BY_CONFIG,
+            GIT_DIFF_FIND_BY_CONFIG );
+   add_flag( opts->flags, L, index,
+            RENAMES,
+            GIT_DIFF_FIND_RENAMES );
+   add_flag( opts->flags, L, index,
+            RENAMES_FROM_REWRITES,
+            GIT_DIFF_FIND_RENAMES_FROM_REWRITES );
+   add_flag( opts->flags, L, index,
+            COPIES,
+            GIT_DIFF_FIND_COPIES );
+   add_flag( opts->flags, L, index,
+            COPIES_FROM_UNMODIFIED,
+            GIT_DIFF_FIND_COPIES_FROM_UNMODIFIED );
+   add_flag( opts->flags, L, index,
+            REWRITES,
+            GIT_DIFF_FIND_REWRITES );
+   add_flag( opts->flags, L, index,
+            BREAK_REWRITES,
+            GIT_DIFF_BREAK_REWRITES );
+   add_flag( opts->flags, L, index,
+            FOR_UNTRACKED,
+            GIT_DIFF_FIND_FOR_UNTRACKED );
+   add_flag( opts->flags, L, index,
+            ALL,
+            GIT_DIFF_FIND_ALL );
+   add_flag( opts->flags, L, index,
+            IGNORE_WHITESPACE,
+            GIT_DIFF_FIND_IGNORE_WHITESPACE );
+   add_flag( opts->flags, L, index,
+            DONT_IGNORE_WHITESPACE,
+            GIT_DIFF_FIND_DONT_IGNORE_WHITESPACE );
+   add_flag( opts->flags, L, index,
+            EXACT_MATCH_ONLY,
+            GIT_DIFF_FIND_EXACT_MATCH_ONLY );
+   add_flag( opts->flags, L, index,
+            REWRITES_FOR_RENAMES_ONLY,
+            GIT_DIFF_BREAK_REWRITES_FOR_RENAMES_ONLY );
+   add_flag( opts->flags, L, index,
+            REMOVE_UNMODIFIED,
+            GIT_DIFF_FIND_REMOVE_UNMODIFIED );
+   
+   lua_getfield( L, index, RENAME_THRESHOLD );
+   int rthresh = luaL_optinteger( L, -1, -1 );
+   if( rthresh >= 0 )
+   {
+      opts->rename_threshold = rthresh;
+   }
+
+   lua_getfield( L, index, RENAME_FROM_REWRITE_THRESHOLD );
+   int rwthresh = luaL_optinteger( L, -1, -1 );
+   if( rwthresh >= 0 )
+   {
+      opts->rename_from_rewrite_threshold = rwthresh;
+   }
+
+   lua_getfield( L, index, COPY_THRESHOLD );
+   int copy = luaL_optinteger( L, -1, -1 );
+   if( copy >= 0 )
+   {
+      opts->copy_threshold = copy;
+   }
+
+   lua_getfield( L, index, BREAK_REWRITE_THRESHOLD );
+   int brthresh = luaL_optinteger( L, -1, -1 );
+   if( brthresh >= 0 )
+   {
+      opts->break_rewrite_threshold = brthresh;
+   }
+
+   lua_getfield( L, index, RENAME_LIMIT );
+   int rename_limit = luaL_optinteger( L, -1, -1 );
+   if( rename_limit >= 0 )
+   {
+      opts->rename_limit = rename_limit;
+   }
+
+   //TODO similarity mertic
+   return ret;
+}
+
 int luagi_diff_find_similar( lua_State *L )
 {
-   //TODO find options
    git_diff **diff = checkdiff_at( L, 1 );
 
    git_diff_find_options options;
-   if( git_diff_find_init_options( &options, GIT_DIFF_FIND_OPTIONS_VERSION ) ) 
+   if( luagi_diff_find_init_options( L, 2, &options ) ) 
    {
       const git_error *err = giterr_last();
       luaL_error( L, err->message );
@@ -501,9 +630,32 @@ int luagi_diff_stats_deletions( lua_State *L )
 int luagi_diff_stats_to_buf( lua_State *L )
 {
    git_diff_stats **stats = checkdiffstats_at( L, 1 );
-   //TODO stats format
    git_diff_stats_format_t format = GIT_DIFF_STATS_NONE;
-   size_t width = 0;
+   const char *formatstr = luaL_optstring( L, 2, NULL );
+
+   if( formatstr != NULL )
+   {
+      switch ( formatstr[0] )
+      {
+         case 'n':
+            if( formatstr[1] == 'u' )
+            {
+               format = GIT_DIFF_STATS_NUMBER;
+            }
+            break;
+         case 'f':
+            format = GIT_DIFF_STATS_FULL;
+            break;
+         case 's':
+            format = GIT_DIFF_STATS_SHORT;
+            break;
+         case 'i':
+            format = GIT_DIFF_STATS_INCLUDE_SUMMARY;
+            break;
+      }
+   }
+
+   size_t width = luaL_optinteger( L, 3, 0 );
 
    git_buf out;
    if( git_diff_stats_to_buf( &out, *stats, format, width ) )
@@ -520,10 +672,41 @@ int luagi_diff_stats_free( lua_State *L )
    git_diff_stats_free( *stats );
    return 0;
 }
-static int luagi_diff_format_email_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_diff_format_email_options *opts )
+static int luagi_diff_format_email_init_options( lua_State *L, int index, git_diff_format_email_options *opts )
 {
    int ret =  git_diff_format_email_init_options( opts, GIT_DIFF_FORMAT_EMAIL_OPTIONS_VERSION );
-   //TODO email format options
+   
+   add_flag( opts->flags, L, index, NONE, GIT_DIFF_FORMAT_EMAIL_NONE );
+   add_flag( opts->flags, L, index, EXCLUDE_SUBJECT_PATCH_MARKER, GIT_DIFF_FORMAT_EMAIL_EXCLUDE_SUBJECT_PATCH_MARKER );
+
+   lua_getfield( L, index, PATCH_NO );
+   if( lua_type( L, -1 ) == LUA_TNUMBER )
+   {
+      opts->patch_no = luaL_checkinteger( L, -1 );
+   }
+
+   lua_getfield( L, index, TOTAL_PATCHES );
+   if( lua_type( L, -1) == LUA_TNUMBER )
+   {
+      opts->total_patches = luaL_checkinteger( L, -1 );
+   }
+
+   lua_getfield( L, index, OID );
+   luagi_check_oid( (git_oid *)opts->id, L, -1 );
+
+   lua_getfield( L, index, SUMMARY );
+   const char *summary = luaL_optstring( L, -1, NULL );
+   if( summary )
+   {
+      opts->summary = summary;
+   }
+
+   lua_getfield( L, index, AUTHOR );
+   if( lua_type( L, -1 ) == LUA_TTABLE )
+   {
+      table_to_signature( L, (git_signature *)opts->author, -1 );
+   }
+
    return ret;
 }
 

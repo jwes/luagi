@@ -2,6 +2,7 @@
 #define IS_LUAGI_SUBMODULE
 #include <lua.h>
 #include <lauxlib.h>
+#include <git2/types.h>
 
 int luagi_submodule_lookup( lua_State *L );
 int luagi_submodule_foreach( lua_State *L );
@@ -69,4 +70,6 @@ static const struct luaL_Reg luagi_submodule_funcs [] = {
    { "open_repository", luagi_submodule_open },
    { NULL, NULL }
 };
+
+git_submodule_ignore_t luagi_sub_check_ignore( lua_State *L, int index );
 #endif

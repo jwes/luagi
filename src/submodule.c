@@ -233,7 +233,7 @@ static int luagi_sub_push_ignore( lua_State *L, git_submodule_ignore_t ignore )
    return 1;
 }
 
-static git_submodule_ignore_t luagi_sub_check_ignore( lua_State *L, int index )
+git_submodule_ignore_t luagi_sub_check_ignore( lua_State *L, int index )
 {
    const char *ignore = luaL_checkstring( L, index );
    
