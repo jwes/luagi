@@ -18,8 +18,13 @@ int luagi_stash_save( lua_State *L )
 
    const char *message = luaL_optstring( L, 3, NULL );
 
-   //TODO flags:
    unsigned int flags = GIT_STASH_DEFAULT;
+   if( lua_type( L, 3 ) == LUA_TTABLE )
+   {
+      add_flag( flags, L, 3, KEEP_INDEX, GIT_STASH_KEEP_INDEX );
+      add_flag( flags, L, 3, INCLUDE_UNTRACKED, GIT_STASH_INCLUDE_UNTRACKED ); 
+      add_flag( flags, L, 3, INCLUDE_IGNORED, GIT_STASH_INCLUDE_IGNORED );
+   }
 
    git_oid out;
    if( git_stash_save( &out, *repo, &stasher, message, flags ) )

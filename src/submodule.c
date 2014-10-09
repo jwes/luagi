@@ -424,6 +424,38 @@ int luagi_submodule_reload( lua_State *L )
    }
    return 0;
 }
+static void push_flag_to_table( lua_State *L, const unsigned int bitfield, const char *name, const unsigned int flag )
+{
+   if( bitfield & flag )
+   {
+      lua_pushboolean( L, 1 );
+      lua_setfield( L, -2, name );
+   }
+}
+
+static int luagi_push_status( lua_State *L, const unsigned int status )
+{
+   lua_newtable( L );
+   push_flag_to_table( L, status, IN_HEAD, GIT_SUBMODULE_STATUS_IN_HEAD);
+   push_flag_to_table( L, status, IN_INDEX, GIT_SUBMODULE_STATUS_IN_INDEX);
+   push_flag_to_table( L, status, IN_CONFIG, GIT_SUBMODULE_STATUS_IN_CONFIG);
+   push_flag_to_table( L, status, IN_WD, GIT_SUBMODULE_STATUS_IN_WD);
+   lua_newtable( L );
+   push_flag_to_table( L, status, ADDED, GIT_SUBMODULE_STATUS_INDEX_ADDED);
+   push_flag_to_table( L, status, DELETED, GIT_SUBMODULE_STATUS_INDEX_DELETED);
+   push_flag_to_table( L, status, MODIFIED, GIT_SUBMODULE_STATUS_INDEX_MODIFIED);
+   lua_setfield( L, -2, INDEX );
+   push_flag_to_table( L, status, UNINITIALIZED, GIT_SUBMODULE_STATUS_WD_UNINITIALIZED);
+   push_flag_to_table( L, status, ADDED, GIT_SUBMODULE_STATUS_WD_ADDED);
+   push_flag_to_table( L, status, DELETED, GIT_SUBMODULE_STATUS_WD_DELETED );
+   push_flag_to_table( L, status, MODIFIED, GIT_SUBMODULE_STATUS_WD_MODIFIED);
+   push_flag_to_table( L, status, IMOD, GIT_SUBMODULE_STATUS_WD_INDEX_MODIFIED);
+   push_flag_to_table( L, status, WMOD, GIT_SUBMODULE_STATUS_WD_WD_MODIFIED);
+   push_flag_to_table( L, status, UNTRACKED, GIT_SUBMODULE_STATUS_WD_UNTRACKED);
+   lua_setfield( L, -2, WORKDIR );
+
+   return 1;
+}
 
 static int luagi_get_status( lua_State *L, int (*func)( unsigned int *status, git_submodule *sub ) )
 {
@@ -436,9 +468,7 @@ static int luagi_get_status( lua_State *L, int (*func)( unsigned int *status, gi
       ERROR_PUSH( L );
    }
 
-   //TODO flags 
-   lua_pushinteger( L, status );
-   return 1;
+   return luagi_push_status( L, status );
 }
 
 int luagi_submodule_status( lua_State *L )

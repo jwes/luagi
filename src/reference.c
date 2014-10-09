@@ -574,8 +574,16 @@ int luagi_reference_ensure_log( lua_State *L )
 int luagi_reference_normalize_name( lua_State *L )
 {
    const char *name = luaL_checkstring( L, 1 );
-   //TODO flags
+
    int flags = GIT_REF_FORMAT_NORMAL;
+   if( lua_type( L, 2 ) == LUA_TTABLE)
+   {
+
+      add_flag( flags, L, 2, ALLOW_ONELEVEL, GIT_REF_FORMAT_ALLOW_ONELEVEL );
+      add_flag( flags, L, 2, REFSPEC_PATTERN, GIT_REF_FORMAT_REFSPEC_PATTERN );
+      add_flag( flags, L, 2, REFSPEC_SHORTHAND, GIT_REF_FORMAT_REFSPEC_SHORTHAND );
+   }
+
    char buffer_out[ bufsize ];
 
    memset( buffer_out, 0, bufsize );

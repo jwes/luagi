@@ -264,4 +264,16 @@
 #define INITIAL_HEAD "initial_head"
 #define ORIGIN_URL "origin_url"
 
+#define REFSPEC_PATTERN "refspec_pattern"
+#define REFSPEC_SHORTHAND "refspec_shorthand"
+#define ALLOW_ONELEVEL "allow_onelevel"
+#define KEEP_INDEX "keep_index"
+#define INDEX "index"
+#define WORKDIR "workdir"
+
+#define IN_HEAD "in_head"
+#define IN_INDEX "in_index"
+#define IN_CONFIG "in_config"
+#define IN_WD "in_workdir"
+#define UNINITIALIZED "uninitalized"
 #endif
