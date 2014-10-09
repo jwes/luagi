@@ -20,7 +20,12 @@ int luagi_push_new( lua_State *L )
 static int luagi_push_init_options( lua_State *L __attribute__(( unused )), int index __attribute__(( unused )), git_push_options *opts )
 {
    int ret = git_push_init_options( opts, GIT_PUSH_OPTIONS_VERSION );
-   //TODO push options
+
+   lua_getfield( L, index, THREADS );
+   if( lua_type( L, -1 ) == LUA_TNUMBER )
+   {
+      opts->pb_parallelism = luaL_checkinteger( L, -1 );
+   }
    return ret;
 }
 

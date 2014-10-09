@@ -12,130 +12,131 @@
 
 int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
 {
-   lua_isboolean( L, idx );
    int ret = git_diff_init_options( opts, GIT_DIFF_OPTIONS_VERSION );
-
-   add_flag( opts->flags, L, idx,
-            NORMAL,
-            GIT_DIFF_NORMAL );
-   add_flag( opts->flags, L, idx,
-            REVERSE,
-            GIT_DIFF_REVERSE );
-   add_flag( opts->flags, L, idx,
-            INCLUDE_IGNORED,
-            GIT_DIFF_INCLUDE_IGNORED );
-   add_flag( opts->flags, L, idx,
-            RECURSE_IGNORED_DIRS,
-            GIT_DIFF_RECURSE_IGNORED_DIRS );
-   add_flag( opts->flags, L, idx,
-            INCLUDE_UNTRACKED,
-            GIT_DIFF_INCLUDE_UNTRACKED );
-   add_flag( opts->flags, L, idx,
-            RECURSE_UNTRACKED_DIRS,
-            GIT_DIFF_RECURSE_UNTRACKED_DIRS );
-   add_flag( opts->flags, L, idx,
-            INCLUDE_UNMODIFIED,
-            GIT_DIFF_INCLUDE_UNMODIFIED );
-   add_flag( opts->flags, L, idx,
-            INCLUDE_TYPECHANGE,
-            GIT_DIFF_INCLUDE_TYPECHANGE );
-   add_flag( opts->flags, L, idx,
-            INCLUDE_TYPECHANGE_TREES,
-            GIT_DIFF_INCLUDE_TYPECHANGE_TREES );
-   add_flag( opts->flags, L, idx,
-            IGNORE_FILEMODE,
-            GIT_DIFF_IGNORE_FILEMODE );
-   add_flag( opts->flags, L, idx,
-            IGNORE_SUBMODULES,
-            GIT_DIFF_IGNORE_SUBMODULES );
-   add_flag( opts->flags, L, idx,
-            IGNORE_CASE,
-            GIT_DIFF_IGNORE_CASE );
-   add_flag( opts->flags, L, idx,
-            DISABLE_PATHSPEC_MATCH,
-            GIT_DIFF_DISABLE_PATHSPEC_MATCH );
-   add_flag( opts->flags, L, idx,
-            SKIP_BINARY_CHECK,
-            GIT_DIFF_SKIP_BINARY_CHECK );
-   add_flag( opts->flags, L, idx,
-            ENABLE_FAST_UNTRACKED_DIRS,
-            GIT_DIFF_ENABLE_FAST_UNTRACKED_DIRS );
-   add_flag( opts->flags, L, idx,
-            UPDATE_INDEX,
-            GIT_DIFF_UPDATE_INDEX );
-   add_flag( opts->flags, L, idx,
-            FORCE_TEXT,
-            GIT_DIFF_FORCE_TEXT );
-   add_flag( opts->flags, L, idx,
-            FORCE_BINARY,
-            GIT_DIFF_FORCE_BINARY );
-   add_flag( opts->flags, L, idx,
-            IGNORE_WHITESPACE,
-            GIT_DIFF_IGNORE_WHITESPACE );
-   add_flag( opts->flags, L, idx,
-            IGNORE_WHITESPACE_CHANGE,
-            GIT_DIFF_IGNORE_WHITESPACE_CHANGE );
-   add_flag( opts->flags, L, idx,
-            IGNORE_WHITESPACE_EOL,
-            GIT_DIFF_IGNORE_WHITESPACE_EOL );
-   add_flag( opts->flags, L, idx,
-            SHOW_UNTRACKED_CONTENT,
-            GIT_DIFF_SHOW_UNTRACKED_CONTENT );
-   add_flag( opts->flags, L, idx,
-            SHOW_UNMODIFIED,
-            GIT_DIFF_SHOW_UNMODIFIED );
-   add_flag( opts->flags, L, idx,
-            PATIENCE,
-            GIT_DIFF_PATIENCE );
-   add_flag( opts->flags, L, idx,
-            MINIMAL,
-            GIT_DIFF_MINIMAL );
-   add_flag( opts->flags, L, idx,
-            SHOW_BINARY,
-            GIT_DIFF_SHOW_BINARY );
-
-   lua_getfield( L, idx, IGNORE_SUBMODULES_TYPE );
-   opts->ignore_submodules = luagi_sub_check_ignore( L, -1 );
-
-   lua_getfield( L, idx, PATHSPEC );
-   opts->pathspec = luagi_strings_from_lua_list( L, -1 );
-
-   //TODO notify_cb
-
-   lua_getfield( L, idx, CONTEXT_LINES );
-   int context_lines = luaL_optinteger(L, -1, -1 );
-   if( context_lines >= 0 )
+   if( lua_type( L, idx ) == LUA_TTABLE )
    {
-      opts->context_lines = context_lines;
-   }
 
-   lua_getfield( L, idx, INTERHUNK_LINES );
-   int ihunk = luaL_optinteger( L, -1, -1 );
-   if( ihunk >= 0 )
-   {
-      opts->interhunk_lines = ihunk;
-   }
+      add_flag( opts->flags, L, idx,
+               NORMAL,
+               GIT_DIFF_NORMAL );
+      add_flag( opts->flags, L, idx,
+               REVERSE,
+               GIT_DIFF_REVERSE );
+      add_flag( opts->flags, L, idx,
+               INCLUDE_IGNORED,
+               GIT_DIFF_INCLUDE_IGNORED );
+      add_flag( opts->flags, L, idx,
+               RECURSE_IGNORED_DIRS,
+               GIT_DIFF_RECURSE_IGNORED_DIRS );
+      add_flag( opts->flags, L, idx,
+               INCLUDE_UNTRACKED,
+               GIT_DIFF_INCLUDE_UNTRACKED );
+      add_flag( opts->flags, L, idx,
+               RECURSE_UNTRACKED_DIRS,
+               GIT_DIFF_RECURSE_UNTRACKED_DIRS );
+      add_flag( opts->flags, L, idx,
+               INCLUDE_UNMODIFIED,
+               GIT_DIFF_INCLUDE_UNMODIFIED );
+      add_flag( opts->flags, L, idx,
+               INCLUDE_TYPECHANGE,
+               GIT_DIFF_INCLUDE_TYPECHANGE );
+      add_flag( opts->flags, L, idx,
+               INCLUDE_TYPECHANGE_TREES,
+               GIT_DIFF_INCLUDE_TYPECHANGE_TREES );
+      add_flag( opts->flags, L, idx,
+               IGNORE_FILEMODE,
+               GIT_DIFF_IGNORE_FILEMODE );
+      add_flag( opts->flags, L, idx,
+               IGNORE_SUBMODULES,
+               GIT_DIFF_IGNORE_SUBMODULES );
+      add_flag( opts->flags, L, idx,
+               IGNORE_CASE,
+               GIT_DIFF_IGNORE_CASE );
+      add_flag( opts->flags, L, idx,
+               DISABLE_PATHSPEC_MATCH,
+               GIT_DIFF_DISABLE_PATHSPEC_MATCH );
+      add_flag( opts->flags, L, idx,
+               SKIP_BINARY_CHECK,
+               GIT_DIFF_SKIP_BINARY_CHECK );
+      add_flag( opts->flags, L, idx,
+               ENABLE_FAST_UNTRACKED_DIRS,
+               GIT_DIFF_ENABLE_FAST_UNTRACKED_DIRS );
+      add_flag( opts->flags, L, idx,
+               UPDATE_INDEX,
+               GIT_DIFF_UPDATE_INDEX );
+      add_flag( opts->flags, L, idx,
+               FORCE_TEXT,
+               GIT_DIFF_FORCE_TEXT );
+      add_flag( opts->flags, L, idx,
+               FORCE_BINARY,
+               GIT_DIFF_FORCE_BINARY );
+      add_flag( opts->flags, L, idx,
+               IGNORE_WHITESPACE,
+               GIT_DIFF_IGNORE_WHITESPACE );
+      add_flag( opts->flags, L, idx,
+               IGNORE_WHITESPACE_CHANGE,
+               GIT_DIFF_IGNORE_WHITESPACE_CHANGE );
+      add_flag( opts->flags, L, idx,
+               IGNORE_WHITESPACE_EOL,
+               GIT_DIFF_IGNORE_WHITESPACE_EOL );
+      add_flag( opts->flags, L, idx,
+               SHOW_UNTRACKED_CONTENT,
+               GIT_DIFF_SHOW_UNTRACKED_CONTENT );
+      add_flag( opts->flags, L, idx,
+               SHOW_UNMODIFIED,
+               GIT_DIFF_SHOW_UNMODIFIED );
+      add_flag( opts->flags, L, idx,
+               PATIENCE,
+               GIT_DIFF_PATIENCE );
+      add_flag( opts->flags, L, idx,
+               MINIMAL,
+               GIT_DIFF_MINIMAL );
+      add_flag( opts->flags, L, idx,
+               SHOW_BINARY,
+               GIT_DIFF_SHOW_BINARY );
+   
+      lua_getfield( L, idx, IGNORE_SUBMODULES_TYPE );
+      opts->ignore_submodules = luagi_sub_check_ignore( L, -1 );
+   
+      lua_getfield( L, idx, PATHSPEC );
+      opts->pathspec = luagi_strings_from_lua_list( L, -1 );
 
-   lua_getfield( L, idx, ID_ABBREV );
-   int ida = luaL_optinteger( L, -1, -1 );
-   if( ida >= 0 )
-   {
-      opts->id_abbrev = ida;
-   }
+      //TODO notify_cb
+   
+      lua_getfield( L, idx, CONTEXT_LINES );
+      int context_lines = luaL_optinteger(L, -1, -1 );
+      if( context_lines >= 0 )
+      {
+         opts->context_lines = context_lines;
+      }
 
-   lua_getfield( L, idx, MAX_SIZE );
-   git_off_t msize = luaL_optinteger( L, -1, -1 );
-   if( msize >= 0 )
-   {
-      opts->max_size = msize;
-   }
+      lua_getfield( L, idx, INTERHUNK_LINES );
+      int ihunk = luaL_optinteger( L, -1, -1 );
+      if( ihunk >= 0 )
+      {
+         opts->interhunk_lines = ihunk;
+      }
+   
+      lua_getfield( L, idx, ID_ABBREV );
+      int ida = luaL_optinteger( L, -1, -1 );
+      if( ida >= 0 )
+      {
+         opts->id_abbrev = ida;
+      }
+   
+      lua_getfield( L, idx, MAX_SIZE );
+      git_off_t msize = luaL_optinteger( L, -1, -1 );
+      if( msize >= 0 )
+      {
+         opts->max_size = msize;
+      }
 
-   lua_getfield( L, idx, OLD_PREFIX );
-   opts->old_prefix = luaL_checkstring( L, -1 );
-
-   lua_getfield( L, idx, NEW_PREFIX );
-   opts->new_prefix = luaL_checkstring( L, -1 );
-
+      lua_getfield( L, idx, OLD_PREFIX );
+      opts->old_prefix = luaL_checkstring( L, -1 );
+   
+      lua_getfield( L, idx, NEW_PREFIX );
+      opts->new_prefix = luaL_checkstring( L, -1 );
+   } 
    return ret;
 }
 
@@ -735,10 +736,21 @@ int luagi_diff_commit_as_email( lua_State *L )
    int patch_no = luaL_checkinteger( L, 3 );
    int total_patches = luaL_checkinteger( L, 4 );
 
-   //TODO format flags
    git_diff_format_email_flags_t flags = GIT_DIFF_FORMAT_EMAIL_NONE;
+
+   if( lua_type( L, 5 ) == LUA_TTABLE )
+   {
+      // if available, the flags can be combined 
+      // with the other options in the table
+      add_flag( flags, L, 5, 
+               EXCLUDE_SUBJECT_PATCH_MARKER, 
+               GIT_DIFF_FORMAT_EMAIL_EXCLUDE_SUBJECT_PATCH_MARKER );
+   
+   }
+
    git_diff_options diff_opts;
    luagi_diff_init_options( L, 5, &diff_opts );
+
    git_buf out;
    if( git_diff_commit_as_email( &out, *repo, *commit, patch_no, total_patches, flags, &diff_opts ) )
    {

@@ -276,4 +276,5 @@
 #define IN_CONFIG "in_config"
 #define IN_WD "in_workdir"
 #define UNINITIALIZED "uninitalized"
+#define THREADS "threads"
 #endif
