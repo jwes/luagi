@@ -463,16 +463,25 @@ int luagi_remote_set_transport( lua_State *L )
 
 int luagi_remote_set_callbacks( lua_State *L )
 { 
-   //todo
+   //TODO callbacks
    lua_pushnil( L ); 
    return 1; 
 }
+
 int luagi_remote_stats( lua_State *L )
 { 
-   //todo
-   lua_pushnil( L ); 
+   git_remote **rem = checkremote( L );
+
+   const git_transfer_progress *progress = git_remote_stats( *rem );
+   if( ! progress )
+   {
+      ERROR_PUSH( L )
+   }
+
+   luagi_push_transfer_stats( L, progress );
    return 1; 
 }
+
 int luagi_remote_autotag( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
