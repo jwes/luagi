@@ -277,4 +277,11 @@
 #define IN_WD "in_workdir"
 #define UNINITIALIZED "uninitalized"
 #define THREADS "threads"
+
+#define SYSTEM "system"
+#define XDG "xdg"
+#define GLOBAL "global"
+#define APP "app"
+#define HIGHEST "highest"
+
 #endif

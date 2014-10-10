@@ -71,15 +71,46 @@ int luagi_config_open_ondisk( lua_State *L )
 
 static git_config_level_t luagi_check_level( lua_State *L, int index )
 {
-   //TODO config_level from string instead of int
-   int level = luaL_checkinteger( L, index );
-   // TODO if not, at least check bounds
-   return level;
+   const char *level = luaL_checkstring( L, index );
+
+   switch ( *level )
+   {
+      case 's':
+         return GIT_CONFIG_LEVEL_SYSTEM;
+      case 'x':
+         return GIT_CONFIG_LEVEL_XDG;
+      case 'g':
+         return GIT_CONFIG_LEVEL_GLOBAL;
+      case 'l':
+         return GIT_CONFIG_LEVEL_LOCAL;
+      case 'a':
+         return GIT_CONFIG_LEVEL_APP;
+      default:
+      case 'h':
+         return GIT_CONFIG_HIGHEST_LEVEL;
+
+   }
 }
 static int luagi_push_level( lua_State *L, git_config_level_t level )
 {
-   //TODO config_level from string instead of int
-   lua_pushinteger( L, level );
+   char *levelstr;
+   switch( level )
+   {
+      case GIT_CONFIG_LEVEL_SYSTEM:
+         levelstr = SYSTEM;
+      case GIT_CONFIG_LEVEL_XDG:
+         levelstr = XDG;
+      case GIT_CONFIG_LEVEL_GLOBAL:
+         levelstr = GLOBAL;
+      case GIT_CONFIG_LEVEL_LOCAL:
+         levelstr = LOCAL;
+      case GIT_CONFIG_LEVEL_APP:
+         levelstr = APP;
+      case GIT_CONFIG_HIGHEST_LEVEL:
+         levelstr = HIGHEST;
+   }
+      
+   lua_pushstring( L, levelstr );
    return 1;
 }
    
