@@ -37,7 +37,6 @@ set( SRC_FILES
    ${SRC_DIR}/remote.c
    ${SRC_DIR}/repository.c
    ${SRC_DIR}/reset.c
-   ${SRC_DIR}/revert.c
    ${SRC_DIR}/revwalk.c
 
    ${SRC_DIR}/stash.c
