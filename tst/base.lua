@@ -37,7 +37,8 @@ describe("init", function()
 
    describe("invalid path", function()
       local repopath = "data/path/that/does/not/exist"
-      local repo, err = luagi.init( repopath, true )
+      local opts = {}
+      local repo, err = luagi.init_ext( repopath, opts )
       it( "repo should be null", function()
          assert.is.falsy( repo )
       end)
