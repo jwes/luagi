@@ -381,33 +381,6 @@ int table_to_signature( lua_State *L, git_signature *sig, int tablepos )
       return git_signature_new( &sig, name, email, time, offset );
    }
 }
-const char *luagi_otype_to_string( git_otype type )
-{
-   switch( type )
-   {
-      case GIT_OBJ_ANY:
-      default:
-         return ANY; 
-      case GIT_OBJ_BAD:
-         return INVALID;
-      case GIT_OBJ__EXT1:
-         return _EXT1; 
-      case GIT_OBJ__EXT2:
-         return _EXT2; 
-      case GIT_OBJ_COMMIT:
-         return COMMIT;
-      case GIT_OBJ_TREE:
-         return TREE;
-      case GIT_OBJ_BLOB:
-         return BLOB;
-      case GIT_OBJ_TAG:
-         return TAG;
-      case GIT_OBJ_OFS_DELTA:
-         return OFS_DELTA;
-      case GIT_OBJ_REF_DELTA:
-         return REF_DELTA;
-   }
-}
 
 git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx )
 {

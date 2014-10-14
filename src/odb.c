@@ -239,6 +239,7 @@ int luagi_odb_open_rstream( lua_State *L )
    return 1;
 } 
 
+//TODO write pack
 int luagi_odb_write_pack( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
 int luagi_odb_hash( lua_State *L )
 {
@@ -270,6 +271,7 @@ int luagi_odb_hashfile( lua_State *L )
    return luagi_push_oid( L, &oid );
 }
 
+//TODO backend
 int luagi_odb_add_backend( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
 int luagi_odb_add_alternate( lua_State *L ){ luaL_error( L, "not yet implemented" ); return 0; }
 
