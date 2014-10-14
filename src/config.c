@@ -6,6 +6,8 @@
 static int luagi_find_config( lua_State *L, int (*func)( git_buf *out ) )
 {
    git_buf buf;
+   buf.size = 0;
+   buf.asize = 0;
    if( func( &buf ) )
    {
       ERROR_PUSH( L )
