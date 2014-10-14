@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "oid.h"
+#include "types.h"
 
 /*#define checktree(L) \
       (git_tree**) luaL_checkudata( L, 1, LUAGI_TREE_FUNCS )
@@ -189,7 +190,7 @@ int luagi_tree_entry_type( lua_State *L )
 {
    git_tree_entry** entry = checktreeentry( L, 1 );
    git_otype type = git_tree_entry_type( *entry );
-   lua_pushstring( L, luagi_otype_to_string( type ) );
+   lua_pushstring( L, luagi_string_from_otype( type ) );
    return 1;
 }
 int luagi_tree_entry_filemode( lua_State *L )

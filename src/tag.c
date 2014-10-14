@@ -4,6 +4,7 @@
 #include "luagi.h"
 #include "oid.h"
 #include "object.h"
+#include "types.h"
 
 int luagi_tag_lookup( lua_State *L )
 {
@@ -231,7 +232,7 @@ int luagi_tag_target_type( lua_State *L )
    git_tag **tag = checktag_at( L, 1 );
 
    git_otype type = git_tag_target_type( *tag );
-   lua_pushstring( L, luagi_otype_to_string( type ) );
+   lua_pushstring( L, luagi_string_from_otype( type ) );
    return 1;
 }
 
