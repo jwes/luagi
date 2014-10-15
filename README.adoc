@@ -15,6 +15,7 @@ Currently, the source is built against:
 
 The tests use busted ( see luarocks ).
 for the preparation of the test cases, rm, mkdir and unzip are used via os.execute
+
 == Cmake Build
 
 [source,bash]
