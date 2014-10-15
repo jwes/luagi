@@ -13,6 +13,8 @@ Currently, the source is built against:
 ** inculdimg following fix: https://github.com/libgit2/libgit2/pull/2439
 * Lua 5.2.
 
+The tests use busted ( see luarocks ).
+for the preparation of the test cases, rm, mkdir and unzip are used via os.execute
 == Cmake Build
 
 [source,bash]
