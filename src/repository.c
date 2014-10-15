@@ -20,13 +20,9 @@ int luagi_open( lua_State *L )
    const char *path = luaL_checkstring( L, 1 );
    repo = (git_repository **) lua_newuserdata(L, sizeof(git_repository *) );
    
-   const int ret = git_repository_open( repo, path );
-
-   if( ret < 0 )
+   if( git_repository_open( repo, path ) )
    {
-      lua_pushnil(L);
-      lua_pushnumber(L, ret);
-      return 2;
+      ERROR_PUSH( L )
    }
 
    luaL_getmetatable( L, REPO_NAME );

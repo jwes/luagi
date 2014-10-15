@@ -1,3 +1,5 @@
+local test_helper = require( "test_helper" )
+
 local luagi = require( "luagi" )
 describe("version", function()
    describe( "current", function()
@@ -155,3 +157,26 @@ describe("parse_int64", function()
       assert.has_error( function() luagi.parse_int64( "-9223372036854775808" ) end )
    end)
 end)
+
+describe( "open", function()
+   setup(function()
+      test_helper.setup()
+   end)
+
+   it("should not be null", function()
+      local repo, err = luagi.open(test_helper.path)
+      assert.is.not_nil( repo )
+      assert.are.equal( "userdata", type( repo ) )
+
+      assert.is.falsy( err )
+   end)
+
+   it("should be null", function()
+      local repo, err = luagi.open("data/no/valid/path")
+      assert.is.falsy( repo )
+
+      assert.is.not_nil( err )
+      assert.are.equal( "string", type( err ) )
+   end)
+end)
+
