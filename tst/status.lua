@@ -6,3 +6,5 @@ describe( "status_list #status", function() pending("luagi_status_list_new") end
 describe( "status_ignored #status", function() pending("luagi_status_should_ignore") end)
 
 
+describe( "__index #status", function() pending("luagi_status_by_index ") end)
+describe( "__len #status", function() pending("luagi_status_list_entrycount ") end)

@@ -31,3 +31,10 @@ $ make
 * automated tests for the library *with busted ;-)*
 * documentation
 * functions
+
+== TEST
+[source,bash]
+----
+$ cd tst
+$ busted -p .lua --suppress-pending .
+----

@@ -1,2 +1,13 @@
    --pack
 describe( "new_packbuilder #pack", function() pending("luagi_packbuilder_new") end)
+describe( "set_threads #pack", function() pending("luagi_packbuilder_set_threads ") end)
+describe( "insert #pack", function() pending("luagi_packbuilder_insert ") end)
+describe( "insert_tree #pack", function() pending("luagi_packbuilder_insert_tree ") end)
+describe( "insert_commit #pack", function() pending("luagi_packbuilder_insert_commit ") end)
+describe( "write_buf #pack", function() pending(" luagi_packbuilder_write_buf ") end)
+describe( "write #pack", function() pending("luagi_packbuilder_write ") end)
+describe( "hash #pack", function() pending("luagi_packbuilder_hash ") end)
+describe( "foreach #pack", function() pending("luagi_packbuilder_foreach ") end)
+describe( "count #pack", function() pending("luagi_packbuilder_object_count ") end)
+describe( "written #pack", function() pending("luagi_packbuilder_written ") end)
+describe( "set_callbacks #pack", function() pending("luagi_packbuilder_set_callbacks ") end)
