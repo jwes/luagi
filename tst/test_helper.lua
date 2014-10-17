@@ -7,8 +7,20 @@ local function setup()
       os.execute( "unzip -q repo.zip -d "..path)
    end
 
+local modification = ".........\n" 
+
+local function modify( path )
+   local file = io.open( path, "a" )
+   file:write( modification ) 
+   file:close()
+end
+
 return {
+   --parameters
    path = path,
-   setup = setup
+   modification = modification,
+   --functions
+   setup = setup,
+   modify = modify,
 }
 
