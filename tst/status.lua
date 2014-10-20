@@ -2,24 +2,95 @@ local test_helper = require( "test_helper" )
 
 local luagi = require( "luagi" )
 
---status
-describe( "status_for_each #status", function() 
-   pending("luagi_status_foreach") 
-end)
-
-describe( "status_for_each_ext #status", function() 
-   pending("luagi_status_foreach_ext") 
-end)
-
 local function assert_status( table, expected )
    for k, v in pairs(table) do
-      if k == "workdir_modified" then
+      if k == expected then
          assert.is.True( v )
       else
          assert.is.False( v )      
       end
    end
 end
+
+--status
+describe( "status_for_each #status", function() 
+   local repo = nil
+   setup( function()
+
+      test_helper.setup()
+      repo = luagi.open( test_helper.path )
+   end)
+
+   it( "should only return ignored", function()
+      for path, status in repo:status_for_each() do
+         local pattern = ".ign"
+         local ret = string.match( path, pattern )
+         assert.is.True( ret == pattern ) 
+      end
+   end)
+
+   it( "should return path or ignored", function()
+      local path = test_helper.path.."/testfile"
+      test_helper.modify( path )
+      at_least_one = false
+      for rpath, status in repo:status_for_each( ) do
+         if rpath == "testfile" then
+            assert.is.equal( "testfile", rpath)
+            assert_status( status, "workdir_modified" )
+            at_least_one = true
+         elseif ".ign" == string.match(rpath,".ign") then
+            assert_status( status, "ignored" )
+         end
+      end
+
+      assert.is.True( at_least_one )
+   end)
+   
+end)
+
+describe( "status_for_each_ext #status", function() 
+   local repo = nil
+   setup( function()
+
+      test_helper.setup()
+      repo = luagi.open( test_helper.path )
+   end)
+
+   it( "should not return a thing", function()
+      not_one = true
+      for path, status in repo:status_for_each_ext() do
+         not_one = false
+      end
+      assert.is.True( not_one )
+   end)
+
+   it( "should include unmodified", function()
+      flags = {
+         include_unmodified = true,
+      }
+
+      count = 0
+      for path, status in repo:status_for_each_ext( flags ) do
+         count = count + 1
+         assert_status( status, "nothing" )
+      end
+      assert.equal( 3, count )
+   end)
+
+   it( "should return path", function()
+      local path = test_helper.path.."/testfile"
+      test_helper.modify( path )
+      at_least_one = false
+      for rpath, status in repo:status_for_each_ext( ) do
+         assert.is.equal( "testfile", rpath)
+         assert_status( status, "workdir_modified" )
+         at_least_one = true
+      end
+
+      assert.is.True( at_least_one )
+   end)
+end)
+
 
 describe( "status_file #status", function() 
    local repo = nil
@@ -51,7 +122,16 @@ describe( "status_file #status", function()
 end)
 
 describe( "status_ignored #status", function() 
-   pending("luagi_status_should_ignore") 
+   local repo = nil
+   setup( function()
+
+      test_helper.setup()
+      repo = luagi.open( test_helper.path )
+   end)
+
+   it( "should be ignored", function() 
+      assert.is.True(repo:status_ignored( "ignored.ign"))
+   end)
 end)
 
 
