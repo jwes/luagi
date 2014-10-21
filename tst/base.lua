@@ -53,7 +53,7 @@ end)
 
 describe( "open #base", function()
    setup(function()
-      test_helper.setup()
+      test_helper.extract()
    end)
 
    it("should not be null", function()
@@ -73,9 +73,18 @@ describe( "open #base", function()
    end)
 end)
 
-describe( "create_index", function() pending("pending") end)
-describe( "reference_normalize_name", function() pending("pending") end)
-describe( "reference_is_valid_name", function() pending("pending") end)
+describe( "create_index", function() 
+
+   it("should not be nil", function()
+      local index, err = luagi.create_index() 
+      assert.is.not_nil( index )
+      assert.are.equal( "userdata", type( index ) )
+
+      assert.is.falsy( err )
+   end)
+end)
+
+
 describe( "merge_files", function() pending("pending") end)
 describe( "wrap_odb", function() pending("pending") end)
 describe( "discover", function() pending("pending") end)
@@ -93,8 +102,5 @@ describe( "find_system_config", function() pending("pending") end)
 describe( "open_default_config", function() pending("pending") end)
 describe( "new_config", function() pending("pending") end)
 describe( "open_ondisk_config", function() pending("pending") end)
-describe( "parse_bool", function() pending("pending") end)
-describe( "parse_int32", function() pending("pending") end)
-describe( "parse_int64", function() pending("pending") end)
 describe( "patch_buffers", function() pending("pending") end)
  
