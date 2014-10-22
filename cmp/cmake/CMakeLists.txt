@@ -30,6 +30,7 @@ find_package( GIT2 "0.21.0" EXACT REQUIRED ) # GIT2_LIBRARIES / GIT2_INCLUDE_DIR
 include_directories( ${INC_DIR} ${GIT2_INCLUDE_DIRS} )
 
 add_library( ${LIB_NAME} SHARED ${SRC_FILES} )
+set_target_properties( ${LIB_NAME} PROPERTIES PREFIX "" )
 target_link_libraries( ${LIB_NAME} m ${LUA52_LIBRARIES} ${GIT2_LIBRARIES} )
 
 ########################################################################################################################
