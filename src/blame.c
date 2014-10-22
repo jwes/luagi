@@ -158,9 +158,15 @@ int luagi_blame_get_hunk_byindex( lua_State *L )
 {
    git_blame **blame = checkblame_at( L, 1 );
    int index = luaL_checkinteger( L, 2 );
-
-   //luas base is 1
+   
    index--;
+   int max = git_blame_get_hunk_count( *blame );
+   if( index < 0 || index >= max )
+   {
+      lua_pushnil( L );
+      lua_pushfstring( L, "invalid value for index %d, allowed range (%d, %d)", index + 1, 1, max );
+      return 2;
+   }
 
    const git_blame_hunk *hunk = git_blame_get_hunk_byindex( *blame, index );
    if( hunk == NULL )
@@ -176,8 +182,12 @@ int luagi_blame_get_hunk_byline( lua_State *L )
    git_blame **blame = checkblame_at( L, 1 );
    int line = luaL_checkinteger( L, 2 );
 
-   //luas base is 1
-   line--;
+   if( line <= 0 )
+   {
+      lua_pushnil( L );
+      lua_pushstring( L, "invalid value for line" );
+      return 2;
+   }
 
    const git_blame_hunk *hunk = git_blame_get_hunk_byline( *blame, line );
    if( hunk == NULL )
