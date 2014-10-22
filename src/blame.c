@@ -8,6 +8,9 @@ static int luagi_blame_init_options( lua_State *L __attribute__((unused)),
 {
    int ret = git_blame_init_options( opts, GIT_BLAME_OPTIONS_VERSION );
 
+   if( lua_type( L, index ) != LUA_TTABLE )
+      return ret;
+
    add_flag( opts->flags, L, index, 
             NORMAL, 
             GIT_BLAME_NORMAL );
@@ -156,6 +159,9 @@ int luagi_blame_get_hunk_byindex( lua_State *L )
    git_blame **blame = checkblame_at( L, 1 );
    int index = luaL_checkinteger( L, 2 );
 
+   //luas base is 1
+   index--;
+
    const git_blame_hunk *hunk = git_blame_get_hunk_byindex( *blame, index );
    if( hunk == NULL )
    {
@@ -169,6 +175,9 @@ int luagi_blame_get_hunk_byline( lua_State *L )
 {
    git_blame **blame = checkblame_at( L, 1 );
    int line = luaL_checkinteger( L, 2 );
+
+   //luas base is 1
+   line--;
 
    const git_blame_hunk *hunk = git_blame_get_hunk_byline( *blame, line );
    if( hunk == NULL )
