@@ -17,6 +17,14 @@ int luagi_check_oid_prefix( git_oid *out, int *oid_len, lua_State *L, int pos )
 int luagi_push_oid( lua_State *L, const git_oid *oid )
 {
    char buf[GIT_OID_HEXSZ + 1 ];
-   lua_pushstring( L, git_oid_tostr( buf, sizeof(buf), oid ) );
+
+   if( oid != NULL )
+   {
+      lua_pushstring( L, git_oid_tostr( buf, sizeof(buf), oid ) );
+   }
+   else
+   {
+      lua_pushnil( L );
+   }
    return 1;
 }

@@ -56,7 +56,7 @@ describe( "blame_file #blame", function()
 
    end)
 
-   describe( "hunks by line", function()
+   describe( "hunks by line #blame", function()
       local hunk, err = blame:byline( 1 )
       it( "should be a valid object", function()
          assert.is.not_nil( hunk )
@@ -81,7 +81,25 @@ describe( "blame_file #blame", function()
       end)
 
    end)
+
+   describe( "buffer #blame", function() 
+      io.input( test_helper.path.."/some/folder/testfile2" )
+      content = io.read("*a") 
+      content = content.."some more content\n"
+      local bufblame, err = blame:buffer( content )
+      it( "should have a result", function()
+         assert.is.equal("userdata", type( bufblame ) )
+         assert.is.falsy( err )
+      end)
+      it( "should have 2 hunks", function()
+         assert.is.equal( 2, bufblame:count() )
+      end)
+
+      it( "should have no name", function()
+         local hunk, err = bufblame:byindex( 2 )
+         assert.is.falsy( hunk.final.signature.name )
+      end)
+   end)
    
 end)
    
-describe( "buffer #blame", function() pending("luagi_blame_buffer ") end)

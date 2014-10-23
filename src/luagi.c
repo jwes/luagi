@@ -348,6 +348,9 @@ int luaopen_luagi(lua_State *L)
 int signature_to_table( lua_State *L, const git_signature *sig )
 {
    lua_newtable( L );
+   if( sig == NULL )
+      return 0;
+
    lua_pushstring( L, sig->name );
    lua_setfield( L, -2, NAME );
    lua_pushstring( L, sig->email );
