@@ -11,6 +11,7 @@
 #include "branch.h"
 #include "luagi.h"
 #include "commit.h"
+#include "reference.h"
 
 #include <stdio.h>
 
@@ -245,13 +246,6 @@ int luagi_branch_lookup( lua_State *L )
    return 1;
 }
 
-int luagi_branch_gc( lua_State *L )
-{
-   git_reference** ref = checkbranch(L);
-   git_reference_free( *ref );
-   return 0;
-}
-
 int luagi_branch_is_head( lua_State *L )
 {
    git_reference** ref = checkbranch(L);
@@ -272,5 +266,95 @@ int luagi_branch_name( lua_State *L )
    }
    lua_pushstring( L, out );
    return 1;
+}
+
+int luagi_reference_branch_target( lua_State *L )
+{
+   return luagi_reference_gen_target( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_target_peel( lua_State *L )
+{
+   return luagi_reference_gen_target_peel( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_symbolic_target( lua_State *L )
+{
+   return luagi_reference_gen_symbolic_target( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_type( lua_State *L )
+{
+   return luagi_reference_gen_type( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_name( lua_State *L )
+{
+   return luagi_reference_gen_name( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_resolve( lua_State *L )
+{
+   return luagi_reference_gen_resolve( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_owner( lua_State *L )
+{
+   return luagi_reference_gen_owner( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_symbolic_set_target( lua_State *L )
+{
+   return luagi_reference_gen_symbolic_set_target( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_set_target( lua_State *L )
+{
+   return luagi_reference_gen_set_target( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_rename( lua_State *L )
+{
+   return luagi_reference_gen_rename( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_delete( lua_State *L )
+{
+   return luagi_reference_gen_delete( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_is_branch( lua_State *L )
+{
+   return luagi_reference_gen_is_branch( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_is_remote( lua_State *L )
+{
+   return luagi_reference_gen_is_remote( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_is_tag( lua_State *L )
+{
+   return luagi_reference_gen_is_tag( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_is_note( lua_State *L )
+{
+   return luagi_reference_gen_is_note( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_peel( lua_State *L )
+{
+   return luagi_reference_gen_peel( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_shorthand( lua_State *L )
+{
+   return luagi_reference_gen_shorthand( L, LUAGI_BRANCH_FUNCS );
+}
+
+int luagi_reference_branch_free( lua_State *L )
+{
+   return luagi_reference_gen_free( L, LUAGI_BRANCH_FUNCS );
 }
 

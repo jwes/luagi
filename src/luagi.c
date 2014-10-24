@@ -103,6 +103,8 @@ static const struct luaL_Reg repofuncs [] = {
    { "iterate_references", luagi_reference_iterator },
    { "reference_has_log", luagi_reference_has_log },
    { "reference_ensure_log", luagi_reference_ensure_log },
+   { "remove_reference", luagi_reference_remove },
+   { "list_references", luagi_reference_list },
 
    //merge
    { "merge_base", luagi_merge_base },

@@ -182,30 +182,30 @@ int luagi_reference_create_matching( lua_State *L )
 
 
 // reference methods
-int luagi_reference_target( lua_State *L )
+int luagi_reference_gen_target( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    const git_oid *oid = git_reference_target( *ref );
    return luagi_push_oid( L, oid );
 }
 
-int luagi_reference_target_peel( lua_State *L )
+int luagi_reference_gen_target_peel( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    const git_oid *oid = git_reference_target_peel( *ref );
    return luagi_push_oid( L, oid );
 }
 
-int luagi_reference_symbolic_target( lua_State *L )
+int luagi_reference_gen_symbolic_target( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    lua_pushstring( L, git_reference_symbolic_target( *ref ) );
    return 1;
 }
 
-int luagi_reference_type( lua_State *L )
+int luagi_reference_gen_type( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    git_ref_t type = git_reference_type( *ref );
    if( type == GIT_REF_INVALID )
    {
@@ -222,16 +222,16 @@ int luagi_reference_type( lua_State *L )
    return 1;
 }
 
-int luagi_reference_name( lua_State *L )
+int luagi_reference_gen_name( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    lua_pushstring( L, git_reference_name( *ref ) );
    return 1;
 }
 
-int luagi_reference_resolve( lua_State *L )
+int luagi_reference_gen_resolve( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
    if( git_reference_resolve( out, *ref ) )
    {
@@ -242,9 +242,9 @@ int luagi_reference_resolve( lua_State *L )
    return 1;
 }
 
-int luagi_reference_owner( lua_State *L )
+int luagi_reference_gen_owner( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    git_repository **owner = lua_newuserdata( L, sizeof( git_repository * ) );
    *owner = git_reference_owner( *ref );
    if( *owner == NULL )
@@ -256,9 +256,9 @@ int luagi_reference_owner( lua_State *L )
    return 1;
 }
 
-int luagi_reference_symbolic_set_target( lua_State *L )
+int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    const char *target = luaL_checkstring( L, 2 );
    git_signature sig;
    if( table_to_signature( L, &sig, 3 ) )
@@ -277,9 +277,9 @@ int luagi_reference_symbolic_set_target( lua_State *L )
    return 1;
 }
 
-int luagi_reference_set_target( lua_State *L )
+int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    git_oid oid;
    if( luagi_check_oid( &oid, L, 2 ) )
    {
@@ -302,9 +302,9 @@ int luagi_reference_set_target( lua_State *L )
    return 1;
 }
 
-int luagi_reference_rename( lua_State *L )
+int luagi_reference_gen_rename( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    const char *name = luaL_checkstring( L, 2 );
    git_signature sig;
    if( table_to_signature( L, &sig, 3 ) )
@@ -324,9 +324,9 @@ int luagi_reference_rename( lua_State *L )
    return 1;
 }
 
-int luagi_reference_delete( lua_State *L )
+int luagi_reference_gen_delete( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    if( git_reference_delete( *ref ) )
    {
       ERROR_ABORT( L )
@@ -415,36 +415,36 @@ int luagi_reference_foreach( lua_State *L )
    return 0;   
 }
 
-static int generic_is_func( lua_State *L, int (*func)(const git_reference *ref ) )
+static int generic_is_func( lua_State *L, const char *tablename, int (*func)(const git_reference *ref ) )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    lua_pushboolean( L, func( *ref ) );
    return 1;
 }
 
-int luagi_reference_is_branch( lua_State *L )
+int luagi_reference_gen_is_branch( lua_State *L, const char *tablename )
 {
-   return generic_is_func( L, git_reference_is_branch );
+   return generic_is_func( L, tablename, git_reference_is_branch );
 }
 
-int luagi_reference_is_remote( lua_State *L )
+int luagi_reference_gen_is_remote( lua_State *L, const char *tablename )
 {
-   return generic_is_func( L, git_reference_is_remote );
+   return generic_is_func( L, tablename, git_reference_is_remote );
 }
 
-int luagi_reference_is_tag( lua_State *L )
+int luagi_reference_gen_is_tag( lua_State *L, const char *tablename )
 {
-   return generic_is_func( L, git_reference_is_tag );
+   return generic_is_func( L, tablename, git_reference_is_tag );
 }
 
-int luagi_reference_is_note( lua_State *L )
+int luagi_reference_gen_is_note( lua_State *L, const char *tablename )
 {
-   return generic_is_func( L, git_reference_is_note );
+   return generic_is_func( L, tablename, git_reference_is_note );
 }
 
-int luagi_reference_peel( lua_State *L )
+int luagi_reference_gen_peel( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    git_otype type = luagi_otype_from_string( luaL_checkstring( L, 2 ) );
 
    git_object **out = lua_newuserdata( L, sizeof( git_object *) );
@@ -458,16 +458,16 @@ int luagi_reference_peel( lua_State *L )
    return 1;
 }
 
-int luagi_reference_shorthand( lua_State *L )
+int luagi_reference_gen_shorthand( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    lua_pushstring( L, git_reference_shorthand( *ref ) );
    return 1;
 }
 
-int luagi_reference_free( lua_State *L )
+int luagi_reference_gen_free( lua_State *L, const char *tablename )
 {
-   git_reference **ref = check_ref_at( L, 1 );
+   git_reference **ref = luaL_checkudata( L, 1, tablename );
    git_reference_free( *ref );
    return 0;
 }
@@ -602,4 +602,94 @@ int luagi_reference_is_valid_name( lua_State *L )
    return 1;
 }
 
+
+int luagi_reference_target( lua_State *L )
+{
+   return luagi_reference_gen_target( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_target_peel( lua_State *L )
+{
+   return luagi_reference_gen_target_peel( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_symbolic_target( lua_State *L )
+{
+   return luagi_reference_gen_symbolic_target( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_type( lua_State *L )
+{
+   return luagi_reference_gen_type( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_name( lua_State *L )
+{
+   return luagi_reference_gen_name( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_resolve( lua_State *L )
+{
+   return luagi_reference_gen_resolve( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_owner( lua_State *L )
+{
+   return luagi_reference_gen_owner( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_symbolic_set_target( lua_State *L )
+{
+   return luagi_reference_gen_symbolic_set_target( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_set_target( lua_State *L )
+{
+   return luagi_reference_gen_set_target( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_rename( lua_State *L )
+{
+   return luagi_reference_gen_rename( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_delete( lua_State *L )
+{
+   return luagi_reference_gen_delete( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_is_branch( lua_State *L )
+{
+   return luagi_reference_gen_is_branch( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_is_remote( lua_State *L )
+{
+   return luagi_reference_gen_is_remote( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_is_tag( lua_State *L )
+{
+   return luagi_reference_gen_is_tag( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_is_note( lua_State *L )
+{
+   return luagi_reference_gen_is_note( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_peel( lua_State *L )
+{
+   return luagi_reference_gen_peel( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_shorthand( lua_State *L )
+{
+   return luagi_reference_gen_shorthand( L, LUAGI_REFERENCE_FUNCS );
+}
+
+int luagi_reference_free( lua_State *L )
+{
+   return luagi_reference_gen_free( L, LUAGI_REFERENCE_FUNCS );
+}
 

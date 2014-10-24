@@ -3,6 +3,28 @@
 #include <lua.h>
 #include <lauxlib.h>
 
+// branch is a reference too but lua checks the metatablename
+int luagi_reference_gen_target( lua_State *L, const char *tablename );
+int luagi_reference_gen_target_peel( lua_State *L, const char *tablename );
+int luagi_reference_gen_symbolic_target( lua_State *L, const char *tablename );
+int luagi_reference_gen_type( lua_State *L, const char *tablename );
+int luagi_reference_gen_name( lua_State *L, const char *tablename );
+int luagi_reference_gen_resolve( lua_State *L, const char *tablename );
+int luagi_reference_gen_owner( lua_State *L, const char *tablename );
+int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename );
+int luagi_reference_gen_set_target( lua_State *L, const char *tablename );
+int luagi_reference_gen_rename( lua_State *L, const char *tablename );
+int luagi_reference_gen_delete( lua_State *L, const char *tablename );
+int luagi_reference_gen_foreach( lua_State *L, const char *tablename );
+int luagi_reference_gen_is_branch( lua_State *L, const char *tablename );
+int luagi_reference_gen_is_remote( lua_State *L, const char *tablename );
+int luagi_reference_gen_is_tag( lua_State *L, const char *tablename );
+int luagi_reference_gen_is_note( lua_State *L, const char *tablename );
+int luagi_reference_gen_peel( lua_State *L, const char *tablename );
+int luagi_reference_gen_shorthand( lua_State *L, const char *tablename );
+int luagi_reference_gen_free( lua_State *L, const char *tablename );
+
+// stub classes called by reference directly
 int luagi_reference_lookup( lua_State *L );
 int luagi_reference_name_to_id( lua_State *L );
 int luagi_reference_dwim( lua_State *L );
@@ -27,7 +49,6 @@ int luagi_reference_delete( lua_State *L );
 int luagi_reference_remove( lua_State *L );
 int luagi_reference_list( lua_State *L );
 int luagi_reference_foreach( lua_State *L );
-int luagi_reference_foreach_name( lua_State *L );
 int luagi_reference_is_branch( lua_State *L );
 int luagi_reference_is_remote( lua_State *L );
 int luagi_reference_is_tag( lua_State *L );
@@ -67,9 +88,6 @@ static const struct luaL_Reg luagi_reference_funcs [] = {
    { "set_target", luagi_reference_set_target },
    { "rename", luagi_reference_rename },
    { "delete", luagi_reference_delete },
-   { "remove", luagi_reference_remove },
-   { "list", luagi_reference_list },
-   { "foreach", luagi_reference_foreach },
    { "is_branch", luagi_reference_is_branch },
    { "is_remote", luagi_reference_is_remote },
    { "is_tag",  luagi_reference_is_tag },
