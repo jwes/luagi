@@ -23,14 +23,13 @@ int luagi_create_branch( lua_State *L )
    git_repository** repo = checkrepo(L, 1);
    const char* branch_name = luaL_checkstring(L, 2);
    git_commit** target = ( git_commit** ) luaL_checkudata( L, 3, LUAGI_COMMIT_FUNCS);
-   int force = lua_toboolean(L, 4);
    git_signature sig;
-   int ret = table_to_signature( L, &sig, 5 );
+   int ret = table_to_signature( L, &sig, 4 );
    if( ret != 0 )
    {
-      luaL_error( L, "failed to create a signature %d", ret);
-      return 0;
+      ERROR_ABORT( L )
    }
+   int force = lua_toboolean(L, 5);
    const char* log_message = luaL_optstring(L, 6, NULL);
 
    git_reference** out = (git_reference**) lua_newuserdata(L, sizeof(git_reference*) );
@@ -39,9 +38,7 @@ int luagi_create_branch( lua_State *L )
                force, &sig, log_message);
    if( ret != 0 )
    {
-      lua_pushnil(L);
-      lua_pushstring(L, "Could not create the branch " );
-      return 2;
+      ERROR_PUSH( L )
    }
 
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );

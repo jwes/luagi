@@ -2,7 +2,25 @@ local luagi = require( "luagi" )
 local test_helper = require( "test_helper" )
 
 describe( "branch #branch", function() 
-   pending("luagi_create_branch") 
+   local repo = nil
+   setup( function()
+      test_helper.extract()
+      repo = luagi.open( test_helper.path )
+   end)
+   describe("create branch", function()
+      local name = "new_branch"
+      local commitId = "3a3e73745d1a2ba679362d51e0a090a3ee03aad6"
+      local commit = repo:lookup_commit( commitId )
+      local branch = repo:branch( name, commit, { name = "tester", email = "mctest@test.tt"} )
+
+      it("should have the name", function()
+         assert.are.equal( name, branch:name() )
+      end)
+
+      it( "should habe the same commitId", function()
+         assert.are.equal( commitId, branch:target() )
+      end)
+   end)
 end)
 
 describe( "branch lookup", function() 
