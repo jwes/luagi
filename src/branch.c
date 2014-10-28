@@ -71,35 +71,19 @@ int luagi_move_branch( lua_State *L )
    const char* log_message = luaL_optstring(L, 4, NULL);
    int force = lua_toboolean(L, 5 );
 
-   /* get username from table */
-   lua_pushstring( L, "name");
-   lua_gettable( L, 3 );
-   const char* name = luaL_checkstring( L, -1);
-   /* get email from table */
-   lua_pushstring( L, "email");
-   lua_gettable( L, 3 );
-   const char* email = luaL_checkstring( L, -1 );
-
-   git_signature* sig;
-   int ret = git_signature_now( &sig, name, email );
+   git_signature sig;
+   int ret = table_to_signature( L, &sig, 3 );
    if( ret != 0 )
    {
-      luaL_error( L, "failed to create a signature %d", ret);
+      ERROR_ABORT( L )
       return 0;
    }
 
    git_reference** out = (git_reference**) lua_newuserdata(L, sizeof(git_reference*) );
-   ret = git_branch_move( out, *ref, to_name, force, sig, log_message);
-   git_signature_free( sig );
+   ret = git_branch_move( out, *ref, to_name, force, &sig, log_message);
    if( ret != 0 )
    {
-      if( ret == GIT_EEXISTS ){
-         luaL_error( L, "moving failed, branch with name %s already exists, use force if you are sure what you are doing", to_name  );
-      }
-      else
-      {
-         luaL_error( L, "moving failed %d", ret );
-      }
+      ERROR_PUSH( L )
    }
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );
@@ -136,7 +120,8 @@ int luagi_branches( lua_State *L )
    int ret = git_branch_iterator_new( iter, *repo, flags);
    if( ret != 0 )
    { 
-      luaL_error(L, "can't open iterator, error %d", ret);
+      ERROR_ABORT( L )
+      return 0;
    }
 
    lua_pushcclosure( L, branch_iter, 1 );
@@ -187,17 +172,7 @@ int luagi_branch_upstream_get( lua_State *L )
    int ret = git_branch_upstream( out, *ref );
    if( ret != 0 )
    {
-      if( ret == GIT_ENOTFOUND )
-      {
-         lua_pushnil( L );
-         lua_pushstring( L, "upstream not found");
-         return 2;
-      } 
-      else 
-      {
-         luaL_error( L, "error getting upstream %d", ret);
-         return 0;
-      }
+      ERROR_PUSH( L )
    }
    
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
@@ -207,6 +182,7 @@ int luagi_branch_upstream_get( lua_State *L )
 
 int luagi_branch_upstream_set( lua_State *L )
 {
+   //TODO set upstream
    lua_pushnil( L );
    return 1;
 }
@@ -226,17 +202,7 @@ int luagi_branch_lookup( lua_State *L )
    int ret = git_branch_lookup( out, *repo, branch_name, type );
    if( ret != 0 )
    {
-      if( ret == GIT_ENOTFOUND )
-      {
-         lua_pushnil( L );
-         lua_pushfstring( L, "branch %s not found", branch_name );
-         return 2;
-      }
-      else
-      {
-         luaL_error( L, "branch lookup failed %d", ret);
-         return 0;
-      }
+      ERROR_PUSH( L )
    }
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );

@@ -55,7 +55,60 @@ describe( "branch lookup", function()
    
 end) 
 
-describe( "delete #branch", function() pending("luagi_delete_branch ") end)
-describe( "move #branch", function() pending("luagi_move_branch ") end)
+describe( "delete #branch", function() 
+   local repo = nil
+   local to_delete = nil
+   local name = "new_branch"
+   local commitId = "3a3e73745d1a2ba679362d51e0a090a3ee03aad6"
+   local signature = { name = "tester", email = "mctest@test.tt"}
+
+   setup( function()
+      test_helper.extract()
+      repo = luagi.open( test_helper.path )
+      local commit = repo:lookup_commit( commitId )
+      to_delete = repo:branch( name, commit, signature ) 
+   end)
+
+   it( "a branch lookup should fail after deletion", function()
+      to_delete:delete();
+
+      local branch, err = repo:lookup_branch( name )
+
+      assert.is.falsy( branch )
+      assert.are.equal( "string", type( err ) )
+   end)
+end)
+
+describe( "move #branch", function() 
+   local repo = nil
+   local to_move = nil
+   local name = "move_branch"
+   local new_name = "moved_branch"
+   local commitId = "3a3e73745d1a2ba679362d51e0a090a3ee03aad6"
+   local signature = { name = "tester", email = "mctest@test.tt"}
+
+   setup( function()
+      test_helper.setup()
+      repo = luagi.open( test_helper.path )
+      local commit = repo:lookup_commit( commitId )
+      to_move = repo:branch( name, commit, signature ) 
+   end)
+
+   it( "should be found under the new name", function()
+      local branch, err = to_move:move( new_name, signature )
+      assert.are.equal( "userdata", type( branch ) )
+      assert.are.equal( new_name, branch:name() )
+      assert.is.falsy( err )
+
+      local old_branch, err = repo:lookup_branch( name )
+      assert.is.falsy( old_branch )
+      assert.are.equal( "string", type( err ) )
+
+      local new_branch, err = repo:lookup_branch( new_name )
+      assert.are.equal( "userdata", type( new_branch ) )
+      assert.are.equal( commitId, new_branch:target() )
+   end)
+end)
+
 describe( "get_upstream #branch", function() pending("luagi_branch_upstream_get ") end)
 describe( "set_upstream #branch", function() pending("luagi_branch_upstream_set ") end)
