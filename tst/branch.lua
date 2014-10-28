@@ -110,5 +110,40 @@ describe( "move #branch", function()
    end)
 end)
 
-describe( "get_upstream #branch", function() pending("luagi_branch_upstream_get ") end)
-describe( "set_upstream #branch", function() pending("luagi_branch_upstream_set ") end)
+describe( "upstream #branch", function() 
+   local repo = nil
+   local name = "upstream"
+   local commitId = "3a3e73745d1a2ba679362d51e0a090a3ee03aad6"
+   local signature = { name = "tester", email = "mctest@test.tt"}
+   local branch = nil
+
+   setup( function()
+      test_helper.setup()
+      repo = luagi.open( test_helper.path )
+      local commit = repo:lookup_commit( commitId )
+      branch = repo:branch( name, commit, signature )
+   end)
+
+   describe( "no upstream", function()
+      up = branch:get_upstream()
+      it( "should have no upstream", function()
+         assert.is.falsy( up )
+      end)
+   end)
+
+   describe( "new upstream", function()
+      branch:set_upstream( "master" )
+      it( "should return userdata", function()
+         assert.are.equal("userdata", type( branch:get_upstream() ))
+      end)
+   end)
+
+   describe( "new upstream", function()
+      it( "should have error", function()
+         assert.has_error( function()
+            branch:set_upstream( "not-existant" )
+         end)
+      end)
+   end)
+  
+end)

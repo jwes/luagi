@@ -182,9 +182,13 @@ int luagi_branch_upstream_get( lua_State *L )
 
 int luagi_branch_upstream_set( lua_State *L )
 {
-   //TODO set upstream
-   lua_pushnil( L );
-   return 1;
+   git_reference** ref = checkbranch(L);
+   const char *upstream = luaL_checkstring( L, 2 );
+   if( git_branch_set_upstream( *ref, upstream ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
 }
 
 int luagi_branch_lookup( lua_State *L )
