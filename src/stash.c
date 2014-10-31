@@ -10,7 +10,7 @@ int luagi_stash_save( lua_State *L )
    git_repository **repo = checkrepo( L, 1 ); 
    
    luaL_checktype( L, 2, LUA_TTABLE );
-   git_signature stasher;
+   git_signature *stasher;
    if( table_to_signature( L, &stasher, 2 ) )
    {
       ERROR_PUSH( L )
@@ -27,7 +27,9 @@ int luagi_stash_save( lua_State *L )
    }
 
    git_oid out;
-   if( git_stash_save( &out, *repo, &stasher, message, flags ) )
+   int ret = git_stash_save( &out, *repo, stasher, message, flags );
+   git_signature_free( stasher );
+   if( ret )
    {
       ERROR_PUSH( L )
    }

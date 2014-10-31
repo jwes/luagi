@@ -1,4 +1,5 @@
 #include <git2/tag.h>
+#include <git2/signature.h>
 
 #include "tag.h"
 #include "luagi.h"
@@ -43,13 +44,15 @@ int luagi_tag_create( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    const char *tag_name = luaL_checkstring( L, 2 );
    git_object **obj = checkobject_at( L, 3 );
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 4 );
    const char *message = luaL_checkstring( L, 5 );
    int force = lua_toboolean( L, 6 );
 
    git_oid out;
-   if( git_tag_create( &out, *repo, tag_name, *obj, &sig, message, force ) )
+   int ret = git_tag_create( &out, *repo, tag_name, *obj, sig, message, force );
+   git_signature_free( sig );
+   if(ret)
    {
       ERROR_PUSH( L )
    }
@@ -61,12 +64,14 @@ int luagi_tag_annotation_create( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    const char *tag_name = luaL_checkstring( L, 2 );
    git_object **obj = checkobject_at( L, 3 );
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 4 );
    const char *message = luaL_checkstring( L, 5 );
 
    git_oid out;
-   if( git_tag_annotation_create( &out, *repo, tag_name, *obj, &sig, message  ) )
+   int ret = git_tag_annotation_create( &out, *repo, tag_name, *obj, sig, message  );
+   git_signature_free( sig );
+   if( ret )
    {
       ERROR_PUSH( L )
    }

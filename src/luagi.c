@@ -3,6 +3,8 @@
 #include <git2/signature.h>   
 
 #include <string.h>
+#include <stdio.h>
+
 #include "luagi.h"
 #include "repository.h"
 #include "common.h"
@@ -255,6 +257,7 @@ static const struct luaL_Reg mylib [] = {
    { "parse_int64", luagi_config_parse_int64 },
 
    { "patch_buffers", luagi_patch_from_buffers },
+   { "create_tree_builder", luagi_tree_builder_create },
    { NULL, NULL } /*sentinel*/
 };
 
@@ -366,7 +369,7 @@ int signature_to_table( lua_State *L, const git_signature *sig )
    lua_setfield( L, -2, TIME_OFF );
    return 0;
 }
-int table_to_signature( lua_State *L, git_signature *sig, int tablepos )
+int table_to_signature( lua_State *L, git_signature **sig, int tablepos )
 {
    lua_getfield( L, tablepos, NAME );
    const char *name = luaL_checkstring( L, -1 );
@@ -377,13 +380,14 @@ int table_to_signature( lua_State *L, git_signature *sig, int tablepos )
    lua_getfield( L, tablepos, TIME_OFF );
    int offset = lua_tointeger( L, -1 );
 
+   lua_pop( L, 4 );
    if( time == 0 )
    {
-      return git_signature_now( &sig, name, email );
+      return git_signature_now( sig, name, email );
    }
    else 
    {
-      return git_signature_new( &sig, name, email, time, offset );
+      return git_signature_new( sig, name, email, time, offset );
    }
 }
 

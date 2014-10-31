@@ -35,7 +35,7 @@
       (git_remote**) luaL_checkudata( L, 1, LUAGI_REMOTE_FUNCS )
 
 int signature_to_table( lua_State *L, const git_signature* sig);
-int table_to_signature( lua_State *L, git_signature* sig, int position );
+int table_to_signature( lua_State *L, git_signature **sig, int position );
 
 void luagi_lua_list_from_string( lua_State *L, git_strarray *array );
 git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx );

@@ -1,3 +1,4 @@
+#include <git2/signature.h>
 #include "reflog.h"
 #include "luagi.h"
 #include "oid.h"
@@ -61,11 +62,13 @@ int luagi_reflog_append( lua_State *L )
    git_reflog **log = checkreflog( L );
    git_oid oid;
    luagi_check_oid( &oid, L, 2 );
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 3 );
    const char *msg = luaL_checkstring( L, 4 );
 
-   if( git_reflog_append( *log, &oid, &sig, msg ) )
+   int ret = git_reflog_append( *log, &oid, sig, msg );
+   git_signature_free( sig );
+   if( ret )
    {
       ERROR_ABORT( L )
    }

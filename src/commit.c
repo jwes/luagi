@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <lauxlib.h>
 #include <git2/commit.h>
 #include <git2/oid.h>
@@ -126,6 +127,9 @@ int luagi_commit_parent( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
+   // lua to c
+   n--;
+
    git_commit** parent = (git_commit**) lua_newuserdata( L, sizeof( git_commit* ) );
    int ret = git_commit_parent( parent, *commit, n );
    if( ret != 0 )
@@ -143,6 +147,10 @@ int luagi_commit_parent_id( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
+  
+   //luas index starts with 1
+   n--;
+
    const git_oid* oid = git_commit_parent_id( *commit, n );
    return luagi_push_oid( L, oid );
 }
@@ -151,20 +159,15 @@ int luagi_commit_nth_gen_ancestor( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int n = luaL_checkunsigned( L, 2 );
+   //lua to c 
+   n--;
    
    git_commit** anc = (git_commit**) lua_newuserdata( L, sizeof( git_commit* ) );
 
    int ret = git_commit_nth_gen_ancestor( anc, *commit, n );
    if( ret != 0 )
    {
-      lua_pushnil( L );
-      char* errf = "can't find ancestor on level %d : %d";
-      if( ret == GIT_ENOTFOUND )
-      {
-         errf = "there is no ancestor on level %d : %d";
-      }
-
-      lua_pushfstring( L, errf, n, ret );
+      ERROR_PUSH( L )
    }
    luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
    lua_setmetatable( L, -2 );
@@ -174,35 +177,36 @@ int luagi_commit_nth_gen_ancestor( lua_State *L )
 int luagi_commit_create( lua_State *L )
 {
    git_repository** repo = checkrepo( L, 1 );
-   const char* update_ref = luaL_optstring( L, 2, NULL );
-   git_signature author;
-   int ret = table_to_signature( L, &author, 3 );
-   git_signature committer;
-   ret = table_to_signature( L, &committer, 4 );
-   const char* encoding = luaL_optstring( L, 5, NULL );
-   const char* message = luaL_checkstring( L, 6 );
-   git_tree** tree = (git_tree**) luaL_checkudata( L, 7, LUAGI_TREE_FUNCS );
+   git_signature *author;
+   int ret = table_to_signature( L, &author, 2 );
+   git_signature *committer; 
+   ret = table_to_signature( L, &committer, 3 );
+   const char* message = luaL_checkstring( L, 4 );
+   git_tree** tree = (git_tree**) luaL_checkudata( L, 5, LUAGI_TREE_FUNCS );
    
    // table of parents
-   luaL_checktype( L, 8, LUA_TTABLE );
-   unsigned int n = luaL_len( L, 8 );
+   luaL_checktype( L, 6, LUA_TTABLE );
+   unsigned int n = luaL_len( L, 6 );
    const git_commit* parents[n];
 
-   for( unsigned int i = 1; i <= n; i++ )
+   for( unsigned int i = 0; i < n; i++ )
    {
-      lua_rawgeti( L, 8, i );
+      lua_rawgeti( L, 6, i + 1 );
       parents[i] = *( (git_commit**) luaL_checkudata( L, -1, LUAGI_COMMIT_FUNCS ) );
    }
+   lua_pop( L, n );
 
+   const char* update_ref = luaL_optstring( L, 7, NULL );
+   const char* encoding = luaL_optstring( L, 8, NULL );
    git_oid oid;
-   ret = git_commit_create( &oid, *repo, update_ref, &author,
-                      &committer, encoding, message, *tree,
+   ret = git_commit_create( &oid, *repo, update_ref, author,
+                      committer, encoding, message, *tree,
                       n, parents );
+   git_signature_free( author );
+   git_signature_free( committer );
    if( ret != 0 )
    {
-      lua_pushnil( L );
-      lua_pushfstring( L, "commit failed: %d", ret );
-      return 2;
+      ERROR_PUSH( L )
    }
    return luagi_push_oid( L, &oid );
 }
@@ -225,18 +229,18 @@ int luagi_commit_amend( lua_State *L )
 
    lua_getfield( L, 2, "update_ref");
    const char* update_ref = luaL_optstring( L, -1, NULL );
-   git_signature* author = NULL;
+   git_signature* author;
    int ret = 0;
    lua_getfield( L, 2, "author" );
    if( lua_istable( L, -1 ) )
    {
-      ret = table_to_signature( L, author, -1 );
+      ret = table_to_signature( L, &author, -1 );
    }
-   git_signature* committer = NULL;
+   git_signature* committer;
    lua_getfield( L, 2, "committer" );
    if( lua_istable( L, -1 ) )
    {
-      ret = table_to_signature( L, committer, -1 );
+      ret = table_to_signature( L, &committer, -1 );
    }
 
    lua_getfield( L, 2, "message_encoding" );
@@ -255,6 +259,8 @@ int luagi_commit_amend( lua_State *L )
    // use the table and modify the commit
    git_oid outid;
    ret = git_commit_amend( &outid, *commit, update_ref, author, committer, message_encoding, message, tree );
+   git_signature_free( author );
+   git_signature_free( committer );
    if( ret != 0 )
    {
       lua_pushnil( L );

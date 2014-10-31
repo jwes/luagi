@@ -1,4 +1,5 @@
 #include <git2/notes.h>
+#include <git2/signature.h>
 #include "note.h"
 #include "luagi.h"
 #include "oid.h"
@@ -112,7 +113,7 @@ int luagi_note_read( lua_State *L )
 int luagi_note_create( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   git_signature author, committer;
+   git_signature *author, *committer;
    table_to_signature( L, &author, 2 ); 
    table_to_signature( L, &committer, 3 ); 
 
@@ -122,7 +123,11 @@ int luagi_note_create( lua_State *L )
    const char *note = luaL_checkstring( L, 6 );
    int force = lua_toboolean( L, 7 );
 
-   if( git_note_create( &out, *repo, &author, &committer, notes_ref, &oid, note, force ) )
+   int ret = git_note_create( &out, *repo, author, committer, notes_ref, &oid, note, force );
+
+   git_signature_free( author );
+   git_signature_free( committer );
+   if( ret )
    {
       ERROR_PUSH( L )
    }
@@ -134,14 +139,18 @@ int luagi_note_remove( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    const char *notes_ref = luaL_checkstring( L, 2 );
-   git_signature author, committer;
+   git_signature *author, *committer;
    table_to_signature( L, &author, 3); 
    table_to_signature( L, &committer, 4 ); 
 
    git_oid oid;
    luagi_check_oid( &oid, L, 5 );
 
-   if( git_note_remove( *repo, notes_ref, &author, &committer, &oid ) )
+   int ret = git_note_remove( *repo, notes_ref, author, committer, &oid );
+   git_signature_free( author );
+   git_signature_free( committer );
+
+   if( ret )
    {
       ERROR_ABORT( L )
    }

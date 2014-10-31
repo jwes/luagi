@@ -388,19 +388,19 @@ static int call_with_sig( lua_State *L, int (*func)( git_remote *remote, const g
 { 
    git_remote **rem = checkremote( L );
    luaL_checktype( L, 2, LUA_TTABLE );
-   git_signature sig;
+   git_signature *sig;
 
    table_to_signature( L, &sig, 2 );
 
    const char* reflog_message = luaL_optstring( L, 3, NULL );
 
-   if( func( *rem, &sig, reflog_message ))
+   if( func( *rem, sig, reflog_message ))
    {
-      git_signature_free( &sig );
+      git_signature_free( sig );
       const git_error *err = giterr_last();
       luaL_error( L, err->message );
    }
-   git_signature_free( &sig );
+   git_signature_free( sig );
    return 0;
 }
 

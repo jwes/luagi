@@ -1,4 +1,5 @@
 #include <git2/repository.h>
+#include <git2/signature.h>
 
 #include <lauxlib.h>
 
@@ -488,11 +489,13 @@ int luagi_repository_set_head( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    const char *refname = luaL_checkstring( L, 2 );
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 3 );
    const char *log_message = luaL_checkstring( L, 4 );
 
-   if( git_repository_set_head( *repo, refname, &sig, log_message ) )
+   int ret = git_repository_set_head( *repo, refname, sig, log_message );
+   git_signature_free( sig );
+   if( ret )
    {
       ERROR_ABORT( L )
    }
@@ -504,11 +507,13 @@ int luagi_repository_set_head_detached( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    git_oid oid;
    luagi_check_oid( &oid, L, 2 );
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 3 );
    const char *log_message = luaL_checkstring( L, 4 );
 
-   if( git_repository_set_head_detached( *repo, &oid, &sig, log_message ) )
+   int ret = git_repository_set_head_detached( *repo, &oid, sig, log_message );
+   git_signature_free( sig );
+   if( ret )
    {
       ERROR_ABORT( L )
    }
@@ -518,11 +523,13 @@ int luagi_repository_set_head_detached( lua_State *L )
 int luagi_repository_detach_head( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 3 );
    const char *log_message = luaL_checkstring( L, 4 );
 
-   if( git_repository_detach_head( *repo, &sig, log_message ) )
+   int ret = git_repository_detach_head( *repo, sig, log_message );
+   git_signature_free( sig );
+   if( ret )
    {
       ERROR_ABORT( L )
    }

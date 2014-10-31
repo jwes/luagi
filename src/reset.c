@@ -1,4 +1,5 @@
 #include <string.h>
+#include <git2/signature.h>
 
 #include "reset.h"
 #include "luagi.h"
@@ -31,11 +32,13 @@ int luagi_reset( lua_State *L )
    git_object **target = checkobject_at( L, 2 );
    git_reset_t reset = luagi_check_resettype( L, 3 );
 
-   git_signature sig;
+   git_signature *sig;
    table_to_signature( L, &sig, 4 );
    const char *log_message = luaL_optstring( L, 5, NULL );
 
-   if( git_reset( *repo, *target, reset, &sig, log_message ) )
+   int ret = git_reset( *repo, *target, reset, sig, log_message );
+   git_signature_free( sig );
+   if( ret )
    {
       ERROR_ABORT( L )
    }

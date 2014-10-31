@@ -79,6 +79,7 @@ static const struct luaL_Reg luagi_tree_funcs [] = {
    { "entry_byindex", luagi_tree_entry_byindex },
    { "entry_bypath", luagi_tree_entry_bypath },
    { "walk", luagi_tree_walk },
+   { "create_builder", luagi_tree_builder_create },
    { "__gc", luagi_tree_gc },
    { NULL, NULL }
 };

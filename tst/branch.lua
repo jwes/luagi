@@ -63,7 +63,7 @@ describe( "delete #branch", function()
    local signature = { name = "tester", email = "mctest@test.tt"}
 
    setup( function()
-      test_helper.extract()
+      test_helper.setup()
       repo = luagi.open( test_helper.path )
       local commit = repo:lookup_commit( commitId )
       to_delete = repo:branch( name, commit, signature ) 

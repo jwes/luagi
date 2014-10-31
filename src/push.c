@@ -1,5 +1,6 @@
 #include <git2/buffer.h>
 #include <git2/push.h>
+#include <git2/signature.h>
 #include "push.h"
 #include "luagi.h"
 #include "remote.h"
@@ -63,11 +64,13 @@ int luagi_push_add_refspec( lua_State *L )
 int luagi_push_update_tips( lua_State *L )
 {
    git_push **push = checkpush_at( L, 1 );
-   git_signature signature;
+   git_signature *signature;
    table_to_signature( L, &signature,  2 );
    const char *message = luaL_checkstring( L, 3 );
 
-   if( git_push_update_tips( *push, &signature, message ) )
+   int ret = git_push_update_tips( *push, signature, message );
+   git_signature_free( signature );
+   if( ret )
    {
       ERROR_ABORT( L )
    }

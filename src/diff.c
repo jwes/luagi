@@ -705,7 +705,7 @@ static int luagi_diff_format_email_init_options( lua_State *L, int index, git_di
    lua_getfield( L, index, AUTHOR );
    if( lua_type( L, -1 ) == LUA_TTABLE )
    {
-      table_to_signature( L, (git_signature *)opts->author, -1 );
+      table_to_signature( L, (git_signature **)&opts->author, -1 );
    }
 
    return ret;
