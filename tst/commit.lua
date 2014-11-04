@@ -28,7 +28,27 @@ describe( "commit #create #commit", function()
    end)
    
 
-   describe( "amend #commit", function() pending("luagi_commit_amend ") end)
+   describe( "amend #commit", function() 
+      local oldmsg = parent:message()
+      
+      local options = {}
+      options.message = message 
+      local oid, err = parent:amend( options )
+      local new_parent = repo:lookup_commit( oid )
+
+      it( "should not have an error", function()
+         assert.is.falsy( err )
+      end)
+
+      it( "should have a new id", function()
+         assert.are.not_equal( parentId, oid )
+      end)
+
+      it( "should be equal", function()
+         assert.are.equal( message, new_parent:message() )
+      end)
+
+   end)
 end)
 
 describe( "commit getter", function()
