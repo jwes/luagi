@@ -108,20 +108,40 @@ end)
 
 describe( "tree_builder #tree", function()
    local builder = nil
+   local filename = "new_file"
+   local path = test_helper.path.."/some/"..filename
+   local filehash = nil
    setup( function()
       test_helper.extract()
       local repo = luagi.open( test_helper.path )
       local tree = repo:lookup_tree( treeid )
       builder = tree:create_builder()
+
+      local file = io.open( path, "w" )
+      file:write( "some 'random' data" ) 
+      file:close()
+
+      filehash, err = luagi.hashfile( path, "blob" )
    end)
    
    it( "should not be nil", function()
       assert.is.not_nil( builder )
    end)
 
+   it( "should have the right hash", function() 
+      assert.are.equal( "c8c47e4f0b34049547158bc26d0b0fd0f5223a60", filehash )
+   end)
+
    describe( "clear #tree", function() pending("luagi_tree_builder_clear ") end)
    describe( "get #tree", function() pending("luagi_tree_builder_get ") end)
-   describe( "insert #tree", function() pending("luagi_tree_builder_insert ") end)
+   describe( "insert #tree", function()
+      it( "should return an oid", function()
+         local erg, err = builder:insert( filename, filehash, "blob" )
+         assert.is.falsy( err )
+         assert.is.not_nil( erg )
+      end)
+   end)
+      
    describe( "remove #tree", function() pending("luagi_tree_builder_remove ") end)
    describe( "write #tree", function() pending("luagi_tree_builder_write ") end)
    describe( "filter #tree", function() pending("luagi_tree_builder_filter ") end)

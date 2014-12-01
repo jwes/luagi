@@ -1,8 +1,10 @@
+#include <git2/types.h>
 #include <lua.h>
 #include <lauxlib.h>
+#include <string.h>
 #include "tree.h"
-#include <stdio.h>
 #include "oid.h"
+#include "defines.h"
 
 #define checktreebuilder(L) \
       (git_treebuilder**) luaL_checkudata( L, 1, LUAGI_TREE_BUILDER_FUNCS )
@@ -76,21 +78,45 @@ int luagi_tree_builder_insert( lua_State *L )
       lua_pushstring( L, "invalid ref" );
       return 2;
    }
+
    const char* filemode = luaL_checkstring( L, 4 );
-   unsigned int value;
-   if( 1 != sscanf(filemode, "%x", &value) )
+   git_filemode_t mode = 0;
+   if( strncmp( filemode, NEW, strlen( NEW ) ) == 0 ) 
+   {
+      mode = GIT_FILEMODE_NEW;
+   } 
+   else if( strncmp( filemode, TREE, strlen( TREE ) ) == 0 )
+   {
+      mode = GIT_FILEMODE_TREE;
+   }
+   else if( strncmp( filemode, BLOB, strlen( BLOB ) ) == 0 )
+   {
+      mode = GIT_FILEMODE_BLOB;
+   }
+   else if( strncmp( filemode, BLOB_EXECUTABLE, strlen( BLOB_EXECUTABLE ) ) == 0 )
+   {
+      mode = GIT_FILEMODE_BLOB_EXECUTABLE;
+   }
+   else if( strncmp( filemode, LINK, strlen( LINK ) ) == 0 )
+   {
+      mode = GIT_FILEMODE_LINK;
+   }
+   else if( strncmp( filemode, COMMIT, strlen( COMMIT ) ) == 0 )
+   {
+      mode = GIT_FILEMODE_COMMIT;
+   }
+
+   if( mode == 0 )
    {
       lua_pushnil( L );
       lua_pushstring( L, "invalid filemode" );
       return 2;
    }
    const git_tree_entry** entry = (const git_tree_entry**) lua_newuserdata( L, sizeof( git_tree_entry* ) );
-   ret = git_treebuilder_insert( entry, *builder, filename, &oid, (git_filemode_t)value );
+   ret = git_treebuilder_insert( entry, *builder, filename, &oid, mode );
    if( ret != 0 )
    {
-      lua_pushnil( L );
-      lua_pushfstring( L, "error inserting entry -- %d", ret );
-      return 2;
+      ERROR_PUSH( L )
    }
    luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );

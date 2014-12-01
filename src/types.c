@@ -1,42 +1,43 @@
 #include <string.h>
 #include "types.h"
 #include "defines.h"
+
 git_otype luagi_otype_from_string( const char *str )
 {
    git_otype ret = GIT_OBJ_BAD;
-   if( strncmp( str, ANY, strlen( ANY )) )
+   if( strncmp( str, ANY, strlen( ANY )) == 0 )
    {
       ret = GIT_OBJ_ANY;
    }
-   else if( strncmp( str, _EXT1, strlen( _EXT1 )) )
+   else if( strncmp( str, _EXT1, strlen( _EXT1 )) == 0 )
    {
       ret = GIT_OBJ__EXT1;
    }
-   else if( strncmp( str, COMMIT, strlen( COMMIT )) )
+   else if( strncmp( str, COMMIT, strlen( COMMIT )) == 0 )
    {
       ret = GIT_OBJ_COMMIT;
    }
-   else if( strncmp( str, TREE, strlen( TREE )) )
+   else if( strncmp( str, TREE, strlen( TREE )) == 0 )
    {
       ret = GIT_OBJ_TREE;
    }
-   else if( strncmp( str, BLOB, strlen( BLOB )) )
+   else if( strncmp( str, BLOB, strlen( BLOB )) == 0 )
    {
       ret = GIT_OBJ_BLOB;
    }
-   else if( strncmp( str, TAG, strlen( TAG )) )
+   else if( strncmp( str, TAG, strlen( TAG )) == 0 )
    {
       ret = GIT_OBJ_TAG;
    }
-   else if( strncmp( str, _EXT2, strlen( _EXT2 )) )
+   else if( strncmp( str, _EXT2, strlen( _EXT2 )) == 0 )
    {
       ret = GIT_OBJ__EXT2;
    }
-   else if( strncmp( str, OFS_DELTA, strlen( OFS_DELTA )) )
+   else if( strncmp( str, OFS_DELTA, strlen( OFS_DELTA )) == 0 )
    {
       ret = GIT_OBJ_OFS_DELTA;
    }
-   else if( strncmp( str, REF_DELTA, strlen( REF_DELTA )) )
+   else if( strncmp( str, REF_DELTA, strlen( REF_DELTA )) == 0 )
    {
       ret = GIT_OBJ_REF_DELTA;
    }

@@ -134,6 +134,9 @@
 #define OFS_DELTA "ofs_delta"
 #define REF_DELTA "ref_delta"
 
+#define BLOB_EXECUTABLE "blob_executable"
+#define LINK "link"
+
 #define SSH "ssh"
 #define HTTP "http"
 
