@@ -51,7 +51,7 @@ int luagi_tree_builder_get( lua_State *L )
    if( entry == NULL )
    {
       lua_pushnil( L );
-      lua_pushstring( L, "git_treebuilder_get failed" );
+      lua_pushstring( L, "no result found" );
       return 2;
    }
    git_tree_entry** e = (git_tree_entry**) lua_newuserdata( L, sizeof( git_tree_entry*) );
@@ -149,14 +149,14 @@ int luagi_tree_builder_write( lua_State *L )
 struct filter_payload 
 {
    lua_State *L;
-   lua_CFunction function;
+   int function;
 };
 
 static int builder_filter( const git_tree_entry *entry, void *payload )
 {
    struct filter_payload *fp = (struct filter_payload *) payload;
 
-   lua_pushcfunction( fp->L, fp->function);
+   lua_pushvalue( fp->L, fp->function );
    git_tree_entry** e = (git_tree_entry**) lua_newuserdata( fp->L, sizeof( git_tree_entry* ) );
    
    if( git_tree_entry_dup( e, entry ))
@@ -167,25 +167,26 @@ static int builder_filter( const git_tree_entry *entry, void *payload )
    luaL_getmetatable( fp->L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( fp->L, -2 );
 
-   if(lua_pcall( fp->L, 2, 1, 0) )
+   if(lua_pcall( fp->L, 1, 1, 0) )
    {
       luaL_error( fp->L, "failure calling function" );
    }
-   return lua_toboolean( fp->L, -1 );
+   int ret = lua_toboolean( fp->L, -1 );
+   lua_pop( fp->L, 1 );
+   return ret;
 }
 
 int luagi_tree_builder_filter( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
-   if( lua_iscfunction( L, 2 ) == 0 )
+   if( lua_type( L, 2 ) != LUA_TFUNCTION )
    {
       luaL_error( L, "function( tree_entry entry ) parameter required" );
    }
-   lua_CFunction function = lua_tocfunction( L, 2 );
 
    struct filter_payload *payload = (struct filter_payload *) malloc( sizeof( struct filter_payload ) );
    payload->L = L;
-   payload->function = function;
+   payload->function = 2;
 
    git_treebuilder_filter( *builder, builder_filter, payload );
 

@@ -132,8 +132,6 @@ describe( "tree_builder #tree", function()
       assert.are.equal( "c8c47e4f0b34049547158bc26d0b0fd0f5223a60", filehash )
    end)
 
-   describe( "clear #tree", function() pending("luagi_tree_builder_clear ") end)
-   describe( "get #tree", function() pending("luagi_tree_builder_get ") end)
    describe( "insert #tree", function()
       it( "should return an oid", function()
          local erg, err = builder:insert( filename, filehash, "blob" )
@@ -141,8 +139,92 @@ describe( "tree_builder #tree", function()
          assert.is.not_nil( erg )
       end)
    end)
-      
-   describe( "remove #tree", function() pending("luagi_tree_builder_remove ") end)
-   describe( "write #tree", function() pending("luagi_tree_builder_write ") end)
-   describe( "filter #tree", function() pending("luagi_tree_builder_filter ") end)
+end)
+   
+describe( "with inserted file", function()
+   local builder = nil
+   local filename = "new_file"
+   local filename_two = "new_file_two"
+   local path = test_helper.path.."/some/"
+   local filehash = nil
+   local filehash_two = nil
+   local repo = nil
+
+   setup( function()
+      test_helper.extract()
+      repo = luagi.open( test_helper.path )
+      local tree = repo:lookup_tree( treeid )
+      builder = tree:create_builder()
+
+      local file = io.open( path..filename, "w" )
+      file:write( "some 'random' data" ) 
+      file:close()
+      file = io.open( path..filename_two, "w" )
+      file:write( "some other 'random' data" ) 
+      file:close()
+
+      filehash, err = luagi.hashfile( path..filename, "blob" )
+      filehash_two, err = luagi.hashfile( path..filename_two, "blob" )
+   end)
+
+   local function refill()
+      if builder:entry_count() == 0 then
+         builder:insert( filename, filehash, "blob" )
+      end
+      if builder:entry_count() == 1 then
+         builder:insert( filename_two, filehash_two, "blob" )
+      end
+   end
+
+   describe( "clear #tree", function()
+      setup( refill )
+
+      builder:clear()
+
+      it( "should have no entries", function()
+         assert.are.equal( 0, builder:entry_count() )
+      end)
+   end)
+
+   describe( "get #tree", function()
+      setup( refill )
+      local entry, err = builder:get( filename )
+      it( "no error", function()
+         assert.is.falsy( err )
+      end)
+   end)
+
+   describe( "remove #tree", function()
+      setup( refill )
+      builder:remove( filename_two )
+
+      it( "should have just one entry", function()
+         assert.are.equal( 1, builder:entry_count() )
+      end)
+   end)
+
+   describe( "write #tree", function()
+      setup( refill )
+      local oid = builder:write( repo )
+      local result, err= repo:lookup_tree( oid )
+
+      it( "should be falsy", function()
+         assert.is.falsy( err )
+         assert.is.not_nil( oid )
+         assert.is.not_nil( result )
+      end)
+   end)
+   
+   describe( "filter #tree", function()
+      setup( refill )
+      it( "should have more than 0 elements", function()
+         assert.are.equal( 2, builder:entry_count() )
+      end)
+
+      builder:filter( function( entry ) return true end) 
+
+      it( "should have no entries left", function()
+         assert.are.equal( 0, builder:entry_count() )
+      end)
+   end)
 end)
