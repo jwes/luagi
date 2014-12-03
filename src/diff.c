@@ -473,9 +473,17 @@ static int diff_hunk_callback( const git_diff_delta *delta,
       return 1;
 
    lua_pushvalue( f->L, f->use_hunks );
-   diff_delta_to_table( f->L, delta );
+   if( delta )
+   {
+      diff_delta_to_table( f->L, delta );
+   }
+   else lua_pushnil( f->L );
 
-   diff_hunk_to_table( f->L, hunk );
+   if( hunk )
+   {
+      diff_hunk_to_table( f->L, hunk );
+   }
+   else lua_pushnil( f->L );
   
    if( lua_pcall( f->L, 2, 1, 0 ) )
    {
@@ -495,15 +503,28 @@ int diff_line_callback( const git_diff_delta *delta,
 
    if( ! f->use_lines )
    {
-      return 1;
+      return -1;
    }
 
    lua_pushvalue( f->L, f->use_lines );
-   diff_delta_to_table( f->L, delta );
+   if( delta )
+   {
+      diff_delta_to_table( f->L, delta );
+   }
+   else lua_pushnil( f->L );
 
-   diff_hunk_to_table( f->L, hunk );
+   if( hunk )
+   {
+      diff_hunk_to_table( f->L, hunk );
+   }
+   else lua_pushnil( f->L );
 
-   diff_line_to_table( f->L, line );
+   if( line )
+   {
+      diff_line_to_table( f->L, line );
+   }
+   else lua_pushnil( f->L );
+
    if( lua_pcall( f->L, 3, 1, 0 ) )
    {
       luaL_error( f->L, "can not call line callback" );
