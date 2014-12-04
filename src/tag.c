@@ -11,10 +11,21 @@ int luagi_tag_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_oid id;
-   luagi_check_oid( &id, L, 2 );
+   int len, ret = 0;
+   luagi_check_oid_prefix( &id, &len, L, 2 );
 
    git_tag **out = lua_newuserdata( L, sizeof( git_tag * ) ); 
-   if( git_tag_lookup( out, *repo, &id ) ) {
+   if( len == GIT_OID_HEXSZ )
+   {
+      ret = git_tag_lookup( out, *repo, &id );
+   }
+   else
+   {
+      ret =  git_tag_lookup_prefix( out, *repo, &id, len );
+   }
+
+   if( ret )
+   {
       ERROR_PUSH( L )
    }
    luaL_getmetatable( L, LUAGI_TAG_FUNCS );
@@ -22,23 +33,6 @@ int luagi_tag_lookup( lua_State *L )
    return 1;
 }
 
-int luagi_tag_lookup_prefix( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   git_oid id;
-   luagi_check_oid( &id, L, 2 );
-   int len = luaL_checkinteger( L, 3 );
-
-   git_tag **out = lua_newuserdata( L, sizeof( git_tag * ) ); 
-   if( git_tag_lookup_prefix( out, *repo, &id, len ) ) {
-      ERROR_PUSH( L )
-   }
-   luaL_getmetatable( L, LUAGI_TAG_FUNCS );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
-   
 int luagi_tag_create( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );

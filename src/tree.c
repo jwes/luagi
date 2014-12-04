@@ -21,7 +21,8 @@ int luagi_tree_lookup( lua_State *L )
    git_repository** repo = checkrepo( L, 1 );
 
    git_oid oid;
-   int ret = luagi_check_oid( &oid, L, 2 );
+   int len = 0;
+   int ret = luagi_check_oid_prefix( &oid, &len, L, 2 );
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -30,7 +31,17 @@ int luagi_tree_lookup( lua_State *L )
    }
 
    git_tree** out = (git_tree**)lua_newuserdata( L, sizeof(git_tree*) );
-   if( git_tree_lookup( out, *repo, &oid ) )
+
+   if( len == GIT_OID_HEXSZ )
+   {
+      ret = git_tree_lookup( out, *repo, &oid );
+   } 
+   else
+   {
+      ret = git_tree_lookup_prefix( out, *repo, &oid, len );
+   }
+
+   if( ret )
    {
       const git_error* err = giterr_last();
       lua_pushnil( L );
@@ -41,13 +52,6 @@ int luagi_tree_lookup( lua_State *L )
    luaL_getmetatable( L, LUAGI_TREE_FUNCS );
    lua_setmetatable( L, -2 );
    return 1;
-}
-
-int luagi_tree_lookup_prefix( lua_State *L )
-{
-   lua_pushnil( L );
-   lua_pushstring(L, "not yet implemented" );
-   return 2;
 }
 
 int luagi_tree_id( lua_State *L )

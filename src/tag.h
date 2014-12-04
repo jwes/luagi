@@ -5,7 +5,6 @@
 
 // repo funcs
 int luagi_tag_lookup( lua_State *L );
-int luagi_tag_lookup_prefix( lua_State *L );
 int luagi_tag_create( lua_State *L );
 int luagi_tag_annotation_create( lua_State *L );
 int luagi_tag_create_frombuffer( lua_State *L );

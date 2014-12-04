@@ -142,7 +142,6 @@ static const struct luaL_Reg repofuncs [] = {
    */
    //tag
    { "lookup_tag", luagi_tag_lookup },
-   { "lookup_tag_prefix", luagi_tag_lookup_prefix },
    { "create_tag", luagi_tag_create },
    { "create_tag_annotation", luagi_tag_annotation_create },
    { "create_tag_from_buffer", luagi_tag_create_frombuffer },

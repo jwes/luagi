@@ -5,7 +5,6 @@
 #include "luagi.h"
 
 int luagi_tree_lookup( lua_State *L );
-int luagi_tree_lookup_prefix( lua_State *L );
 
 int luagi_tree_id( lua_State *L );
 int luagi_tree_entrycount( lua_State *L );

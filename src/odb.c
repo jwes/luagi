@@ -59,30 +59,19 @@ int luagi_odb_read( lua_State *L )
 {
    git_odb **odb = checkodb_at( L, 1 );
    git_oid oid;
-   luagi_check_oid( &oid, L, 2 );
-
-   git_odb_object **obj = lua_newuserdata( L, sizeof( git_odb_object *) );
-
-   if( git_odb_read( obj, *odb, &oid ) )
-   {
-      ERROR_PUSH( L )
-   }
-
-   luaL_getmetatable( L, LUAGI_ODB_OBJECT_FUNCS );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
-int luagi_odb_read_prefix( lua_State *L )
-{
-   git_odb **odb = checkodb_at( L, 1 );
-   git_oid oid;
-   int len;
+   int len, ret = 0;
    luagi_check_oid_prefix( &oid, &len, L, 2 );
 
    git_odb_object **obj = lua_newuserdata( L, sizeof( git_odb_object *) );
-
-   if( git_odb_read_prefix( obj, *odb, &oid, len ) )
+   if( len == GIT_OID_HEXSZ )
+   {
+      ret = git_odb_read( obj, *odb, &oid ); 
+   }
+   else
+   {
+      ret = git_odb_read_prefix( obj, *odb, &oid, len ); 
+   }
+   if( ret )
    {
       ERROR_PUSH( L )
    }
@@ -114,28 +103,26 @@ int luagi_odb_read_header( lua_State *L )
 int luagi_odb_exists( lua_State *L )
 {
    git_odb **odb = checkodb_at( L, 1 );
-   git_oid oid;
-   luagi_check_oid( &oid, L, 2 );
-
-   lua_pushboolean( L, git_odb_exists( *odb, &oid ) );
-   return 1;
-}
-
-int luagi_odb_exists_prefix( lua_State *L )
-{
-   git_odb **odb = checkodb_at( L, 1 );
    git_oid oid, out;
-   int len;
+   int len, ret = 0;
    luagi_check_oid_prefix( &oid, &len,  L, 2 );
-
-   int ret = git_odb_exists_prefix( &out, *odb, &oid, len );
+   if( len == GIT_OID_HEXSZ )
+   {
+      ret = git_odb_exists( *odb, &oid );
+      out = oid;
+   }
+   else
+   {
+      ret = git_odb_exists_prefix( &out, *odb, &oid, len );
+   }
    if( ret < 0 )
    {
       ERROR_PUSH( L )
    }
 
    lua_pushboolean( L, ret );
-   return 1;
+   int num = luagi_push_oid( L, &out );
+   return num + 1;
 }
 
 int luagi_odb_refresh( lua_State *L )

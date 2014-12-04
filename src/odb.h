@@ -13,10 +13,8 @@ int luagi_odb_open( lua_State *L );
 int luagi_odb_add_disk_alternate( lua_State *L );
 int luagi_odb_free( lua_State *L );
 int luagi_odb_read( lua_State *L );
-int luagi_odb_read_prefix( lua_State *L );
 int luagi_odb_read_header( lua_State *L );
 int luagi_odb_exists( lua_State *L );
-int luagi_odb_exists_prefix( lua_State *L );
 int luagi_odb_refresh( lua_State *L );
 int luagi_odb_foreach( lua_State *L );
 int luagi_odb_write( lua_State *L );
@@ -41,10 +39,8 @@ static const struct luaL_Reg luagi_odb_funcs [] = {
    { "add_disk_alternate", luagi_odb_add_disk_alternate },
    { "__gc", luagi_odb_free },
    { "read", luagi_odb_read },
-   { "read_prefix", luagi_odb_read_prefix },
    { "read_header", luagi_odb_read_header },
    { "exists", luagi_odb_exists },
-   { "exists_prefix", luagi_odb_exists_prefix },
    { "refresh", luagi_odb_refresh },
    { "foreach", luagi_odb_foreach },
    { "write", luagi_odb_write },
