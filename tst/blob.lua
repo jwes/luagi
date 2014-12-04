@@ -14,7 +14,16 @@ describe( "lookup_blob #blob", function ()
 end)
 
 
-describe( "lookup_blob_prefix #blob", function() pending("luagi_blob_lookup_prefix") end)
+describe( "lookup_blob_prefix #blob", function()
+   test_helper.extract()
+   local repo = luagi.open( test_helper.path )
+   blob, err = repo:lookup_blob( "69f48e5" )
+   it( "should have a result", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( blob )
+   end)
+end)
+
 
 describe( "create_blob_from_workdir #blob", function()
    local repo = nil

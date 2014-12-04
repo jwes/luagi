@@ -8,35 +8,25 @@ int luagi_blob_lookup( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_oid oid;
-   if( luagi_check_oid( &oid, L, 2 ) )
+   int len = 0;
+   if( luagi_check_oid_prefix( &oid, &len, L, 2 ) )
    {
       ERROR_ABORT( L )
       return 0;
    }
    git_blob **out = lua_newuserdata( L, sizeof( git_blob * ) ); 
-   if( git_blob_lookup( out, *repo, &oid ) )
+
+   int ret = 0;
+   if( len == GIT_OID_HEXSZ )
    {
-      ERROR_PUSH( L )
+      ret = git_blob_lookup( out, *repo, &oid );
+   }
+   else
+   {
+      ret = git_blob_lookup_prefix( out, *repo, &oid, len );
    }
 
-   luaL_getmetatable( L, LUAGI_BLOB_FUNCS );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
-int luagi_blob_lookup_prefix( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   git_oid oid;
-   if( luagi_check_oid( &oid, L, 2 ) )
-   {
-      ERROR_ABORT( L )
-      return 0;
-   }
-   int len = luaL_checkinteger( L, 3 );
-
-   git_blob **out = lua_newuserdata( L, sizeof( git_blob * ) ); 
-   if( git_blob_lookup_prefix( out, *repo, &oid, len ) )
+   if( ret )
    {
       ERROR_PUSH( L )
    }

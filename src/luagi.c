@@ -122,7 +122,6 @@ static const struct luaL_Reg repofuncs [] = {
    { "merge_analysis", luagi_merge_analysis },
    // blob
    { "lookup_blob", luagi_blob_lookup },
-   { "lookup_blob_prefix", luagi_blob_lookup_prefix },
    { "create_blob_from_workdir", luagi_blob_create_fromworkdir },
    { "create_blob_from_disk", luagi_blob_create_fromdisk },
    { "create_blob_from_chunks", luagi_blob_create_fromchunks },
