@@ -74,9 +74,13 @@ static int chunk_cb( char *content, size_t max_length, void *payload )
    {
       return 0;
    }
-   int len = luaL_len( p->L, -1 );
-   const char *str = luaL_checkstring( p->L, -1 );
-   strncpy( content, str, len );
+   int len = 0;
+   if( lua_type(p->L, -1) != LUA_TNIL )
+   {
+      len = luaL_len( p->L, -1 );
+      const char *str = luaL_checkstring( p->L, -1 );
+      strncpy( content, str, len );
+   }
    lua_pop( p->L, 1 );
    return len; 
 }
@@ -164,6 +168,8 @@ int luagi_blob_filtered_content( lua_State *L )
    int check_for_binary = lua_toboolean( L, 3 );
 
    git_buf out;
+   out.size = 0;
+   out.asize = 0;
    if( git_blob_filtered_content( &out, *blob, as_path, check_for_binary ) )
    {
       ERROR_PUSH(L)
