@@ -194,6 +194,14 @@ describe( "with inserted file", function()
       end)
    end)
 
+   describe( "get #tree", function()
+      setup( refill )
+      local entry, err = builder:get( "nothing" )
+      it( "no error", function()
+         assert.is.falsy( entry )
+      end)
+   end)
+
    describe( "remove #tree", function()
       setup( refill )
       builder:remove( filename_two )
@@ -214,7 +222,7 @@ describe( "with inserted file", function()
          assert.is.not_nil( result )
       end)
    end)
-   
+
    describe( "filter #tree", function()
       setup( refill )
       it( "should have more than 0 elements", function()

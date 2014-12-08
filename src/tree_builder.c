@@ -155,13 +155,18 @@ struct filter_payload
 static int builder_filter( const git_tree_entry *entry, void *payload )
 {
    struct filter_payload *fp = (struct filter_payload *) payload;
-
+   if( entry == NULL )
+   {
+      luaL_error( fp->L, "no input entry" );
+      return -1;
+   }
    lua_pushvalue( fp->L, fp->function );
    git_tree_entry** e = (git_tree_entry**) lua_newuserdata( fp->L, sizeof( git_tree_entry* ) );
    
    if( git_tree_entry_dup( e, entry ))
    {
       luaL_error( fp->L, "dup failed" );
+      return -1;
    }
 
    luaL_getmetatable( fp->L, LUAGI_TREE_ENTRY_FUNCS );
@@ -170,6 +175,7 @@ static int builder_filter( const git_tree_entry *entry, void *payload )
    if(lua_pcall( fp->L, 1, 1, 0) )
    {
       luaL_error( fp->L, "failure calling function" );
+      return -1;
    }
    int ret = lua_toboolean( fp->L, -1 );
    lua_pop( fp->L, 1 );
