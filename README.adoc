@@ -10,7 +10,7 @@ libgit2 and Lua is necessary to compile the source.
 Currently, the source is built against:
 
 * libgit2 0.21.0
-** inculdimg following fix: https://github.com/libgit2/libgit2/pull/2439
+** including the following fix: https://github.com/libgit2/libgit2/pull/2439
 * Lua 5.2.
 
 The tests use busted ( see luarocks ).
