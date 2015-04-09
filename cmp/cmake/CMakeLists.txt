@@ -33,6 +33,10 @@ add_library( ${LIB_NAME} SHARED ${SRC_FILES} )
 set_target_properties( ${LIB_NAME} PROPERTIES PREFIX "" )
 target_link_libraries( ${LIB_NAME} m ${LUA52_LIBRARIES} ${GIT2_LIBRARIES} )
 
+add_test( NAME busted 
+          COMMAND busted -p .lua --cpath=$PATH:../bld/ --suppress-pending .
+          WORKING_DIRECTORY ${TST_DIR})
+
 ########################################################################################################################
 # install - make install
 ########################################################################################################################

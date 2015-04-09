@@ -24,6 +24,7 @@ $ mkdir bld
 $ cd bld
 $ cmake ../cmp/cmake
 $ make
+$ make test
 ----
 
 == TODO
@@ -32,9 +33,3 @@ $ make
 * documentation
 * functions
 
-== TEST
-[source,bash]
-----
-$ cd tst
-$ busted -p .lua --suppress-pending .
-----
