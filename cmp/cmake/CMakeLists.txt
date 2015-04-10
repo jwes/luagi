@@ -20,6 +20,9 @@ include( DefineCompilerFlags )
 
 # file list
 include( ${CMAKE_SOURCE_DIR}/FileLists.cmake )
+file( GLOB TST_FILES
+   "${TST_DIR}/*.lua"
+)
 
 find_package( Lua52 REQUIRED ) # LUA52_LIBRARIES / LUA52_INCLUDE_DIR
 find_package( GIT2 "0.21.0" EXACT REQUIRED ) # GIT2_LIBRARIES / GIT2_INCLUDE_DIRS
@@ -33,9 +36,13 @@ add_library( ${LIB_NAME} SHARED ${SRC_FILES} )
 set_target_properties( ${LIB_NAME} PROPERTIES PREFIX "" )
 target_link_libraries( ${LIB_NAME} m ${LUA52_LIBRARIES} ${GIT2_LIBRARIES} )
 
-add_test( NAME busted 
-          COMMAND busted -p .lua --cpath=$PATH:../bld/ --suppress-pending .
-          WORKING_DIRECTORY ${TST_DIR})
+foreach( test_file ${TST_FILES} )
+
+   add_test( NAME ${test_file} 
+      COMMAND busted --cpath=$PATH:../bld/ --suppress-pending ${test_file}
+      WORKING_DIRECTORY ${TST_DIR})
+
+endforeach( test_file )
 
 ########################################################################################################################
 # install - make install
