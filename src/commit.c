@@ -229,14 +229,14 @@ int luagi_commit_amend( lua_State *L )
 
    lua_getfield( L, 2, "update_ref");
    const char* update_ref = luaL_optstring( L, -1, NULL );
-   git_signature* author;
+   git_signature* author = NULL;
    int ret = 0;
    lua_getfield( L, 2, "author" );
    if( lua_istable( L, -1 ) )
    {
       ret = table_to_signature( L, &author, -1 );
    }
-   git_signature* committer;
+   git_signature* committer = NULL;
    lua_getfield( L, 2, "committer" );
    if( lua_istable( L, -1 ) )
    {
