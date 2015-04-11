@@ -177,44 +177,56 @@ describe( "with inserted file", function()
    end
 
    describe( "clear #tree", function()
-      setup( refill )
-
-      builder:clear()
-
+      setup( function()
+               refill()
+               builder:clear()
+            end)
       it( "should have no entries", function()
          assert.are.equal( 0, builder:entry_count() )
       end)
    end)
 
    describe( "get #tree", function()
-      setup( refill )
-      local entry, err = builder:get( filename )
+      local entry = nil
+      setup( function()
+               refill()
+               entry, err = builder:get( filename )
+            end)
       it( "no error", function()
          assert.is.falsy( err )
       end)
    end)
 
    describe( "get #tree", function()
-      setup( refill )
-      local entry, err = builder:get( "nothing" )
+      local entry = nil
+      setup( function()
+               refill()
+               entry, err = builder:get( "nothing" )
+            end)
       it( "no error", function()
          assert.is.falsy( entry )
       end)
    end)
 
    describe( "remove #tree", function()
-      setup( refill )
-      builder:remove( filename_two )
-
+      setup( function()
+               refill()
+               builder:remove( filename_two )
+            end)
       it( "should have just one entry", function()
          assert.are.equal( 1, builder:entry_count() )
       end)
    end)
 
    describe( "write #tree", function()
-      setup( refill )
-      local oid = builder:write( repo )
-      local result, err= repo:lookup_tree( oid )
+      local oid = nil
+      local result = nil
+      setup( function()
+               refill()
+
+               oid = builder:write( repo )
+               result, err= repo:lookup_tree( oid )
+            end)
 
       it( "should be falsy", function()
          assert.is.falsy( err )
@@ -224,13 +236,10 @@ describe( "with inserted file", function()
    end)
 
    describe( "filter #tree", function()
-      setup( refill )
-      it( "should have more than 0 elements", function()
-         assert.are.equal( 2, builder:entry_count() )
-      end)
-
-      builder:filter( function( entry ) return true end) 
-
+      setup( function()
+               refill()
+               builder:filter( function( entry ) return true end)
+            end )
       it( "should have no entries left", function()
          assert.are.equal( 0, builder:entry_count() )
       end)
