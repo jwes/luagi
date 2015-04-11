@@ -39,7 +39,7 @@ target_link_libraries( ${LIB_NAME} m ${LUA52_LIBRARIES} ${GIT2_LIBRARIES} )
 foreach( test_file ${TST_FILES} )
 
    add_test( NAME ${test_file} 
-           COMMAND busted --cpath=../bld/${LIB_NAME}.so --suppress-pending ${test_file}
+           COMMAND busted --cpath=../bld/${LIB_NAME}.so ${test_file}
       WORKING_DIRECTORY ${TST_DIR})
 
 endforeach( test_file )
