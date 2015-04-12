@@ -206,7 +206,15 @@ int luagi_index_clear( lua_State *L )
 int luagi_index_get_byindex( lua_State *L )
 { 
    git_index **index = checkindex_at( L, 1 );
-   int pos = luaL_checkinteger( L, 2 );
+   unsigned int pos = luaL_checkinteger( L, 2 );
+   if( pos < 1 || pos > git_index_entrycount( *index ))
+   {
+        lua_pushnil( L );
+        lua_pushstring( L, "index out of bounds");
+        return 2;
+   }
+   // indexes are 1 based
+   pos--;
 
    git_index_entry *entry = lua_newuserdata( L, sizeof( git_index_entry ) );
 
