@@ -212,6 +212,9 @@ static const struct luaL_Reg repofuncs [] = {
    { "new_packbuilder", luagi_packbuilder_new },
    //revwalk
    { "revwalk", luagi_revwalk_new },
+   //object
+   { "lookup_object", luagi_object_lookup },
+   { "lookup_object_bypath", luagi_object_lookup_bypath },
    { NULL, NULL },
 };
 
@@ -266,10 +269,18 @@ void setup_funcs( lua_State *L, const char *meta_name, const luaL_Reg *funcs )
    lua_setfield( L, -2, "__index");
    luaL_setfuncs( L, funcs, 0);
 }
+static int luagi_strarray_len( lua_State *L )
+{
+   git_strarray *array = luaL_checkudata( L, 1, LUAGI_STRARRAY );
+   lua_pushinteger( L, array->count );
+   return 1;
+}
+
 static int luagi_strarray_at( lua_State *L )
 {
    git_strarray *array = luaL_checkudata( L, 1, LUAGI_STRARRAY );
    unsigned int index = luaL_checkinteger( L, 2 );
+
    //
    // lua indices start with 1
    if( index > array->count || index <= 0 )
@@ -278,7 +289,7 @@ static int luagi_strarray_at( lua_State *L )
       lua_pushstring( L, "index out of bounds" );
       return 2;
    }
-   
+   index--;
    lua_pushstring( L, array->strings[index] );
    return 1;
 }
@@ -299,6 +310,8 @@ int luaopen_luagi(lua_State *L)
    luaL_newmetatable( L, LUAGI_STRARRAY );
    lua_pushcfunction( L, luagi_strarray_at );
    lua_setfield( L, -2, "__index" );
+   lua_pushcfunction( L, luagi_strarray_len );
+   lua_setfield( L, -2, "__len" );
    lua_pushcfunction( L, luagi_strarray_free );
    lua_setfield( L, -2, "__gc" );
 
