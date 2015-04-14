@@ -269,7 +269,7 @@ describe( "tag object methods", function()
 
    describe( "__tostring #tag", function()
       it("should return the correct name", function()
-         assert.are.equal( tag_name, tag )
+         assert.are.equal( tag_name, tostring(tag ))
       end)
    end)
 
