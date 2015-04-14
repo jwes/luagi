@@ -37,7 +37,7 @@ static const struct luaL_Reg luagi_tag_funcs [] = {
    { "id", luagi_tag_id },
    { "owner", luagi_tag_owner },
    { "target", luagi_tag_target },
-   { "targer_id", luagi_tag_target_id },
+   { "target_id", luagi_tag_target_id },
    { "name", luagi_tag_name },
    { "__tostring", luagi_tag_name },
    { "tagger", luagi_tag_tagger },
