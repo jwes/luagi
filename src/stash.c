@@ -19,11 +19,11 @@ int luagi_stash_save( lua_State *L )
    const char *message = luaL_optstring( L, 3, NULL );
 
    unsigned int flags = GIT_STASH_DEFAULT;
-   if( lua_type( L, 3 ) == LUA_TTABLE )
+   if( lua_type( L, 4 ) == LUA_TTABLE )
    {
-      add_flag( flags, L, 3, KEEP_INDEX, GIT_STASH_KEEP_INDEX );
-      add_flag( flags, L, 3, INCLUDE_UNTRACKED, GIT_STASH_INCLUDE_UNTRACKED ); 
-      add_flag( flags, L, 3, INCLUDE_IGNORED, GIT_STASH_INCLUDE_IGNORED );
+      add_flag( flags, L, 4, KEEP_INDEX, GIT_STASH_KEEP_INDEX );
+      add_flag( flags, L, 4, INCLUDE_UNTRACKED, GIT_STASH_INCLUDE_UNTRACKED );
+      add_flag( flags, L, 4, INCLUDE_IGNORED, GIT_STASH_INCLUDE_IGNORED );
    }
 
    git_oid out;
@@ -36,6 +36,7 @@ int luagi_stash_save( lua_State *L )
 
    return luagi_push_oid( L, &out );
 }
+
 struct foreach_payload
 {
    lua_State *L;
