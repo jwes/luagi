@@ -71,7 +71,7 @@ int luagi_tag_annotation_create( lua_State *L )
    }
    return luagi_push_oid( L, &out );
 }
-
+/* not really relevant for a lua context
 int luagi_tag_create_frombuffer( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -86,7 +86,7 @@ int luagi_tag_create_frombuffer( lua_State *L )
 
    return luagi_push_oid( L, &out );
 }
-
+*/
 int luagi_tag_create_lightweight( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );

@@ -144,7 +144,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "lookup_tag", luagi_tag_lookup },
    { "create_tag", luagi_tag_create },
    { "create_tag_annotation", luagi_tag_annotation_create },
-   { "create_tag_from_buffer", luagi_tag_create_frombuffer },
+   //{ "create_tag_from_buffer", luagi_tag_create_frombuffer },
    { "create_tag_lightweight", luagi_tag_create_lightweight },
    { "delete_tag", luagi_tag_delete },
 

@@ -73,7 +73,7 @@ describe( "create_tag_annotation #tag", function()
       assert.are.equal( 1, #list )
    end)
 end)
-
+--[[
 describe( "create_tag_from_buffer #tag", function() 
    local tag = nil
    local invalid = nil
@@ -108,7 +108,7 @@ describe( "create_tag_from_buffer #tag", function()
    end)
 
 end)
-
+]]--
 describe( "create_tag_lightweight #tag", function()
    local tag = nil
    local err = nil
