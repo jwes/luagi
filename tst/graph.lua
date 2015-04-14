@@ -1,5 +1,50 @@
   --graph
-describe( "graph_ahead_behind #graph", function() pending("luagi_graph_ahead_behind") end)
-describe( "graph_descendant_of #graph", function() pending("luagi_graph_descendant_of") end)
+local luagi = require("luagi")
+local test_helper = require("test_helper")
 
+local version1 = "3a3e73745d1a2ba679362d51e0a090a3ee03aad6"
+local version2 = "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09"
+
+describe( "graph_ahead_behind #graph", function()
+   local repo = nil
+   setup( function()
+      test_helper.extract()
+      repo = luagi.open( test_helper.path )
+   end)
+   it("should be not ahead nor behind", function()
+      ahead, behind = repo:graph_ahead_behind( version1, version1)
+      assert.are.equal( 0, ahead )
+      assert.are.equal( 0, behind )
+   end)
+   it( "should be ahead by one commit", function()
+      ahead, behind = repo:graph_ahead_behind( version1, version2)
+      assert.are.equal( 1, ahead )
+      assert.are.equal( 0, behind )
+   end)
+   it( "should be behind by one commit", function()
+      ahead, behind = repo:graph_ahead_behind( version2, version1)
+      assert.are.equal( 0, ahead )
+      assert.are.equal( 1, behind )
+   end)
+end)
+
+describe( "graph_descendant_of #graph", function()
+   local repo = nil
+   setup( function()
+      test_helper.extract()
+      repo = luagi.open( test_helper.path )
+   end)
+   it("should not be a descendant", function()
+      local d = repo:graph_descendant_of( version1, version1 )
+      assert.is.False( d )
+   end)
+   it("should be a descendant", function()
+      local d = repo:graph_descendant_of( version1, version2 )
+      assert.is.False( d )
+   end)
+   it("should be a descendant", function()
+      local d = repo:graph_descendant_of( version2, version1 )
+      assert.is.True( d )
+   end)
+end)
 
