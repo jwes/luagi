@@ -59,5 +59,6 @@ void dumpStack( lua_State* L );
    if( lua_toboolean( L, -1 ) ) \
    { \
       out |= flag; \
-   } 
+   } \
+   lua_pop( L, 1 );
 #endif

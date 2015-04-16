@@ -368,7 +368,7 @@ int luagi_odb_object_data( lua_State *L )
    git_odb_object **obj = checkodbobject_at( L, 1 );
    const char *data = git_odb_object_data( *obj );
 
-   lua_pushstring( L, data );
+   lua_pushlstring( L, data, git_odb_object_size( *obj)  );
    return 1;
 }
 

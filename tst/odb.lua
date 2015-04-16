@@ -99,7 +99,10 @@ describe( "open_odb", function()
       end)
 
       describe( "data #odb", function()
-         pending("luagi_odb_object_data ") end)
+         data = odb_obj:data()
+         assert.is.not_nil( data )
+         assert.are.equal( 67, #data )
+      end)
   end)
 end)
 
