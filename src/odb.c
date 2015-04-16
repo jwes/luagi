@@ -105,6 +105,7 @@ int luagi_odb_exists( lua_State *L )
    git_odb **odb = checkodb_at( L, 1 );
    git_oid oid, out;
    int len, ret = 0;
+   int ambiguous = 0, num = 0;
    luagi_check_oid_prefix( &oid, &len,  L, 2 );
    if( len == GIT_OID_HEXSZ )
    {
@@ -114,6 +115,19 @@ int luagi_odb_exists( lua_State *L )
    else
    {
       ret = git_odb_exists_prefix( &out, *odb, &oid, len );
+      switch( ret )
+      {
+         case GIT_EAMBIGUOUS:
+            ambiguous = 1;
+            /* no break */
+         case 0:
+            ret = 1;
+            break;
+         case GIT_ENOTFOUND:
+            ret = 0;
+            break;
+      }
+
    }
    if( ret < 0 )
    {
@@ -121,7 +135,10 @@ int luagi_odb_exists( lua_State *L )
    }
 
    lua_pushboolean( L, ret );
-   int num = luagi_push_oid( L, &out );
+   if( ! ambiguous )
+   {
+        num = luagi_push_oid( L, &out );
+   }
    return num + 1;
 }
 
