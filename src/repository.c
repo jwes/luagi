@@ -60,7 +60,7 @@ int luagi_repository_discover( lua_State *L )
    int across_fs = lua_toboolean( L, 2 );
    const char *ceiling_dirs = luaL_optstring( L, 3, NULL );
 
-   git_buf out;
+   git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
 
    if( git_repository_discover( &out, start_path, across_fs, ceiling_dirs ) )
    {
@@ -359,7 +359,7 @@ int luagi_repository_message( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
 
-   git_buf buf;
+   git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
 
    if( git_repository_message( &buf, *repo ) )
    {

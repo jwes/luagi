@@ -68,7 +68,7 @@ int luagi_packbuilder_insert_commit( lua_State *L )
 int luagi_packbuilder_write_buf( lua_State *L )
 {
    git_packbuilder **pack = checkpack( L );
-   git_buf buf;
+   git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_packbuilder_write_buf( &buf, *pack ) )
    {
       ERROR_PUSH( L )

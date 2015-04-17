@@ -167,9 +167,7 @@ int luagi_blob_filtered_content( lua_State *L )
    const char *as_path = luaL_checkstring( L, 2 );
    int check_for_binary = lua_toboolean( L, 3 );
 
-   git_buf out;
-   out.size = 0;
-   out.asize = 0;
+   git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_blob_filtered_content( &out, *blob, as_path, check_for_binary ) )
    {
       ERROR_PUSH(L)

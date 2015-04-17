@@ -208,7 +208,7 @@ int luagi_patch_to_buf( lua_State *L )
 {
    git_patch **patch = checkpatch( L );
 
-   git_buf out;
+   git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_patch_to_buf( &out, *patch ) )
    {
       ERROR_PUSH( L )

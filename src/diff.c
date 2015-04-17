@@ -386,6 +386,15 @@ int luagi_diff_get_delta( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
    int idx = luaL_checkinteger( L, 2 );
+   int num = git_diff_num_deltas( *diff );
+   if( idx <= 0 || idx > num )
+   {
+        lua_pushnil( L );
+        lua_pushstring( L, "index out of bounds" );
+        return 2;
+   }
+   idx--;
+
    const git_diff_delta *delta = git_diff_get_delta( *diff, idx );
 
    diff_delta_to_table( L, delta );
@@ -679,7 +688,7 @@ int luagi_diff_stats_to_buf( lua_State *L )
 
    size_t width = luaL_optinteger( L, 3, 0 );
 
-   git_buf out;
+   git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_diff_stats_to_buf( &out, *stats, format, width ) )
    {
       ERROR_PUSH( L )
@@ -736,7 +745,7 @@ int luagi_diff_format_email( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
 
-   git_buf out;
+   git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    git_diff_format_email_options opts;
    luagi_diff_format_email_init_options( L, 2, &opts );
 
@@ -772,7 +781,7 @@ int luagi_diff_commit_as_email( lua_State *L )
    git_diff_options diff_opts;
    luagi_diff_init_options( L, 5, &diff_opts );
 
-   git_buf out;
+   git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_diff_commit_as_email( &out, *repo, *commit, patch_no, total_patches, flags, &diff_opts ) )
    {
       ERROR_PUSH( L )

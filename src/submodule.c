@@ -77,7 +77,7 @@ int luagi_submodule_resolve_url( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    const char *url = luaL_checkstring( L, 2 );
 
-   git_buf buf;
+   git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_submodule_resolve_url( &buf, *repo, url ) )
    {
       ERROR_PUSH( L )
