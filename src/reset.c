@@ -33,6 +33,7 @@ int luagi_reset( lua_State *L )
    git_reset_t reset = luagi_check_resettype( L, 3 );
 
    git_signature *sig;
+   luaL_checktype( L, 4, LUA_TTABLE );
    table_to_signature( L, &sig, 4 );
    const char *log_message = luaL_optstring( L, 5, NULL );
 
@@ -50,10 +51,25 @@ int luagi_reset_default( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    git_object **target = checkobject_at( L, 2 );
 
+   luaL_checktype( L, 3, LUA_TTABLE );
    git_strarray array = luagi_strings_from_lua_list( L, 3 );
 
 
    if( git_reset_default( *repo, *target, &array ) )
+   {
+      ERROR_ABORT( L )
+   }
+   return 0;
+}
+
+int luagi_reset_index( lua_State *L )
+{
+   git_repository **repo = checkrepo( L, 1 );
+
+   luaL_checktype( L, 2, LUA_TTABLE );
+   git_strarray array = luagi_strings_from_lua_list( L, 2 );
+
+   if( git_reset_default( *repo, NULL, &array ) )
    {
       ERROR_ABORT( L )
    }

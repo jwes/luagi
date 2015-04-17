@@ -1,6 +1,11 @@
 local os = require("os")
 local path = "data/test_repo"
 
+local signature = {
+   name = "A. Tester",
+   email = "some@mail.address"
+}
+
 local function extract()
    if not io.open( path ) then
       os.execute( "mkdir -p "..path )
@@ -24,6 +29,7 @@ return {
    --parameters
    path = path,
    modification = modification,
+   signature = signature,
    --functions
    setup = setup,
    modify = modify,

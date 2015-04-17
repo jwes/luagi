@@ -135,6 +135,7 @@ static const struct luaL_Reg repofuncs [] = {
    //reset
    { "reset", luagi_reset },
    { "reset_default", luagi_reset_default },
+   { "reset_index", luagi_reset_index },
    /*
    //revert TODO
    { "revert", luagi_revert },
