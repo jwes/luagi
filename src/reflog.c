@@ -2,6 +2,7 @@
 #include "reflog.h"
 #include "luagi.h"
 #include "oid.h"
+#include <stdio.h>
 
 int luagi_reflog_read( lua_State *L )
 {
@@ -87,6 +88,14 @@ int luagi_reflog_entry_byindex( lua_State *L )
 {
    git_reflog **log = checkreflog( L );
    size_t idx = luaL_checkinteger( L, 2 );
+   //check bounds
+   if( idx <= 0 || idx > git_reflog_entrycount( *log ) )
+   {
+      lua_pushnil( L );
+      lua_pushstring( L, "index out of bounds" );
+      return 2;
+   }
+   idx--;
 
    const git_reflog_entry *entry = git_reflog_entry_byindex( *log, idx );
    if( entry == NULL )
@@ -115,20 +124,19 @@ int luagi_reflog_entry_totable( lua_State *L, const git_reflog_entry *entry )
    const git_oid *old = git_reflog_entry_id_old( entry );
 
    luagi_push_oid( L, old );
-   lua_setfield( L, 1, OLD );
+   lua_setfield( L, 3, OLD );
 
    const git_oid *new = git_reflog_entry_id_new( entry );
    luagi_push_oid( L, new );
-   lua_setfield( L, 1, NEW );
+   lua_setfield( L, 3, NEW );
 
    const git_signature *committer = git_reflog_entry_committer( entry );
    signature_to_table( L, committer );
-   lua_setfield( L, 1, COMMITTER );
+   lua_setfield( L, 3, COMMITTER );
 
    const char *message = git_reflog_entry_message( entry );
    lua_pushstring( L, message );
-   lua_setfield( L, 1, MESSAGE );
-
+   lua_setfield( L, 3, MESSAGE );
    return 1;
 }
 
@@ -138,5 +146,4 @@ int luagi_reflog_free( lua_State *L )
    git_reflog_free( *log );
    return 0;
 }
-
 

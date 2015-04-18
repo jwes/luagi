@@ -356,6 +356,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_PATCH_FUNCS, luagi_patch_funcs );
    setup_funcs(L, LUAGI_PACK_FUNCS, luagi_pack_funcs );
    setup_funcs(L, LUAGI_REVWALK_FUNCS, luagi_revwalk_funcs );
+   setup_funcs(L, LUAGI_REFLOG_FUNCS, luagi_reflog_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
    luaL_newlib( L, mylib );
