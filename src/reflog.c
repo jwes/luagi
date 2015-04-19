@@ -110,6 +110,13 @@ int luagi_reflog_drop( lua_State *L )
 {
    git_reflog **log = checkreflog( L );
    size_t idx = luaL_checkinteger( L, 2 );
+   if( idx <= 0 || idx > git_reflog_entrycount( *log ) )
+   {
+      luaL_error( L, "index out of bounds" );
+      return 0;
+   }
+   idx--;
+
    int rewrite_previous_entry = lua_toboolean( L, 3 );
    if( git_reflog_drop( *log, idx, rewrite_previous_entry ) )
    {
