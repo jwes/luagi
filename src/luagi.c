@@ -201,7 +201,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "detach_head", luagi_repository_detach_head },
    { "state", luagi_repository_state },
    { "set_namespace", luagi_repository_set_namespace },
-   { "get_namespache", luagi_repository_get_namespace },
+   { "get_namespace", luagi_repository_get_namespace },
    //refdb
    { "new_refdb", luagi_refdb_new },
    { "open_refdb", luagi_refdb_open },

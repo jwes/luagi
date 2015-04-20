@@ -117,7 +117,6 @@
 #define CHECKOUT "checkout"
 #define REBASE "rebase"
 #define MERGE "merge"
-#define NONE "none"
 
 #define RECURSE_YES "yes"
 #define RECURSE_NO "no"
@@ -156,7 +155,6 @@
 #define UNKNOWN "unknown"
 #define FORCE "force"
 #define ALL "all"
-#define NONE "none"
 #define AUTO "auto"
 #define TOTAL "total"
 #define DELTA "delta"
@@ -314,4 +312,12 @@
 #define DIR_MODE "dir_mode"
 #define FILE_MODE "file_mode"
 #define FILE_OPEN_FLAGS "file_open_flags"
+
+#define REVERT "revert"
+#define CHERRY_PICK "cherry_pick"
+#define BISECT "bisect"
+#define REBASE_INTERACTIVE "rebase_interactive"
+#define REBASE_MERGE "rebase_merge"
+#define APPLY_MAILBOX "apply_mailbox"
+#define APPLY_MAILBOX_OR_REBASE "apply_mailbox_or_rebase"
 #endif

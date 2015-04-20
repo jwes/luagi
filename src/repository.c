@@ -524,8 +524,8 @@ int luagi_repository_detach_head( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_signature *sig;
-   table_to_signature( L, &sig, 3 );
-   const char *log_message = luaL_checkstring( L, 4 );
+   table_to_signature( L, &sig, 2 );
+   const char *log_message = luaL_checkstring( L, 3 );
 
    int ret = git_repository_detach_head( *repo, sig, log_message );
    git_signature_free( sig );
@@ -538,7 +538,39 @@ int luagi_repository_detach_head( lua_State *L )
 
 static int push_state( lua_State *L, int state )
 {
-   lua_pushinteger( L, state );
+   switch( state )
+   {
+      case GIT_REPOSITORY_STATE_NONE:
+        lua_pushstring( L, NONE );
+        break;
+      case GIT_REPOSITORY_STATE_MERGE:
+        lua_pushstring( L, MERGE );
+        break;
+      case GIT_REPOSITORY_STATE_REVERT:
+        lua_pushstring( L, REVERT );
+        break;
+      case GIT_REPOSITORY_STATE_CHERRY_PICK:
+        lua_pushstring( L, CHERRY_PICK );
+        break;
+      case GIT_REPOSITORY_STATE_BISECT:
+        lua_pushstring( L, BISECT );
+        break;
+      case GIT_REPOSITORY_STATE_REBASE:
+        lua_pushstring( L, REBASE );
+        break;
+      case GIT_REPOSITORY_STATE_REBASE_INTERACTIVE:
+        lua_pushstring( L, REBASE_INTERACTIVE );
+        break;
+      case GIT_REPOSITORY_STATE_REBASE_MERGE:
+        lua_pushstring( L, REBASE_MERGE );
+        break;
+      case GIT_REPOSITORY_STATE_APPLY_MAILBOX:
+        lua_pushstring( L, APPLY_MAILBOX );
+        break;
+      case GIT_REPOSITORY_STATE_APPLY_MAILBOX_OR_REBASE:
+        lua_pushstring( L, APPLY_MAILBOX_OR_REBASE );
+        break;
+   }
    return 1;
 }
 
@@ -554,7 +586,7 @@ int luagi_repository_state( lua_State *L )
 int luagi_repository_set_namespace( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const char *namespace = luaL_checkstring( L, 2 );
+   const char *namespace = luaL_optstring( L, 2, NULL );
 
    if( git_repository_set_namespace( *repo, namespace ) )
    {
