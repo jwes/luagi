@@ -70,7 +70,7 @@ static const struct luaL_Reg luagi_config_funcs [] = {
    { "open_global", luagi_config_open_global },
    { "snapshot", luagi_config_snapshot },
 
-   { "refresk", luagi_config_refresh },
+   { "refresh", luagi_config_refresh },
    { "get_entry", luagi_config_get_entry },
    { "get_int32", luagi_config_get_int32 },
    { "get_int64", luagi_config_get_int64 },
