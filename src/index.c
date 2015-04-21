@@ -65,7 +65,7 @@ int luagi_index_caps( lua_State *L )
    lua_pushboolean( L, caps & GIT_INDEXCAP_NO_SYMLINKS );
    lua_setfield( L, -2, NO_SYMLINKS );
 
-   lua_pushboolean( L, caps & GIT_INDEXCAP_FROM_OWNER );
+   lua_pushboolean( L, (caps & GIT_INDEXCAP_FROM_OWNER) == GIT_INDEXCAP_FROM_OWNER );
    lua_setfield( L, -2, FROM_OWNER );
    return 1;
 }

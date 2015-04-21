@@ -191,13 +191,71 @@ describe( "remove_all #index", function()
    end)
 end)
 
+describe( "set_caps #index", function()
+   local index = nil
+   local err = nil
+   local caps = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+      if err then return end
+      caps = index:caps()
+   end)
 
-describe( "set_caps #index", function() pending("  luagi_index_set_caps ") end)
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.False( caps.ignore_case )
+      assert.is.False( caps.no_filemode )
+      assert.is.False( caps.no_symlinks )
+      assert.is.False( caps.from_owner )
+   end)
+   it( "should set the caps", function()
+      cap = {
+         ignore_case = true,
+      }
+      assert.is.True( cap.ignore_case )
+      assert.has_no_error( function()
+         index:set_caps( cap )
+      end)
+      new_caps = index:caps()
+      assert.is.True( new_caps.ignore_case )
+      assert.is.False( new_caps.no_filemode )
+      assert.is.False( new_caps.no_symlinks )
+      assert.is.False( new_caps.from_owner )
+   end)
+end)
+
 describe( "read_tree #index", function() pending("  luagi_index_read_tree ") end)
 describe( "write_tree #index", function() pending("  luagi_index_write_tree ") end)
-describe( "by_path #index", function() pending("  luagi_index_get_bypath ") end)
+describe( "by_path #index", function()
+   local index = nil
+   local entry = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+      if err then return end
+      entry, err = index:by_path("testfile", -1)
+   end)
+
+   it("should be an entry", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( entry )
+      assert.are.equal( "userdata", type( entry ) )
+      assert.is.not_nil( entry.stage )
+   end)
+
+   describe( "entry_stage #index", function()
+      it( "should return a stage", function()
+         assert.are.equal( 0, entry:stage() )
+      end)
+   end)
+end)
 describe( "add #index", function() pending("  luagi_index_add ") end)
-describe( "entry_stage #index", function() pending("  luagi_index_entry_stage ") end)
 describe( "add_by_path #index", function() pending("  luagi_index_add_bypath ") end)
 describe( "add_all #index", function() pending("  luagi_index_add_all ") end)
 describe( "update_all #index", function() pending("  luagi_index_update_all ") end)
