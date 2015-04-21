@@ -2,8 +2,60 @@
 #include <string.h>
 #include <git2/errors.h>
 #include <git2/repository.h>
+#include <lua.h>
 #include "luagi.h"
 #include "oid.h"
+
+static int check_stage( lua_State *L, int index )
+{
+   const char *stage_str = luaL_checkstring( L, index );
+
+   switch( stage_str[0] )
+   {
+      case 'o':
+         return 2; // stage 2 HEAD "ours"
+      case 't':
+         return 3; // stage 3 MERGE_HEAD "theirs"
+      case 'a':
+         if( strlen( stage_str ) < 3 )
+         {
+            luaL_error( L, "ambiguous stage name");
+            return -2;
+         }
+         if( stage_str[2] == 'y' )
+         {
+            return -1; // any
+         }
+         else if( stage_str[2] == 'c' )
+         {
+            return 1; // stage 1 common ancestor "ancestor"
+         }
+      case 'c':
+         return 0; // stage 0 clean "clean"
+   }
+   luaL_error( L, "invalid stage name");
+   return -2;
+}
+
+static int push_stage( lua_State *L, int stage )
+{
+   switch( stage )
+   {
+      case 0:
+         lua_pushstring( L, CLEAN );
+         break;
+      case 1:
+         lua_pushstring( L, ANCESTOR );
+         break;
+      case 2:
+         lua_pushstring( L, OURS );
+         break;
+      case 3:
+         lua_pushstring( L, THEIRS );
+         break;
+   }
+   return 1;
+}
 
 int luagi_index_new( lua_State *L )
 {
@@ -235,7 +287,7 @@ int luagi_index_get_bypath( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
-   int stage = luaL_checkinteger( L, 3 );
+   int stage = check_stage( L, 3 );
 
    git_index_entry *entry = lua_newuserdata( L, sizeof( git_index_entry ) );
 
@@ -256,7 +308,7 @@ static int luagi_remove_func( lua_State *L, int (*func)( git_index *index, const
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
-   int stage = luaL_checkinteger( L, 3 );
+   int stage = check_stage( L, 3 );
 
    if( func( *index, path, stage ) )
    {
@@ -291,8 +343,7 @@ int luagi_index_entry_stage( lua_State *L )
 {
    const git_index_entry *entry = checkindexentry_at( L, 1 );
 
-   lua_pushinteger( L, git_index_entry_stage( entry ) );
-   return 1;
+   return push_stage( L, git_index_entry_stage( entry ) );
 }
 
 static int luagi_index_do_bypath( lua_State *L, int (*func)( git_index *index, const char *path) )

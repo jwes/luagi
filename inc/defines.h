@@ -320,4 +320,9 @@
 #define REBASE_MERGE "rebase_merge"
 #define APPLY_MAILBOX "apply_mailbox"
 #define APPLY_MAILBOX_OR_REBASE "apply_mailbox_or_rebase"
+#define OURS "ours"
+#define THEIRS "theirs"
+#define CLEAN "clean"
+#define ANCESTOR "ancestor"
+
 #endif
