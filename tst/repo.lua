@@ -165,9 +165,124 @@ describe( "with test_repo", function()
    end)
 end)
 
-describe( "set_workdir #repo", function() pending("luagi_repository_set_workdir") end)
-describe( "foreach_fetchhead #repo", function() pending("luagi_repository_fetchhead_foreach") end)
-describe( "foreach_mergehead #repo", function() pending("luagi_repository_mergehead_foreach") end)
-describe( "set_head #repo", function() pending("luagi_repository_set_head") end)
-describe( "set_head_detached #repo", function() pending("luagi_repository_set_head_detached") end)
-describe( "detach_head #repo", function() pending("luagi_repository_detach_head") end)
+describe( "set_workdir #repo", function()
+   local repo =  nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "should not accept a dir", function()
+      assert.has_no_error( function() repo:set_workdir( "/tmp" ) end)
+      assert.are.equal( "/tmp/", repo:workdir() )
+   end)
+end)
+
+describe( "foreach_mergehead #repo", function()
+   local repo =  nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "has no error", function()
+      assert.is.falsy( err )
+   end)
+
+   it( "has no mergehead", function()
+      assert.has_error( function() repo:foreach_mergehead() end)
+   end)
+end)
+
+describe( "foreach_fetchhead #repo", function()
+   local repo =  nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "has no error", function()
+      assert.is.falsy( err )
+   end)
+
+   it( "has no fetchhead", function()
+      assert.has_error( function()
+         repo:foreach_fetchhead(function(num, ref_name, remote_url, oid, is_merge) end)
+      end)
+   end)
+end)
+
+describe( "set_head #repo", function()
+   local repo =  nil
+   local err = nil
+   local id = "55c33519ff7e7ae27372a6f338e635b3c18cca57"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "has no error", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( repo )
+   end)
+
+   it( "set_head", function()
+      assert.has_no_error( function()
+         repo:set_head( "refs/heads/work", test_helper.signature, "switch" )
+      end)
+      local ref, err = repo:head()
+      assert.is.falsy( err )
+      assert.are.equal( id, ref:target() )
+   end)
+end)
+
+describe( "set_head_detached #repo", function()
+   local repo =  nil
+   local err = nil
+   local id = "55c33519ff7e7ae27372a6f338e635b3c18cca57"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "has no error", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( repo )
+   end)
+
+   it( "set_head_detached", function()
+      assert.has_no_error( function()
+         repo:set_head_detached( id, test_helper.signature, "switch" )
+      end)
+      local ref, err = repo:head()
+      assert.is.falsy( err )
+      assert.are.equal( id, ref:target() )
+
+      assert.is.True( repo:is_head_detached() )
+   end)
+end)
+
+describe( "detach_head #repo", function()
+   local repo =  nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "has no error", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( repo )
+   end)
+
+   it( "detach head", function()
+      assert.is.False( repo:is_head_detached() )
+      assert.has_no_error( function()
+         repo:detach_head( test_helper.signature, "some msg" )
+      end)
+      assert.is.True( repo:is_head_detached() )
+   end)
+end)

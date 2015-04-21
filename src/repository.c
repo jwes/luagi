@@ -236,7 +236,7 @@ static int luagi_generic_is( lua_State *L, int (*func)( git_repository *repo ) )
    return 1;
 }
 
-int luagi_repository_head_detatched( lua_State *L )
+int luagi_repository_head_detached( lua_State *L )
 {
    return luagi_generic_is( L, git_repository_head_detached );
 }
@@ -489,6 +489,7 @@ int luagi_repository_set_head( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    const char *refname = luaL_checkstring( L, 2 );
+   luaL_checktype( L, 3, LUA_TTABLE );
    git_signature *sig;
    table_to_signature( L, &sig, 3 );
    const char *log_message = luaL_checkstring( L, 4 );
@@ -508,6 +509,7 @@ int luagi_repository_set_head_detached( lua_State *L )
    git_oid oid;
    luagi_check_oid( &oid, L, 2 );
    git_signature *sig;
+   luaL_checktype( L, 3, LUA_TTABLE );
    table_to_signature( L, &sig, 3 );
    const char *log_message = luaL_checkstring( L, 4 );
 
@@ -523,6 +525,7 @@ int luagi_repository_set_head_detached( lua_State *L )
 int luagi_repository_detach_head( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
+   luaL_checktype( L, 2, LUA_TTABLE );
    git_signature *sig;
    table_to_signature( L, &sig, 2 );
    const char *log_message = luaL_checkstring( L, 3 );
@@ -608,6 +611,4 @@ int luagi_repository_is_shallow( lua_State *L )
 {
    return luagi_generic_is( L, git_repository_is_shallow );
 }
-
-
 

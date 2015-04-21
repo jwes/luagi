@@ -11,7 +11,7 @@ int luagi_repository_open_bare( lua_State *L );
 int luagi_repository_init( lua_State *L );
 int luagi_repository_init_ext( lua_State *L );
 int luagi_repository_head( lua_State *L );
-int luagi_repository_head_detatched( lua_State *L );
+int luagi_repository_head_detached( lua_State *L );
 int luagi_repository_head_unborn( lua_State *L );
 int luagi_repository_is_empty( lua_State *L );
 int luagi_repository_path( lua_State *L );

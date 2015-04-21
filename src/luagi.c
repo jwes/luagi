@@ -178,7 +178,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "is_path_ignored", luagi_ignore_path_is_ignored },
 
    { "head", luagi_repository_head },
-   { "is_head_detached", luagi_repository_head_detatched },
+   { "is_head_detached", luagi_repository_head_detached },
    { "is_head_unborn", luagi_repository_head_unborn },
    { "is_empty", luagi_repository_is_empty },
    { "is_bare", luagi_repository_is_bare },
