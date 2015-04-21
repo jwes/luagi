@@ -84,11 +84,67 @@ describe( "create_index", function()
    end)
 end)
 
+describe( "discover", function()
+   it( "should find test_helper.path", function()
+      test_helper.extract()
+      local path, err = luagi.discover( test_helper.path.."/some/folder", false )
+      assert.is.falsy( err )
+      assert.is.truthy( path:find(test_helper.path) )
+   end)
+end)
 
-describe( "merge_files", function() pending("pending") end)
-describe( "discover", function() pending("pending") end)
-describe( "open_ext", function() pending("pending") end)
-describe( "open_bare", function() pending("pending") end)
-describe( "init_ext", function() pending("pending") end)
-describe( "patch_buffers", function() pending("pending") end)
+describe( "open_ext", function()
+   local repo = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      opts = {
+         cross_fs = true,
+         bare = true,
+      }
+      repo, err = luagi.open_ext( test_helper.path.."/.git", opts )
+   end)
+
+   it("should have no error", function()
+      assert.is.falsy( err )
+   end)
+
+   it( "should be a repo", function()
+      assert.is.not_nil( repo )
+      assert.are.equal( "userdata", type( repo ) )
+      assert.is.not_nil( repo.head )
+      assert.is.True( repo:is_bare() )
+   end)
+end)
+
+describe( "open_bare", function()
+   it( "should open the test_repo bare", function()
+      test_helper.setup()
+      local repo, err = luagi.open_bare( test_helper.path.."/.git" )
+      assert.is.falsy( err )
+      assert.is.True( repo:is_bare() )
+      assert.is.False( repo:is_empty() )
+   end)
+end)
+
+describe( "init_ext", function()
+   it( "should be a repo", function()
+      local path = "/tmp/testpath"
+      os.execute( "rm -rf "..path )
+      local repo_path = "/dir"
+      local opts = {
+         bare = true,
+      }
+      local repo, err = luagi.init_ext( path..repo_path, opts )
+      assert.is.not_nil( err )
+      
+      opts[ "mkdir" ] = true
+      --opts[ "mkpath" ] = true
+      local repo, err = luagi.init_ext( path..repo_path, opts )
+      assert.is.falsy( err )
+      assert.is_true( repo:is_bare() )
+      assert.is_true( repo:is_empty() )
+
+   end)
+end)
  

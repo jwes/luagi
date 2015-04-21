@@ -7,3 +7,4 @@ describe( "get_line_in_hunk #patch", function() pending("luagi_patch_get_line_in
 describe( "size #patch", function() pending("luagi_patch_size ") end)
 describe( "print #patch", function() pending("luagi_patch_print ") end)
 describe( "to_buf #patch", function() pending(" luagi_patch_to_buf ") end)
+describe( "patch_buffers #patch #base", function() pending("pending") end)

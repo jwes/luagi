@@ -26,7 +26,7 @@ end)
 describe( "branch lookup", function() 
    local repo = nil
    setup( function()
-      test_helper.extract()
+      test_helper.setup()
       repo = luagi.open( test_helper.path )
    end)
    describe("lookup_branch #branch", function()

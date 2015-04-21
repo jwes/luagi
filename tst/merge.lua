@@ -11,9 +11,10 @@ describe( "merge #merge", function() pending("luagi_merge") end)
 describe( "merge_file_from_index #merge", function() pending("luagi_merge_file_from_index") end)
 describe( "merge_analysis #merge", function() pending("luagi_merge_analysis") end)
 
-
 describe( "__tostring #merge", function() pending("luagi_merge_head_id ") end)
 describe( "automergable #merge", function() pending("luagi_mergeresult_automergable ") end)
 describe( "path #merge", function() pending("luagi_mergeresult_path ") end)
 describe( "mode #merge", function() pending("luagi_mergeresult_mode ") end)
 describe( "content #merge", function() pending("luagi_mergeresult_content ") end)
+
+describe( "merge_files #merge #base", function() pending("pending") end)
