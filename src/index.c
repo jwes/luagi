@@ -336,9 +336,9 @@ static int index_matched_pathspec( const char *path, const char *matched_pathspe
       luaL_error( p->L, "can not call path callback" );
    }
 
-   int ret = luaL_checkinteger( p->L, -1 );
+   int ret = lua_toboolean( p->L, -1 );
    lua_pop( p->L, 1 );
-   return ret;
+   return !ret;
 }
 
 int luagi_index_add_all( lua_State *L )
@@ -381,6 +381,8 @@ int luagi_index_add_all( lua_State *L )
 int luagi_index_remove_all( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
+   luaL_checktype( L, 2, LUA_TTABLE );
+   luaL_checktype( L, 3, LUA_TFUNCTION );
    git_strarray array = luagi_strings_from_lua_list( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
