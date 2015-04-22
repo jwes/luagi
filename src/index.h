@@ -44,8 +44,9 @@ int luagi_index_conflict_free( lua_State *L );
 
 #define checkindex_at(L, N) \
       (git_index**) luaL_checkudata( L, N, LUAGI_INDEX_FUNCS )
-#define checkindexentry_at(L, N) \
-      (const git_index_entry*) luaL_checkudata( L, N, LUAGI_INDEX_ENTRY_FUNCS )
+
+int check_index_entry( git_index_entry *entry, lua_State *L, const int index);
+int push_index_entry( lua_State *L, const git_index_entry *entry );
 
 #define checkindexconflict_at(L, N) \
       ( git_index_conflict_iterator**) luaL_checkudata( L, N, LUAGI_INDEX_CONFLICT_FUNCS )
@@ -66,7 +67,6 @@ static const struct luaL_Reg luagi_index_funcs [] = {
    { "remove",   luagi_index_remove },
    { "remove_directory",   luagi_index_remove_directory },
    { "add",   luagi_index_add },
-   { "entry_stage",   luagi_index_entry_stage },
    { "add_by_path",   luagi_index_add_bypath },
    { "remove_by_path",   luagi_index_remove_bypath },
    { "add_all",   luagi_index_add_all },
@@ -80,11 +80,6 @@ static const struct luaL_Reg luagi_index_funcs [] = {
    { "has_conflicts",   luagi_index_has_conflicts },
    { "iterate_conflict", luagi_index_conflict_iterator },
    { "__gc",   luagi_index_free },
-   { NULL, NULL }
-};
-
-static const struct luaL_Reg luagi_index_entry_funcs [] = {
-   { "stage", luagi_index_entry_stage },
    { NULL, NULL }
 };
 

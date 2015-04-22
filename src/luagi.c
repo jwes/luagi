@@ -334,7 +334,6 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_DIFF_FUNCS, luagi_diff_funcs );
    setup_funcs(L, LUAGI_DIFF_STATS_FUNCS, luagi_diff_stats_funcs );
    setup_funcs(L, LUAGI_INDEX_FUNCS, luagi_index_funcs );
-   setup_funcs(L, LUAGI_INDEX_ENTRY_FUNCS, luagi_index_entry_funcs );
    setup_funcs(L, LUAGI_INDEX_CONFLICT_FUNCS, luagi_index_conflict_funcs );
    setup_funcs(L, LUAGI_OBJECT_FUNCS, luagi_object_funcs );
    setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );

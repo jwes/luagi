@@ -245,19 +245,121 @@ describe( "by_path #index", function()
    it("should be an entry", function()
       assert.is.falsy( err )
       assert.is.not_nil( entry )
-      assert.are.equal( "userdata", type( entry ) )
+      assert.are.equal( "table", type( entry ) )
       assert.is.not_nil( entry.stage )
    end)
 
    describe( "entry_stage #index", function()
       it( "should return a stage", function()
-         assert.are.equal( "clean", entry:stage() )
+         assert.are.equal( "clean", entry.stage )
       end)
    end)
 end)
-describe( "add #index", function() pending("  luagi_index_add ") end)
-describe( "add_by_path #index", function() pending("  luagi_index_add_bypath ") end)
-describe( "add_all #index", function() pending("  luagi_index_add_all ") end)
+
+describe( "add #index", function()
+   local index = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+      if err then return end
+      index:clear()
+      file = io.open( test_helper.path.."/testfile" )
+      file:write( "foo" )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.are.equal( 0, #index )
+   end)
+
+   it( "shouldn't be able to add nil", function()
+      local entry = nil
+      assert.has_error( function()
+         index:add( entry, "any" )
+      end)
+      assert.are.equal( 0, #index )
+   end)
+   it( "should be able to add the entry", function()
+      local entry = {
+         uid = 1000,
+         gid = 1000,
+         path = "testfile",
+         oid = "d95f3ad14dee633a758d2e331151e950dd13e4ed",
+         file_size = 8,
+         dev = 65033,
+         ino = 1704000,
+         mode = 33188,
+      }
+      assert.has_no_error( function()
+         index:add( entry, "any" )
+      end)
+      assert.are.equal( 1, #index )
+   end)
+end)
+
+describe( "add_by_path #index", function()
+   local index = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+      if err then return end
+      index:clear()
+      file = io.open( test_helper.path.."/testfile" )
+      file:write( "foo" )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.are.equal( 0, #index )
+   end)
+
+   it( "should add the element", function()
+      assert.has_no_error( function()
+         index:add_by_path( "testfile" )
+      end)
+      assert.are.equal( 1, #index )
+   end)
+end)
+
+describe( "add_all #index", function()
+   local index = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+      if err then return end
+      index:clear()
+      file = io.open( test_helper.path.."/testfile" )
+      file:write( "foo" )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.are.equal( 0, #index )
+   end)
+
+   it( "should add the element", function()
+      local pathspec = {}
+      pathspec[1] = "*"
+      local flags = {
+      }
+      assert.has_no_error( function()
+         index:add_all( pathspec, flags, function( path, matched_spec )
+            return path == "testfile"
+         end)
+      end)
+      assert.are.equal( 1, #index )
+   end)
+end)
+
 describe( "update_all #index", function() pending("  luagi_index_update_all ") end)
 describe( "find #index", function() pending("  luagi_index_find ") end)
 describe( "conflict_add #index", function() pending("  luagi_index_conflict_add ") end)

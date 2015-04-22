@@ -324,14 +324,17 @@ int luagi_merge_file( lua_State *L )
 int luagi_merge_file_from_index( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const git_index_entry *ancestor = checkindexentry_at( L, 2 );
-   const git_index_entry *ours = checkindexentry_at( L, 3 );
-   const git_index_entry *theirs = checkindexentry_at( L, 4 );
+   git_index_entry ancestor;
+   check_index_entry( &ancestor, L, 2 );
+   git_index_entry ours;
+   check_index_entry( &ours, L, 3 );
+   git_index_entry theirs;
+   check_index_entry( &theirs, L, 4 );
 
    git_merge_file_options opts;
    luagi_merge_init_file_options( L, 5, &opts );
    git_merge_file_result *res = lua_newuserdata( L, sizeof( git_merge_file_result ) );
-   if( git_merge_file_from_index( res, *repo, ancestor, ours, theirs, &opts ) )
+   if( git_merge_file_from_index( res, *repo, &ancestor, &ours, &theirs, &opts ) )
    {
       ERROR_PUSH( L )
    }

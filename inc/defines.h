@@ -325,4 +325,16 @@
 #define CLEAN "clean"
 #define ANCESTOR "ancestor"
 
+#define SECONDS "seconds"
+#define NANOSECONDS "nanoseconds"
+
+#define CTIME "ctime"
+#define MTIME "mtime"
+#define GID "gid"
+#define UID "uid"
+#define INO "ino"
+#define DEV "dev"
+#define FILE_SIZE "file_size"
+#define STAGE "stage"
+
 #endif
