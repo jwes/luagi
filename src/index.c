@@ -79,7 +79,7 @@ static int index_time_to_table( lua_State *L, git_index_time time )
    return 1;
 }
 
-int check_index_entry( git_index_entry *entry, lua_State *L, const int index)
+int luagi_check_index_entry( git_index_entry *entry, lua_State *L, const int index)
 {
    luaL_checktype( L, index, LUA_TTABLE );
 
@@ -128,7 +128,7 @@ int check_index_entry( git_index_entry *entry, lua_State *L, const int index)
    return 0;
 }
 
-int push_index_entry( lua_State *L, const git_index_entry *entry )
+int luagi_push_index_entry( lua_State *L, const git_index_entry *entry )
 {
    lua_newtable( L );
    index_time_to_table( L, entry->ctime );
@@ -381,7 +381,7 @@ int luagi_index_get_byindex( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   return push_index_entry( L, out );
+   return luagi_push_index_entry( L, out );
 }
 
 int luagi_index_get_bypath( lua_State *L )
@@ -396,7 +396,7 @@ int luagi_index_get_bypath( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   return push_index_entry( L, out );
+   return luagi_push_index_entry( L, out );
 }
    
 static int luagi_remove_func( lua_State *L, int (*func)( git_index *index, const char *path, int stage ) )
@@ -426,7 +426,7 @@ int luagi_index_add( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    git_index_entry entry;
-   check_index_entry( &entry, L, 2 );
+   luagi_check_index_entry( &entry, L, 2 );
 
    if( git_index_add( *index, &entry ) )
    {
@@ -544,6 +544,8 @@ int luagi_index_remove_all( lua_State *L )
 int luagi_index_update_all( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
+   luaL_checktype( L, 2, LUA_TTABLE );
+   luaL_checktype( L, 3, LUA_TFUNCTION );
    git_strarray array = luagi_strings_from_lua_list( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
@@ -572,11 +574,11 @@ int luagi_index_conflict_add( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    git_index_entry ancestor_entry;
-   check_index_entry( &ancestor_entry, L, 2 );
+   luagi_check_index_entry( &ancestor_entry, L, 2 );
    git_index_entry our_entry;
-   check_index_entry( &our_entry, L, 3 );
+   luagi_check_index_entry( &our_entry, L, 3 );
    git_index_entry their_entry;
-   check_index_entry( &their_entry, L, 4 );
+   luagi_check_index_entry( &their_entry, L, 4 );
 
    if( git_index_conflict_add( *index, &ancestor_entry, &our_entry, &their_entry ) )
    {
@@ -602,9 +604,9 @@ int luagi_index_conflict_get( lua_State *L )
    }
 
    int ret = 0;
-   ret += push_index_entry( L, ancestor_out );
-   ret += push_index_entry( L, our_out );
-   ret += push_index_entry( L, their_out );
+   ret += luagi_push_index_entry( L, ancestor_out );
+   ret += luagi_push_index_entry( L, our_out );
+   ret += luagi_push_index_entry( L, their_out );
    return ret;
 }
 
@@ -643,26 +645,24 @@ static int conflict_iter( lua_State *L )
 {
    git_index_conflict_iterator **iter = checkindexconflict_at( L, lua_upvalueindex( 1 ) );   
 
-    const git_index_entry *ancestor_out = lua_newuserdata( L, sizeof( git_index_entry ) );
-   const git_index_entry *our_out = lua_newuserdata( L, sizeof( git_index_entry ) );
-   const git_index_entry *their_out = lua_newuserdata( L, sizeof( git_index_entry ) );
+   const git_index_entry *ancestor_out;
+   const git_index_entry *our_out;
+   const git_index_entry *their_out;
    int ret = git_index_conflict_next( &ancestor_out, &our_out, &their_out, *iter );
-   if( ret < 0 )
+   if( ret == GIT_ITEROVER )
+   {
+      return 0;
+   }
+   else if ( ret < 0 )
    {
       ERROR_ABORT( L )
       return 0;
    }
-   else if ( ret == 0 )
-   {
-      return 0;
-   }
 
-   luaL_getmetatable(L, LUAGI_INDEX_ENTRY_FUNCS);
-   lua_setmetatable(L, -1);
-   lua_setmetatable(L, -2);
-   lua_setmetatable(L, -3);
-   return 3;
-
+   ret += luagi_push_index_entry( L, ancestor_out );
+   ret += luagi_push_index_entry( L, our_out );
+   ret += luagi_push_index_entry( L, their_out );
+   return ret;
 }
 
 int luagi_index_conflict_iterator( lua_State *L )
@@ -678,7 +678,7 @@ int luagi_index_conflict_iterator( lua_State *L )
    luaL_getmetatable(L, LUAGI_INDEX_CONFLICT_FUNCS);
    lua_setmetatable(L, -2);
 
-   lua_pushcclosure( L, conflict_iter, -2 );
+   lua_pushcclosure( L, &conflict_iter, 1 );
    return 1; 
 }
 

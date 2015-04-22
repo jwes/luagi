@@ -325,11 +325,11 @@ int luagi_merge_file_from_index( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    git_index_entry ancestor;
-   check_index_entry( &ancestor, L, 2 );
+   luagi_check_index_entry( &ancestor, L, 2 );
    git_index_entry ours;
-   check_index_entry( &ours, L, 3 );
+   luagi_check_index_entry( &ours, L, 3 );
    git_index_entry theirs;
-   check_index_entry( &theirs, L, 4 );
+   luagi_check_index_entry( &theirs, L, 4 );
 
    git_merge_file_options opts;
    luagi_merge_init_file_options( L, 5, &opts );

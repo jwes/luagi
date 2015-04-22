@@ -39,14 +39,13 @@ int luagi_index_conflict_iterator( lua_State *L );
 int luagi_index_conflict_free( lua_State *L );
 
 #define LUAGI_INDEX_FUNCS "is.westhu.luagi.index"
-#define LUAGI_INDEX_ENTRY_FUNCS "is.westhu.luagi.index.entry"
 #define LUAGI_INDEX_CONFLICT_FUNCS "is.westhu.luagi.index.conflict"
 
 #define checkindex_at(L, N) \
       (git_index**) luaL_checkudata( L, N, LUAGI_INDEX_FUNCS )
 
-int check_index_entry( git_index_entry *entry, lua_State *L, const int index);
-int push_index_entry( lua_State *L, const git_index_entry *entry );
+int luagi_check_index_entry( git_index_entry *entry, lua_State *L, const int index);
+int luagi_push_index_entry( lua_State *L, const git_index_entry *entry );
 
 #define checkindexconflict_at(L, N) \
       ( git_index_conflict_iterator**) luaL_checkudata( L, N, LUAGI_INDEX_CONFLICT_FUNCS )

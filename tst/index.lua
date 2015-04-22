@@ -298,6 +298,17 @@ describe( "add #index", function()
       end)
       assert.are.equal( 1, #index )
    end)
+   describe( "iterate_conflict #index", function()
+      it("should iterate 0 times without error", function()
+         local count = 0
+         assert.has_no_error( function()
+            for ancestor, our, their in index:iterate_conflict() do
+               count = count + 1
+            end
+         end)
+         assert.are.equal( 0, count )
+      end)
+   end)
 end)
 
 describe( "add_by_path #index", function()
@@ -360,10 +371,38 @@ describe( "add_all #index", function()
    end)
 end)
 
-describe( "update_all #index", function() pending("  luagi_index_update_all ") end)
+describe( "update_all #index", function()
+   local index = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.are.equal( 3, #index )
+   end)
+
+   it( "should call all files once", function()
+      local pathspec = {}
+      pathspec[1] = "*"
+      local count = 0
+      function all ( path, matched )
+         count = count + 1
+         assert.are.equal( "*", matched )
+      end
+
+      assert.are.equal( 0, count )
+      index:update_all( pathspec, all )
+      assert.are.equal( #index, count )
+   end)
+end)
+
 describe( "find #index", function() pending("  luagi_index_find ") end)
 describe( "conflict_add #index", function() pending("  luagi_index_conflict_add ") end)
 describe( "conflict_get #index", function() pending("  luagi_index_conflict_get ") end)
 describe( "conflict_remove #index", function() pending("  luagi_index_conflict_remove ") end)
 describe( "conflict_cleanup #index", function() pending("  luagi_index_conflict_cleanup ") end)
-describe( "iterate_conflict #index", function() pending("luagi_index_conflict_iterator ") end)
