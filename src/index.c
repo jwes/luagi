@@ -130,6 +130,11 @@ int luagi_check_index_entry( git_index_entry *entry, lua_State *L, const int ind
 
 int luagi_push_index_entry( lua_State *L, const git_index_entry *entry )
 {
+   if( ! entry )
+   {
+      lua_pushnil( L );
+      return 1;
+   }
    lua_newtable( L );
    index_time_to_table( L, entry->ctime );
    lua_setfield( L, -2, CTIME );
@@ -565,9 +570,17 @@ int luagi_index_find( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );
    const char *path = luaL_checkstring( L, 2 );
-
-   lua_pushinteger( L, git_index_find( NULL, *index, path ) );
-   return 1;
+   int ret = git_index_find( NULL, *index, path );
+   if( ret < 0 )
+   {
+      lua_pushnil( L );
+      return 1;
+   }
+   else
+   {
+      lua_pushinteger( L, ret + 1); //one based index
+      return 1;
+   }
 }
 
 int luagi_index_conflict_add( lua_State *L )
@@ -595,15 +608,17 @@ int luagi_index_conflict_get( lua_State *L )
    const git_index_entry *ancestor_out;
    const git_index_entry *our_out;
    const git_index_entry *their_out;
-
-   if( git_index_conflict_get( &ancestor_out, &our_out, &their_out, *index, path ) )
+   int ret = git_index_conflict_get( &ancestor_out, &our_out, &their_out, *index, path );
+   if( ret == GIT_ENOTFOUND )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      return 0;
+   }
+   else if( ret )
+   {
+      ERROR_ABORT( L )
       return 0;
    }
 
-   int ret = 0;
    ret += luagi_push_index_entry( L, ancestor_out );
    ret += luagi_push_index_entry( L, our_out );
    ret += luagi_push_index_entry( L, their_out );

@@ -17,12 +17,12 @@
 
 #define ERROR_ABORT( L ) \
    const git_error *err = giterr_last(); \
-   luaL_error( L, err->message ); 
+   luaL_error( L, err ? err->message : "unknown" );
 
 #define ERROR_PUSH( L ) \
    const git_error *err = giterr_last(); \
    lua_pushnil( L ); \
-   lua_pushstring( L, err->message ); \
+   lua_pushstring( L, err ? err->message : "unknown" ); \
    return 2;
 
 #define checkrepo(L, n) \
