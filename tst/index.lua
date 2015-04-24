@@ -162,6 +162,7 @@ describe( "remove_directory #index", function()
    end)
    pending( "correct testcase" )
 end)
+
 describe( "remove_all #index", function()
    local index = nil
    local err = nil
@@ -318,7 +319,7 @@ describe( "add #index", function()
       end)
    end)
    describe( "conflict_remove #index", function()
-      it( "should return an error", function()
+      it( "should't return an error", function()
          assert.has_no__error( function()
             index:conflict_remove("testfile")
          end)
@@ -327,6 +328,14 @@ describe( "add #index", function()
    describe( "find #index", function()
       it(" testfile", function()
          assert.are.equal( 1, index:find( "testfile" ) )
+      end)
+   end)
+   describe( "conflict_cleanup #index", function()
+      it( "should't return an error", function()
+         assert.has_no__error( function()
+            index:conflict_cleanup()
+         end)
+         assert.is.False( index:has_conflicts())
       end)
    end)
 end)
@@ -423,7 +432,60 @@ end)
 
 
 describe( "conflict_add #index", function()
+   local index = nil
+   local err = nil
+   local entry = {
+      uid = 1000,
+      gid = 1000,
+      path = "testfile",
+      oid = "d95f3ad14dee633a758d2e331151e950dd13e4ed",
+      file_size = 8,
+      dev = 65033,
+      ino = 1704000,
+      mode = 33188,
+   }
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
 
-   describe( "conflict_cleanup #index", function() pending("  luagi_index_conflict_cleanup ") end)
+      -- add conflict -- dummy
+      index:conflict_add( entry, entry, entry )
+   end)
+
+   it( "should have a conflict", function()
+      assert.is.True( index:has_conflicts() )
+   end)
+
+   describe( "conflict_cleanup #index", function()
+      it( "should't return an error", function()
+         assert.has_no__error( function()
+            index:conflict_cleanup()
+         end)
+         assert.is.False( index:has_conflicts())
+      end)
+   end)
+end)
+describe( "conflict_add #index", function()
+   local index = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      index, err = repo:index()
+   end)
+
+   it( "should survive", function()
+      assert.has_error( function()
+         index:conflict_add( nil, nil, nil )
+      end)
+
+      assert.has_error( function()
+         index:conflict_add( {}, {}, {} )
+      end)
+      assert.is.False( index:has_conflicts())
+   end)
 end)
 

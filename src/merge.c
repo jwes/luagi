@@ -92,11 +92,11 @@ static int base_for_multiple( lua_State *L, int (*func)( git_oid *out, git_repos
    int count = luaL_len( L, tidx );
    git_oid input_array [ count ];
 
-   for( int i = 0; i < count; i++ )
+   for( int i = 1; i <= count; i++ )
    {
       lua_pushinteger( L, i );
       lua_gettable( L, tidx );
-      luagi_check_oid( &input_array[i], L, -1 );
+      luagi_check_oid( &input_array[i-1], L, -1 );
    }
    git_oid out;
    if( func( &out, *repo, count, input_array ) )
