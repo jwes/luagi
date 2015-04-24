@@ -337,4 +337,5 @@
 #define FILE_SIZE "file_size"
 #define STAGE "stage"
 
+#define AUTOMERGEABLE "automergeable"
 #endif

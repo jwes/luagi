@@ -339,7 +339,6 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );
    setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
    setup_funcs(L, LUAGI_MERGEHEAD_FUNCS, luagi_mergehead_funcs );
-   setup_funcs(L, LUAGI_MERGERESULT_FUNCS, luagi_mergeresult_funcs );
    setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
    setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
    setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );

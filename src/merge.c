@@ -61,7 +61,24 @@ int luagi_merge_analysis( lua_State *L )
    lua_pushstring( L, poutstr );      
    return 2;
 }
- 
+
+static int push_merge_file_result( lua_State *L, git_merge_file_result *res )
+{
+   lua_newtable( L );
+   lua_pushboolean( L, res->automergeable );
+   lua_setfield( L, -2, AUTOMERGEABLE );
+
+   lua_pushstring( L, res->path );
+   lua_setfield( L, -2, PATH );
+
+   lua_pushinteger( L, res->mode );
+   lua_setfield( L, -2, MODE );
+
+   lua_pushstring( L, res->ptr );
+   lua_setfield( L, -2, CONTENT );
+   return 1;
+}
+
 int luagi_merge_base( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
@@ -309,16 +326,16 @@ int luagi_merge_file( lua_State *L )
    git_merge_file_options opts;
    luagi_merge_init_file_options( L, 4, &opts );
 
-   git_merge_file_result *out = lua_newuserdata( L, sizeof( git_merge_file_result ) );
+   git_merge_file_result out;
 
-   if( git_merge_file( out, &ancestor, &ours, &theirs, &opts ) )
+   if( git_merge_file( &out, &ancestor, &ours, &theirs, &opts ) )
    {
       ERROR_PUSH( L )
    }
 
-   luaL_getmetatable( L, LUAGI_MERGERESULT_FUNCS );
-   lua_setmetatable( L, -2 );
-   return 1;
+   int ret = push_merge_file_result( L, &out );
+   git_merge_file_result_free( &out );
+   return ret;
 }
 
 int luagi_merge_file_from_index( lua_State *L )
@@ -333,21 +350,14 @@ int luagi_merge_file_from_index( lua_State *L )
 
    git_merge_file_options opts;
    luagi_merge_init_file_options( L, 5, &opts );
-   git_merge_file_result *res = lua_newuserdata( L, sizeof( git_merge_file_result ) );
-   if( git_merge_file_from_index( res, *repo, &ancestor, &ours, &theirs, &opts ) )
+   git_merge_file_result out;
+   if( git_merge_file_from_index( &out, *repo, &ancestor, &ours, &theirs, &opts ) )
    {
       ERROR_PUSH( L )
    }
-   luaL_getmetatable( L, LUAGI_MERGERESULT_FUNCS );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
-int luagi_merge_file_result_free( lua_State *L )
-{
-   git_merge_file_result *result = check_mergeresult_at( L, 1 );
-   git_merge_file_result_free( result );
-   return 0;
+   int ret = push_merge_file_result( L, &out );
+   git_merge_file_result_free( &out );
+   return ret;
 }
 
 int luagi_merge_trees( lua_State *L )
@@ -417,30 +427,3 @@ int luagi_merge( lua_State *L )
    return 0;
 }
 
-int luagi_mergeresult_automergable( lua_State *L )
-{
-   git_merge_file_result *res = check_mergeresult_at( L, 1 );
-   lua_pushboolean( L, res->automergeable );
-   return 1;
-}
-
-int luagi_mergeresult_path( lua_State *L )
-{
-   git_merge_file_result *res = check_mergeresult_at( L, 1 );
-   lua_pushstring( L, res->path );
-   return 1;
-}
-
-int luagi_mergeresult_mode( lua_State *L )
-{
-   git_merge_file_result *res = check_mergeresult_at( L, 1 );
-   lua_pushinteger( L, res->mode );
-   return 1;
-}
-
-int luagi_mergeresult_content( lua_State *L )
-{
-   git_merge_file_result *res = check_mergeresult_at( L, 1 );
-   lua_pushstring( L, res->ptr );
-   return 1;
-}
