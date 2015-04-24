@@ -152,11 +152,118 @@ describe( "merge_head_from_id #merge", function()
    end)
 end)
 
-describe( "merge_trees #merge", function() pending("luagi_merge_trees") end)
-describe( "merge_commits #merge", function() pending("luagi_merge_commits") end)
-describe( "merge #merge", function() pending("luagi_merge") end)
+describe( "merge_trees #merge", function()
+   local repo = nil
+   local err = nil
+   local master = nil
+   local work = nil
+   local ancestor = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      master, err = repo:lookup_tree( "2add3e2b70b08e7fa390dc24ba70920b78ed1076" )
+      if err then return end
+      work, err = repo:lookup_tree( "bdacf21d7fae4970de045efbe33fb389f44072a8" )
+      if err then return end
+      ancestor, err = repo:lookup_tree( "7a00e2b8fb8f22546224ffd11629dd93a5137d5" )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( master )
+      assert.is.not_nil( work )
+      assert.is.not_nil( ancestor )
+   end)
+
+   it( "should merge", function()
+      local index, err = repo:merge_trees( ancestor, master, work, {} )
+      assert.is.falsy( err )
+      assert.are.equal( "userdata", type( index ) )
+      assert.is.not_nil( index.caps )
+   end)
+end)
+
+describe( "merge_commits #merge", function()
+   local repo = nil
+   local err = nil
+   local master = nil
+   local work = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      master, err = repo:lookup_commit( head_master )
+      if err then return end
+      work, err = repo:lookup_commit( head_work )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( master )
+      assert.is.not_nil( work )
+   end)
+
+   it( "should merge", function()
+      local index, err = repo:merge_commits( master, work, {} )
+      assert.is.falsy( err )
+      assert.are.equal( "userdata", type( index ) )
+      assert.is.not_nil( index.caps )
+   end)
+end)
+
+describe( "merge #merge", function()
+   local repo = nil
+   local err = nil
+   local merge_heads = {}
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      merge_heads[1], err = repo:merge_head_from_id( head_work )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( merge_heads )
+      assert.are.equal( "table", type( merge_heads ) )
+      assert.are.equal( "userdata", type( merge_heads[1] ) )
+      assert.is.not_nil( merge_heads[1].__tostring )
+   end)
+
+   it( "should not fail", function()
+      assert.has_no_error( function()
+         repo:merge( merge_heads, {}, {} )
+      end)
+   end)
+end)
+
 describe( "merge_file_from_index #merge", function() pending("luagi_merge_file_from_index") end)
-describe( "merge_analysis #merge", function() pending("luagi_merge_analysis") end)
+describe( "merge_analysis #merge", function()
+   local repo = nil
+   local err = nil
+   local merge_heads = {}
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      merge_heads[1], err = repo:merge_head_from_id( head_work )
+   end)
+
+   it( "should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( merge_heads )
+      assert.are.equal( "table", type( merge_heads ) )
+      assert.are.equal( "userdata", type( merge_heads[1] ) )
+      assert.is.not_nil( merge_heads[1].__tostring )
+   end)
+
+   it( "should return", function()
+      ancestor, pref = repo:merge_analysis( merge_heads )
+      assert.are.equal( "none", pref )
+      assert.are.equal( "normal", ancestor )
+   end)
+end)
 
 describe( "merge_files #merge #base", function()
    local repo = nil

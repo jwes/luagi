@@ -6,18 +6,23 @@
 #include "commit.h"
 #include "checkout.h"
 
+static void fill_merge_heads( lua_State *L, int index, const git_merge_head **heads, int len )
+{
+   for( int i = 0; i < len; i++ )
+   {
+      lua_pushinteger( L, i + 1 );
+      lua_gettable( L, index );
+      heads[i] = *( check_mergehead_at( L, -1 ) );
+      lua_pop( L, 1 );
+   }
+}
+
 int luagi_merge_analysis( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    int len =  luaL_len( L, 2 );
    const git_merge_head *heads[ len ];
-
-   for( int i = 0; i < len; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, 2 );
-      heads[i] = *( check_mergehead_at( L, -1 ) );
-   }
+   fill_merge_heads( L, 2, heads, len );
 
    git_merge_analysis_t anout;
    git_merge_preference_t pout;
@@ -387,6 +392,7 @@ int luagi_merge_commits( lua_State *L )
    git_commit **our = checkcommit_at( L, 2 );
    git_commit **their = checkcommit_at( L, 3 );
    git_merge_options opts;
+   luaL_checktype( L, 4, LUA_TTABLE );
    luagi_merge_init_options( L, 4, &opts );
    
    git_index **index = lua_newuserdata( L, sizeof( git_index *) );
@@ -405,15 +411,11 @@ int luagi_merge( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    luaL_checktype( L, 2, LUA_TTABLE );
 
+   luaL_checktype( L, 3, LUA_TTABLE );
+   luaL_checktype( L, 4, LUA_TTABLE );
    int len =  luaL_len( L, 2 );
    const git_merge_head *heads[ len ];
-
-   for( int i = 0; i < len; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, 2 );
-      heads[i] = *( check_mergehead_at( L, -1 ) );
-   }
+   fill_merge_heads( L, 2, heads, len );
 
    git_merge_options mopts;
    luagi_merge_init_options( L, 3, &mopts ); 
