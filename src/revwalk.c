@@ -137,12 +137,37 @@ int luagi_revwalk_next( lua_State *L )
 
    return luagi_push_oid( L, &out );
 }
+static unsigned int checkmode( lua_State *L, int index )
+{
+   unsigned int mode = GIT_SORT_NONE;
 
+   const char *m_str = luaL_checkstring( L, index );
+   const int len = luaL_len( L, index );
+   switch( m_str[0] )
+   {
+   case 'n':
+      mode = GIT_SORT_NONE;
+      break;
+   case 't':
+      if(  len >= 2 && m_str[1] == 'i' )
+      {
+         mode = GIT_SORT_TIME;
+      }
+      else
+      {
+         mode = GIT_SORT_TOPOLOGICAL;
+      }
+      break;
+   case 'r':
+      mode = GIT_SORT_REVERSE;
+      break;
+   }
+   return mode;
+}
 int luagi_revwalk_sorting( lua_State *L )
 {
    git_revwalk **rev = checkrevwalk( L );
-   //TODO sorting mode
-   unsigned int sorting_mode = luaL_checkinteger( L, 2 );
+   unsigned int sorting_mode = checkmode( L, 2 );
 
    git_revwalk_sorting( *rev, sorting_mode );
 
