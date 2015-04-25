@@ -338,4 +338,5 @@
 #define STAGE "stage"
 
 #define AUTOMERGEABLE "automergeable"
+#define TOPOLOGICAL "topological"
 #endif

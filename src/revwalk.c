@@ -137,31 +137,13 @@ int luagi_revwalk_next( lua_State *L )
 
    return luagi_push_oid( L, &out );
 }
-static unsigned int checkmode( lua_State *L, int index )
+static unsigned int checkmode( lua_State *L, int idx )
 {
+   luaL_checktype( L, idx, LUA_TTABLE );
    unsigned int mode = GIT_SORT_NONE;
-
-   const char *m_str = luaL_checkstring( L, index );
-   const int len = luaL_len( L, index );
-   switch( m_str[0] )
-   {
-   case 'n':
-      mode = GIT_SORT_NONE;
-      break;
-   case 't':
-      if(  len >= 2 && m_str[1] == 'i' )
-      {
-         mode = GIT_SORT_TIME;
-      }
-      else
-      {
-         mode = GIT_SORT_TOPOLOGICAL;
-      }
-      break;
-   case 'r':
-      mode = GIT_SORT_REVERSE;
-      break;
-   }
+   add_flag( mode, L, idx, TIME, GIT_SORT_TIME );
+   add_flag( mode, L, idx, TOPOLOGICAL, GIT_SORT_TOPOLOGICAL );
+   add_flag( mode, L, idx, REVERSE, GIT_SORT_REVERSE );
    return mode;
 }
 int luagi_revwalk_sorting( lua_State *L )
@@ -216,7 +198,7 @@ int luagi_revwalk_repository( lua_State *L )
       ERROR_PUSH( L )
    }
 
-   luaL_getmetatable( L, LUAGI_REVWALK_FUNCS );
+   luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
    return 1;
 }

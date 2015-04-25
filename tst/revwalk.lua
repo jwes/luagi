@@ -11,6 +11,8 @@ describe( "revwalk #revwalk", function()
       repo, err = luagi.open( test_helper.path )
       if err then return end
       revwalk, err = repo:revwalk()
+      revwalk:sorting( {} )
+      revwalk:push_head()
    end)
 
    it( "should be prepared", function()
@@ -21,18 +23,23 @@ describe( "revwalk #revwalk", function()
 
    describe( "next #revwalk", function()
       it( "should iterate elements", function()
-         local count = 0
-         while true do
-            local rev, err= revwalk:next()
-            if not rev then break end
-            count = count + 1
-          end
-          assert.are.equal( 0, count )
+         local rev, err= revwalk:next()
+         assert.are.equal( "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09", rev )
+         rev, err= revwalk:next()
+         assert.are.equal( "3a3e73745d1a2ba679362d51e0a090a3ee03aad6", rev )
        end)
    end)
-
+   describe( "repository #revwalk", function()
+      it( "should return the current repo", function()
+         local r, err = revwalk:repository()
+         assert.is.falsy( err )
+         assert.is.not_nil( r )
+         assert.is.not_nil( r.path )
+         assert.are.equal( repo:path(), r:path() )
+      end)
+   end)
 end)
-describe( "reset #revwalk", function() pending("luagi_revwalk_reset ") end)
+
 describe( "push #revwalk", function() pending("luagi_revwalk_push ") end)
 describe( "push_glob #revwalk", function() pending("luagi_revwalk_push_glob ") end)
 describe( "push_head #revwalk", function() pending("luagi_revwalk_push_head ") end)
@@ -44,5 +51,4 @@ describe( "hide_ref #revwalk", function() pending("luagi_revwalk_hide_ref ") end
 describe( "sorting #revwalk", function() pending("luagi_revwalk_sorting ") end)
 describe( "push_range #revwalk", function() pending("luagi_revwalk_push_range ") end)
 describe( "simplify_first_parent #revwalk", function() pending("luagi_revwalk_simplify_first_parent ") end)
-describe( "repository #revwalk", function() pending("luagi_revwalk_repository ") end)
 describe( "add_hide_callback #revwalk", function() pending(" luagi_revwalk_add_hide_callback ") end)
