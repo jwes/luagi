@@ -112,8 +112,14 @@ int luagi_tree_builder_insert( lua_State *L )
       lua_pushstring( L, "invalid filemode" );
       return 2;
    }
-   const git_tree_entry** entry = (const git_tree_entry**) lua_newuserdata( L, sizeof( git_tree_entry* ) );
-   ret = git_treebuilder_insert( entry, *builder, filename, &oid, mode );
+   git_tree_entry** entry = (git_tree_entry**) lua_newuserdata( L, sizeof( git_tree_entry* ) );
+   const git_tree_entry *e;
+   ret = git_treebuilder_insert( &e, *builder, filename, &oid, mode );
+   if( ret != 0 )
+   {
+      ERROR_PUSH( L )
+   }
+   ret = git_tree_entry_dup( entry, e );
    if( ret != 0 )
    {
       ERROR_PUSH( L )
