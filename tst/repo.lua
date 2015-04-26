@@ -175,7 +175,7 @@ describe( "set_workdir #repo", function()
 
    it( "should not accept a dir", function()
       assert.has_no_error( function() repo:set_workdir( "/tmp" ) end)
-      assert.are.equal( "/tmp/", repo:workdir() )
+      assert.is.truthy( repo:workdir():find( "tmp" ))
    end)
 end)
 
