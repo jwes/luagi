@@ -1,8 +1,79 @@
 local luagi = require("luagi")
+local test_helper = require("test_helper")
    --reference
-describe( "create_reference #reference", function() pending("luagi_reference_create") end)
+describe( "create_reference #reference", function()
+   local repo = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+   it("should be prepared", function()
+      assert.is.falsy( err )
+   end)
+
+   it("should create the ref", function()
+      local ref, err = repo:create_reference( "refs/tags/the_ref", 
+                           "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09",
+                           test_helper.signature,
+                           "test tag log message" )
+                           -- no force flag ) 
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+      local ref, err = repo:create_reference( "refs/tags/the_ref", 
+                           "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09",
+                           test_helper.signature,
+                           "test tag log message" )
+                           -- no force flag ) 
+      assert.is.not_nil( err ) -- no force should return an error
+      assert.is.truthy( err:find( "a reference with that name already exists" ))
+      local ref, err = repo:create_reference( "refs/tags/the_ref", 
+                           "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09",
+                           test_helper.signature,
+                           "new test tag log message",
+                           true )
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+end)
 describe( "create_reference_matching #reference", function() pending("luagi_reference_create_matching") end)
-describe( "create_symbolic_reference #reference", function() pending("luagi_reference_symbolic_create") end)
+describe( "create_symbolic_reference #reference", function()
+   local repo = nil
+   local err = nil
+   local symbolic = nil
+   local target_ref = "refs/tags/version1"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      symbolic, err = repo:create_symbolic_reference( "refs/tags/symbolic_version1", target_ref,
+                                 test_helper.signature,
+                                 "symbolic ref" )
+   end)
+   it("should be prepared", function()
+      assert.is.falsy( err )
+   end)
+
+   it( "should create a symbolic ref", function()
+      assert.is.not_nil( symbolic )
+      assert.is.not_nil( symbolic.symbolic_target )
+   end)
+   describe( "symbolic_target #reference", function()
+      it("should return the target on symbolic refs", function()
+         local target = symbolic:symbolic_target()
+         assert.is.not_nil( target )
+         assert.are.equal( target_ref, target )
+      end)
+      it( "should return nil on normal refs", function()
+         local ref, err = repo:lookup_reference( target_ref )
+         assert.is.falsy( err )
+         local target = ref:symbolic_target()
+         assert.is.falsy( target )
+      end)
+   end)
+end)
 describe( "create_symbolic_reference_matching #reference", function() pending("luagi_reference_symbolic_create_matching") end)
 describe( "lookup_reference #reference", function() pending("luagi_reference_lookup") end)
 describe( "reference_name_to_id #reference", function() pending("luagi_reference_name_to_id") end)
