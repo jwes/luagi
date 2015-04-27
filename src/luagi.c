@@ -427,8 +427,8 @@ void luagi_lua_list_from_string( lua_State *L, git_strarray *array )
    lua_newtable( L );
    for( size_t i = 1; i <= array->count; i++ )
    {
-      lua_pushstring( L, array->strings[i-1]);
       lua_pushinteger( L, i );
+      lua_pushstring( L, array->strings[i-1]);
       lua_settable( L, -3 );
    }
 }

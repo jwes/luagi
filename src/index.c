@@ -693,7 +693,7 @@ int luagi_index_conflict_iterator( lua_State *L )
    luaL_getmetatable(L, LUAGI_INDEX_CONFLICT_FUNCS);
    lua_setmetatable(L, -2);
 
-   lua_pushcclosure( L, &conflict_iter, 1 );
+   lua_pushcclosure( L, conflict_iter, 1 );
    return 1; 
 }
 

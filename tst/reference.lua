@@ -73,21 +73,166 @@ describe( "create_symbolic_reference #reference", function()
          assert.is.falsy( target )
       end)
    end)
+   describe( "target #reference", function()
+      it("should return nil on symbolic refs", function()
+         local target = symbolic:target()
+         assert.is.falsy( target )
+      end)
+      it( "should return the oid on normal refs", function()
+         local ref, err = repo:lookup_reference( target_ref )
+         assert.is.falsy( err )
+         local target = ref:target()
+         assert.is.not_nil( target )
+         assert.are.equal( "3a3e73745d1a2ba679362d51e0a090a3ee03aad6", target )
+      end)
+   end)
 end)
 describe( "create_symbolic_reference_matching #reference", function() pending("luagi_reference_symbolic_create_matching") end)
-describe( "lookup_reference #reference", function() pending("luagi_reference_lookup") end)
-describe( "reference_name_to_id #reference", function() pending("luagi_reference_name_to_id") end)
-describe( "reference_dwim #reference", function() pending("luagi_reference_dwim") end)
-describe( "remove_reference #reference", function() pending("luagi_reference_remove") end)
-describe( "list_references #reference", function() pending("luagi_reference_list") end)
+describe( "lookup_reference #reference", function()
+   local repo = nil
+   local err = nil
+   local symbolic = nil
+   local target_ref = "refs/tags/version1"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "should return a reference", function()
+      local ref, err = repo:lookup_reference( target_ref )
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+   it( "should not return a reference", function()
+      local ref, err = repo:lookup_reference( "not_a_valid_refname" )
+      assert.is.falsy( ref )
+      assert.is.not_nil( err )
+      assert.is.truthy( err:find("is not valid" ))
+   end)
+   it( "should not return a reference", function()
+      local ref, err = repo:lookup_reference( "refs/tags/not_existing" )
+      assert.is.falsy( ref )
+      assert.is.not_nil( err )
+      assert.is.truthy( err:find("not found" ))
+   end)
+   describe( "reference_name_to_id #reference", function()
+      local id = repo:reference_name_to_id( target_ref ) 
+      assert.are.equal( "3a3e73745d1a2ba679362d51e0a090a3ee03aad6", id )
+   end)
+end)
+describe( "reference_dwim #reference", function()
+   local repo = nil
+   local err = nil
+   local symbolic = nil
+   local target_ref = "refs/tags/version1"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it( "should return a reference", function()
+      local ref, err = repo:reference_dwim( "version1" )
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+end)
+
+describe( "remove_reference, list_references #reference", function()
+   local repo = nil
+   local err = nil
+   local symbolic_name = "refs/tags/symbolic_version1"
+   local direct_name = "refs/tags/another_ref"
+   local target_ref = "refs/tags/version1"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local ref, err = repo:create_symbolic_reference( symbolic_name, target_ref,
+                                 test_helper.signature,
+                                 "symbolic ref" )
+      if err then return end
+      ref, err = repo:create_reference( direct_name, "3a3e73745d1a2ba679362d51e0a090a3ee03aad6",
+                                 test_helper.signature,
+                                 "another ref" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      local refs, err = repo:list_references()
+      assert.is.falsy( err )
+      assert.are.equal( "table", type( refs ))
+      assert.are.equal( 5, #refs )
+   end)
+
+   it( "should remove a normal ref", function()
+      local num = #repo:list_references()
+      repo:remove_reference( direct_name )
+      assert.are.equal( num -1, #repo:list_references() )
+   end)
+   it( "should remove a symbolic ref", function()
+      local num = #repo:list_references()
+      repo:remove_reference( symbolic_name )
+      assert.are.equal( num -1, #repo:list_references() )
+   end)
+end)
 describe( "foreach_reference #reference", function() pending("luagi_reference_foreach") end)
 describe( "foreach_reference_with_glob #reference", function() pending("luagi_reference_foreach_glob") end)
-describe( "iterate_references #reference", function() pending("luagi_reference_iterator") end)
-describe( "reference_has_log #reference", function() pending("luagi_reference_has_log") end)
+describe( "iterate_references #reference", function()
+   local repo = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it("should iterate all references", function()
+      for ref, err in repo:iterate_references() do
+         print( ref, err )
+      end
+   end)
+end)
+
+describe( "reference_has_log #reference", function()
+   local repo = nil
+   local err = nil
+   local symbolic_name = "refs/tags/symbolic_version1"
+   local direct_name = "refs/tags/another_ref"
+   local target_ref = "refs/tags/version1"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local ref, err = repo:create_symbolic_reference( symbolic_name, target_ref,
+                                 test_helper.signature,
+                                 "symbolic ref" )
+      if err then return end
+      ref, err = repo:create_reference( direct_name, "3a3e73745d1a2ba679362d51e0a090a3ee03aad6",
+                                 test_helper.signature,
+                                 "direct ref" )
+   end)
+
+   it( "should have a log", function()
+      assert.is.True( repo:reference_has_log("refs/heads/master" ))
+   end)
+   it( "should have a log", function()
+      assert.is.True( repo:reference_has_log("refs/heads/work" ))
+   end)
+   it( "should't have a log", function()
+      assert.is.False( repo:reference_has_log( target_ref ))
+   end)
+   it( "should't have a log", function()
+      assert.is.False( repo:reference_has_log( symbolic_name ))
+   end)
+   it( "should't have a log", function()
+      assert.is.False( repo:reference_has_log( direct_name ))
+   end)
+
+end)
 describe( "reference_ensure_log #reference", function() pending("luagi_reference_ensure_log") end)
 
 
-describe( "target #reference", function() pending("luagi_reference_target ") end)
 describe( "target_peel #reference", function() pending("luagi_reference_target_peel ") end)
 describe( "symbolic_target #reference", function() pending("luagi_reference_symbolic_target ") end)
 describe( "type #reference", function() pending("luagi_reference_type ") end)

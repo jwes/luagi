@@ -491,12 +491,12 @@ static int reference_iter( lua_State *L )
    git_reference_iterator **iter = checkreferenceiter_at( L, lua_upvalueindex( 1 ) );   
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
-   int ret =  git_reference_next( out, *iter );
+   int ret = git_reference_next( out, *iter );
    if( ret == GIT_ITEROVER )
    {
       return 0;
    }
-   else if( iter != 0 )
+   else if( ret != 0 )
    {
       ERROR_ABORT( L )
       return 0;
@@ -529,12 +529,11 @@ int luagi_reference_iterator( lua_State *L )
       ERROR_ABORT( L )
       return 0;
    }
-     
 
    luaL_getmetatable(L, LUAGI_REFERENCE_ITER_FUNCS);
    lua_setmetatable(L, -2);
 
-   lua_pushcclosure( L, reference_iter, -2 );
+   lua_pushcclosure( L, reference_iter, 1 );
    return 1; 
 }
 
