@@ -377,8 +377,11 @@ static int ref_callback( git_reference *ref, void *payload )
 {
    luagi_foreach_t *p = payload;
 
+   lua_pushvalue( p->L, p->callback_pos );
    git_reference **out = lua_newuserdata( p->L, sizeof( git_reference *));
    *out = ref; 
+   luaL_getmetatable( p->L, LUAGI_REFERENCE_FUNCS );
+   lua_setmetatable( p->L, -2 );
    if( lua_pcall( p->L, 1, 1, 0 ) != LUA_OK )
    {
       luaL_error( p->L, "can not call ref callback function" );
@@ -391,6 +394,7 @@ static int ref_callback( git_reference *ref, void *payload )
 static int name_callback( const char *name, void *payload )
 {
    luagi_foreach_t *p = payload;
+   lua_pushvalue( p->L, p->callback_pos );
    lua_pushstring( p->L, name );
    if( lua_pcall( p->L, 1, 1, 0 ) != LUA_OK )
    {
@@ -404,6 +408,7 @@ static int name_callback( const char *name, void *payload )
 int luagi_reference_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
 
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    p->L = L;
@@ -548,7 +553,7 @@ int luagi_reference_foreach_glob( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    const char *glob = luaL_checkstring( L, 2 );
-
+   luaL_checktype( L, 3, LUA_TFUNCTION );
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    p->L = L;
    p->callback_pos = 3;

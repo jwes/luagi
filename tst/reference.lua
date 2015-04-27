@@ -86,6 +86,26 @@ describe( "create_symbolic_reference #reference", function()
          assert.are.equal( "3a3e73745d1a2ba679362d51e0a090a3ee03aad6", target )
       end)
    end)
+   describe( "is_branch #reference", function()
+      it( "should be false", function()
+         assert.is.False( symbolic:is_branch() )
+      end)
+   end)
+   describe( "is_remote #reference", function()
+      it( "should be false", function()
+         assert.is.False( symbolic:is_remote() )
+      end)
+   end)
+   describe( "is_tag #reference", function()
+      it( "should be true", function()
+         assert.is.True( symbolic:is_tag() )
+      end)
+   end)
+   describe( "is_note #reference", function()
+      it( "should be false", function()
+         assert.is.False( symbolic:is_note() )
+      end)
+   end)
 end)
 describe( "create_symbolic_reference_matching #reference", function() pending("luagi_reference_symbolic_create_matching") end)
 describe( "lookup_reference #reference", function()
@@ -177,7 +197,38 @@ describe( "remove_reference, list_references #reference", function()
       assert.are.equal( num -1, #repo:list_references() )
    end)
 end)
-describe( "foreach_reference #reference", function() pending("luagi_reference_foreach") end)
+describe( "foreach_reference #reference", function()
+   local repo = nil
+   local err = nil
+   local count = 0
+   local is_string = true
+   local function f( oid )
+      is_string = is_string and type( oid ) == "string"
+      count = count + 1
+      return 0
+   end
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+   end)
+
+   it("should iterate all references", function()
+      count = 0
+      is_string = true
+
+      repo:foreach_reference( f )
+      assert.are.equal( 3, count )
+      assert.is.False( is_string )
+   end)
+   it("should iterate all references", function()
+      count = 0
+      is_string = true
+
+      repo:foreach_reference( f, true )
+      assert.are.equal( 3, count )
+      assert.is.True( is_string )
+   end)
+end)
 describe( "foreach_reference_with_glob #reference", function() pending("luagi_reference_foreach_glob") end)
 describe( "iterate_references #reference", function()
    local repo = nil
@@ -188,9 +239,12 @@ describe( "iterate_references #reference", function()
    end)
 
    it("should iterate all references", function()
+      count = 0
       for ref, err in repo:iterate_references() do
-         print( ref, err )
+         assert.is.not_nil( ref.symbolic_target )
+         count = count + 1
       end
+      assert.are.equal( 3, count )
    end)
 end)
 
@@ -232,6 +286,39 @@ describe( "reference_has_log #reference", function()
 end)
 describe( "reference_ensure_log #reference", function() pending("luagi_reference_ensure_log") end)
 
+describe( "lookup_reference", function()
+   local repo = nil
+   local err = nil
+   local target_ref = "refs/tags/version1"
+   local ref = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      ref, err = repo:lookup_reference( target_ref )
+   end)
+   
+   describe( "is_branch #reference", function()
+      it( "should be false", function()
+         assert.is.False( ref:is_branch() )
+      end)
+   end)
+   describe( "is_remote #reference", function()
+      it( "should be false", function()
+         assert.is.False( ref:is_remote() )
+      end)
+   end)
+   describe( "is_tag #reference", function()
+      it( "should be true", function()
+         assert.is.True( ref:is_tag() )
+      end)
+   end)
+   describe( "is_note #reference", function()
+      it( "should be false", function()
+         assert.is.False( ref:is_note() )
+      end)
+   end)
+end)
 
 describe( "target_peel #reference", function() pending("luagi_reference_target_peel ") end)
 describe( "symbolic_target #reference", function() pending("luagi_reference_symbolic_target ") end)
@@ -246,10 +333,6 @@ describe( "delete #reference", function() pending("luagi_reference_delete ") end
 describe( "remove #reference", function() pending("luagi_reference_remove ") end)
 describe( "list #reference", function() pending("luagi_reference_list ") end)
 describe( "foreach #reference", function() pending("luagi_reference_foreach ") end)
-describe( "is_branch #reference", function() pending("luagi_reference_is_branch ") end)
-describe( "is_remote #reference", function() pending("luagi_reference_is_remote ") end)
-describe( "is_tag #reference", function() pending(" luagi_reference_is_tag ") end)
-describe( "is_note #reference", function() pending("luagi_reference_is_note ") end)
 describe( "peel #reference", function() pending("luagi_reference_peel ") end)
 describe( "shorthand #reference", function() pending("luagi_reference_shorthand ") end)
 
