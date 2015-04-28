@@ -3,10 +3,10 @@ local test_helper = require("test_helper")
 
 describe( "blame_file #blame", function() 
    local blame = nil
-
+   local repo = nil
    setup( function()
       test_helper.extract()
-      local repo = luagi.open( test_helper.path )
+      repo = luagi.open( test_helper.path )
       blame, err = repo:blame_file( "some/folder/testfile2" )
    end)
 
@@ -83,8 +83,6 @@ describe( "blame_file #blame", function()
    end)
 
    describe( "buffer #blame", function() 
-      pending("buffer produces segmentation faults under certain circumstances")
-      --[[
       io.input( test_helper.path.."/some/folder/testfile2" )
       content = io.read("*a") 
       content = content.."some more content"
@@ -101,7 +99,6 @@ describe( "blame_file #blame", function()
          local hunk, err = bufblame:byindex( 2 )
          assert.is.falsy( hunk.final.signature.name )
       end)
-      ]]--
    end)
    
 end)

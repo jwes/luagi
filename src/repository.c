@@ -68,6 +68,7 @@ int luagi_repository_discover( lua_State *L )
    }
 
    lua_pushlstring( L, out.ptr, out.size );
+   git_buf_free( &out );
    return 1;
 }
 static unsigned int luagi_open_flags_from_table( lua_State *L, int index )
