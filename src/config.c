@@ -11,6 +11,7 @@ static int luagi_find_config( lua_State *L, int (*func)( git_buf *out ) )
       ERROR_PUSH( L )
    }
    lua_pushlstring( L, buf.ptr, buf.size );
+   git_buf_free( &buf );
    return 1;
 }
    

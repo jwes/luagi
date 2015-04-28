@@ -209,9 +209,8 @@ describe( "foreach_fetchhead #repo", function()
    end)
 
    it( "has no fetchhead", function()
-      assert.has_error( function()
-         repo:foreach_fetchhead(function(num, ref_name, remote_url, oid, is_merge) end)
-      end)
+     err = repo:foreach_fetchhead(function(num, ref_name, remote_url, oid, is_merge) return 0 end)
+     assert.is.falsy( err )
    end)
 end)
 

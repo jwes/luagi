@@ -407,7 +407,7 @@ static int fetchhead_cb( const char *ref_name,
 
    if( lua_pcall( p->L, 5, 1, 0 ) )
    {
-      luaL_error( p->L, "error calling fetchhead callback" );
+      lua_pushstring( p->L, "error calling fetchhead callback" );
       return 1;
    }
 
@@ -420,18 +420,14 @@ int luagi_repository_fetchhead_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
 
-   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    luaL_checktype( L, 2, LUA_TFUNCTION );
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    p->L = L;
    p->callback_pos = 2;
 
-   if( git_repository_fetchhead_foreach( *repo, fetchhead_cb, p ) )
-   {
-      ERROR_ABORT( p->L )
-   }
-
+   int ret = git_repository_fetchhead_foreach( *repo, fetchhead_cb, p );
    free( p );
-   return 0;
+   return ret;
 }
 
 static int mergehead_cb( const git_oid *oid, void *payload )
@@ -442,7 +438,7 @@ static int mergehead_cb( const git_oid *oid, void *payload )
 
    if( lua_pcall( p->L, 1, 1, 0 ) )
    {
-      luaL_error( p->L, "error calling fetchhead callback" );
+      lua_pushstring( p->L, "error calling mergehead callback" );
       return 1;
    }
 
@@ -455,18 +451,14 @@ int luagi_repository_mergehead_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    
-   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    luaL_checktype( L, 2, LUA_TFUNCTION );
+   luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    p->L = L;
    p->callback_pos = 2;
 
-   if( git_repository_mergehead_foreach( *repo, mergehead_cb, p ) )
-   {
-      ERROR_ABORT( p->L )
-   }
-
+   int ret = git_repository_mergehead_foreach( *repo, mergehead_cb, p );
    free( p );
-   return 0;
+   return ret;
 }
 
 int luagi_repository_hashfile( lua_State *L )
