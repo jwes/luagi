@@ -125,6 +125,22 @@ describe( "create_symbolic_reference #reference", function()
          assert.are.equal( target_ref, copy:name() )
       end)
    end)
+   describe( "peel #reference", function()
+      it("should return a commit", function()
+         local commit, err = symbolic:peel( "commit" )
+         assert.is.falsy( err )
+         assert.is.not_nil( commit )
+         assert.is.not_nil( commit.amend )
+
+         assert.are.equal( "some content", commit:summary())
+      end)
+
+      it("should not return a tag", function()
+         local tag, err = symbolic:peel( "tag" )
+         assert.is.not_nil( err )
+         assert.is.falsy( tag )
+      end)
+   end)
 end)
 describe( "create_symbolic_reference_matching #reference", function() pending("luagi_reference_symbolic_create_matching") end)
 describe( "lookup_reference #reference", function()
@@ -248,22 +264,36 @@ describe( "foreach_reference #reference", function()
       assert.is.True( is_string )
    end)
 end)
-describe( "foreach_reference_with_glob #reference", function() pending("luagi_reference_foreach_glob") end)
-describe( "iterate_references #reference", function()
+describe( "foreach_reference_with_glob #reference", function()
    local repo = nil
    local err = nil
+   local count = 0
+   local is_string = true
+   local function f( oid )
+      is_string = is_string and type( oid ) == "string"
+      count = count + 1
+      return 0
+   end
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
    end)
 
-   it("should iterate all references", function()
+   it("should iterate all tags", function()
       count = 0
-      for ref, err in repo:iterate_references() do
-         assert.is.not_nil( ref.symbolic_target )
-         count = count + 1
-      end
-      assert.are.equal( 3, count )
+      is_string = true
+
+      repo:foreach_reference_with_glob("refs/tags/*", f )
+      assert.are.equal( 1, count )
+      assert.is.True( is_string )
+   end)
+   it("should iterate all matching references", function()
+      count = 0
+      is_string = true
+
+      repo:foreach_reference_with_glob("*w*", f )
+      assert.are.equal( 1, count )
+      assert.is.True( is_string )
    end)
 end)
 
@@ -375,13 +405,136 @@ describe( "lookup_reference", function()
          assert.are.equal( "version1", ref:shorthand())
       end)
    end)
+   describe( "peel #reference", function()
+      it("should return a commit", function()
+         local commit, err = ref:peel( "commit" )
+         assert.is.falsy( err )
+         assert.is.not_nil( commit )
+         assert.is.not_nil( commit.amend )
+
+         assert.are.equal( "some content", commit:summary())
+      end)
+
+      it("should not return a tag", function()
+         local tag, err = ref:peel( "tag" )
+         assert.is.not_nil( err )
+         assert.is.falsy( tag )
+      end)
+   end)
 end)
 
-describe( "set_symbolic_target #reference", function() pending("luagi_reference_symbolic_set_target ") end)
-describe( "set_target #reference", function() pending("luagi_reference_set_target ") end)
-describe( "rename #reference", function() pending("luagi_reference_rename ") end)
-describe( "delete #reference", function() pending("luagi_reference_delete ") end)
-describe( "peel #reference", function() pending("luagi_reference_peel ") end)
+describe( "set_symbolic_target #reference", function()
+   local repo = nil
+   local err = nil
+   local direct_name = "refs/my/reference"
+   local work_name = "refs/heads/work"
+   local master_name = "refs/heads/master"
+   local ref = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      ref, err = repo:create_symbolic_reference( direct_name, work_name,
+                                 test_helper.signature,
+                                 "another ref" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+
+   it( "should set the target", function()
+      local new_ref, err = ref:set_symbolic_target( master_name, test_helper.signature, "set the target" )
+      assert.is.falsy( err )
+      assert.are.equal( master_name, new_ref:symbolic_target() )
+   end)
+end)
+
+describe( "set_target #reference", function()
+   local repo = nil
+   local err = nil
+   local direct_name = "refs/tags/another_ref"
+   local ref = nil
+   local new_target = "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09"
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      ref, err = repo:create_reference( direct_name, "3a3e73745d1a2ba679362d51e0a090a3ee03aad6",
+                                 test_helper.signature,
+                                 "another ref" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+
+   it( "should set the target", function()
+      local new_ref, err = ref:set_target( new_target, test_helper.signature, "set the target" )
+      assert.is.falsy( err )
+      assert.are.equal( new_target, new_ref:target() )
+   end)
+end)
+describe( "rename #reference", function()
+   local repo = nil
+   local err = nil
+   local direct_name = "refs/tags/another_ref"
+   local ref = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      ref, err = repo:create_reference( direct_name, "3a3e73745d1a2ba679362d51e0a090a3ee03aad6",
+                                 test_helper.signature,
+                                 "another ref" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+   it( "should rename itself", function()
+      local name = "refs/tags/something_different"
+      ref:rename( name , test_helper.signature, "rename it!") 
+      -- seems to be cached or not updated
+      assert.are.equal( direct_name, ref:name())
+
+      local renamed, err = repo:lookup_reference( name )
+      assert.is.falsy( err )
+      assert.is.not_nil( renamed )
+      assert.is.not_nil( renamed.symbolic_target )
+   end)
+end)
+describe( "delete #reference", function()
+   local repo = nil
+   local err = nil
+   local direct_name = "refs/tags/another_ref"
+   local ref = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      ref, err = repo:create_reference( direct_name, "3a3e73745d1a2ba679362d51e0a090a3ee03aad6",
+                                 test_helper.signature,
+                                 "another ref" )
+      assert.are.equal( 4, #repo:list_references())
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( ref )
+      assert.is.not_nil( ref.symbolic_target )
+   end)
+   it("should delete itself", function()
+      ref:delete()
+      assert.are.equal( 3, #repo:list_references())
+   end)
+end)
 
 describe( "reference_normalize_name #reference", function()
    it( "should remove the slashes", function()

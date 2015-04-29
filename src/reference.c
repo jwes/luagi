@@ -9,6 +9,10 @@
 #include "oid.h"
 #include "object.h"
 #include "types.h"
+#include "commit.h"
+#include "tag.h"
+#include "tree.h"
+#include "blob.h"
 
 #define bufsize 1024
 int luagi_reference_lookup( lua_State *L )
@@ -295,6 +299,7 @@ int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
    {
       ERROR_ABORT( L )
    }
+   luaL_checktype( L, 3, LUA_TTABLE );
    git_signature *sig;
    if( table_to_signature( L, &sig, 3 ) )
    {
@@ -318,6 +323,7 @@ int luagi_reference_gen_rename( lua_State *L, const char *tablename )
 {
    git_reference **ref = luaL_checkudata( L, 1, tablename );
    const char *name = luaL_checkstring( L, 2 );
+   luaL_checktype( L, 3, LUA_TTABLE );
    git_signature *sig;
    if( table_to_signature( L, &sig, 3 ) )
    {
@@ -472,7 +478,24 @@ int luagi_reference_gen_peel( lua_State *L, const char *tablename )
    {
       ERROR_PUSH( L )
    }
-   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
+   switch( type)
+   {
+   case GIT_OBJ_COMMIT:
+      luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
+      break;
+   case GIT_OBJ_TREE:
+      luaL_getmetatable( L, LUAGI_TREE_FUNCS );
+      break;
+   case GIT_OBJ_BLOB:
+      luaL_getmetatable( L, LUAGI_BLOB_FUNCS );
+      break;
+   case GIT_OBJ_TAG:
+      luaL_getmetatable( L, LUAGI_TAG_FUNCS );
+      break;
+   default:
+      luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
+      break;
+   }
    lua_setmetatable( L, -2 );
    return 1;
 }
@@ -558,11 +581,12 @@ int luagi_reference_foreach_glob( lua_State *L )
    p->L = L;
    p->callback_pos = 3;
 
-   if( git_reference_foreach_glob( *repo, glob, name_callback, p ))
+   int ret = git_reference_foreach_glob( *repo, glob, name_callback, p );
+   free( p );
+   if( ret )
    {
       ERROR_ABORT( L )
    }
-   free( p );
    return 0;   
 }
 
