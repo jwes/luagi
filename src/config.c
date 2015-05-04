@@ -404,7 +404,7 @@ int luagi_config_set_int64( lua_State *L )
    const char *name = luaL_checkstring( L, 2 );
    int64_t value = luaL_checkinteger( L, 3 );
 
-   if( git_config_set_int32( *cfg, name, value ) )
+   if( git_config_set_int64( *cfg, name, value ) )
    {
       ERROR_ABORT( L )
    }
