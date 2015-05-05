@@ -151,7 +151,6 @@ describe( "print #diff", function() pending("print") end)
 describe( "merge #diff", function() pending("luagi_diff_merge ") end)
 describe( "find_similar #diff", function() pending("luagi_diff_find_similar ") end)
 describe( "format_email #diff", function() pending("luagi_diff_format_email ") end)
-describe( "patch #diff", function() pending("luagi_patch_from_diff ") end)
 
 describe( "get_stats", function()
    local stats = nil
