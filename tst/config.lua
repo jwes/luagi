@@ -275,26 +275,93 @@ describe( "new #config", function()
             local value = "a somewhat longer string"
             config:set_string( key, value )
             local v, k, l = config:get_entry( key )
-            assert.is.not_nil( k )
             assert.are.equal( value, v )
             assert.are.equal( key, k )
             assert.are.equal( "highest", l )
          end)
          
       end)
+      describe( "delete_entry #config", function()
+         it(" should throw no error", function()
+            local key = "app.deletable"
+            local value = "a somewhat longer string"
+            config:set_string( key, value )
+            local v, k, l = config:get_entry( key )
+            assert.are.equal( value, v )
+            assert.are.equal( key, k )
+            assert.are.equal( "highest", l )
+            config:delete_entry( key )
+            v, k, l = config:get_entry( key )
+            assert.is.falsy( v )
+            assert.is.truthy( k:find( "was not found" ))
+            assert.is.falsy( l )
+         end)
+      end)
+   end)
+end)
+
+describe( "iterator #config", function()
+   local config = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      config, err = luagi.new_config()
+      config:add_file_ondisk( test_helper.path.."/my_config", "app" )
+      config:set_string( "app.foo", "foo" )
+      config:set_string( "app.bar", "bar" )
+      config:set_string( "app.baz", "baz" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( config.get_bool )
+   end)
+
+   it("should iterate all values", function()
+      count = 0
+      for v, k, l in config:iterator() do
+         if l == "highest" then
+            count = count + 1
+         end
+      end
+      assert.are.equal( 3, count )
+   end)
+
+   describe( "iterator_glob_new #config", function()
+      count = 0
+      for v, k, l in config:iterator_glob("ba") do
+         if l == "highest" then
+            count = count + 1
+         end
+      end
+      assert.are.equal( 2, count )
+   end)
+   describe( "foreach #config", function()
+      count = 0
+      local function c( v, k, l )
+         count = count + 1
+         return 0;
+      end
+      config:foreach( c )
+      assert.are.equal( 3, count )
+   end)
+
+   describe( "foreach_match #config", function()
+      count = 0
+      local function c( v, k, l )
+         count = count + 1
+         return 0;
+      end
+      config:foreach_match( "ba", c )
+      assert.are.equal( 2, count )
    end)
 end)
 
 describe( "snapshot #config", function() pending("luagi_config_snapshot ") end)
 describe( "refresh #config", function() pending("luagi_config_refresh ") end)
 describe( "get_multivar #config", function() pending("luagi_config_get_mulitvar_foreach ") end)
-describe( "iterator_new #config", function() pending("luagi_config_iterator_new ") end)
-describe( "iterator_glob_new #config", function() pending("luagi_config_iterator_glob_new ") end)
 describe( "multivar_iterator #config", function() pending("luagi_config_multivar_iterator ") end)
-describe( "set_bool #config", function() pending("luagi_config_set_bool ") end)
 describe( "set_multivar #config", function() pending("luagi_config_set_multivar ") end)
-describe( "delete_entry #config", function() pending("luagi_config_delete_entry ") end)
 describe( "delete_multivar #config", function() pending("luagi_config_delete_mulitvar ") end)
-describe( "foreach_match #config", function() pending("luagi_config_foreach_match ") end)
 describe( "get_mapped #config", function() pending("luagi_config_get_mapped ") end)
 describe( "backend_foreach_match #config", function() pending("luagi_config_backend_foreach_match ") end)

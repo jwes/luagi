@@ -79,8 +79,8 @@ static const struct luaL_Reg luagi_config_funcs [] = {
 
    { "get_multivar", luagi_config_get_mulitvar_foreach },
 
-   { "iterator_new", luagi_config_iterator_new },
-   { "iterator_glob_new", luagi_config_iterator_glob_new },
+   { "iterator", luagi_config_iterator_new },
+   { "iterator_glob", luagi_config_iterator_glob_new },
    { "multivar_iterator", luagi_config_multivar_iterator },
 
    { "set_int32", luagi_config_set_int32 },

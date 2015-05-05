@@ -278,10 +278,11 @@ static int config_foreach_cb( const git_config_entry *entry, void *payload )
 
    if( lua_pcall( p->L, elements, 1, 0 ) )
    {
-      luaL_error( p->L, "error calling config callback" );
-      return 1;
+      lua_pushnil( p->L );
+      lua_pushstring( p->L, "error calling config callback" );
+      return 2;
    }
-   int ret = luaL_checkinteger( p->L, -1 );
+   int ret = luaL_optinteger( p->L, -1, 0 );
    lua_pop( p->L, 1 );
    return ret;
 }
@@ -295,6 +296,8 @@ int luagi_config_get_mulitvar_foreach( lua_State *L )
    luaL_checktype( L, 4, LUA_TFUNCTION );
 
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   p->L = L;
+   p->callback_pos = 4;
 
    if( git_config_get_multivar_foreach( *cfg, name, regexp, config_foreach_cb, p ) )
    {
@@ -480,14 +483,17 @@ int luagi_config_delete_mulitvar( lua_State *L )
 int luagi_config_foreach( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
 
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
-
-   if( git_config_foreach( *cfg, config_foreach_cb, p ) )
+   p->L = L;
+   p->callback_pos = 2;
+   int ret = git_config_foreach( *cfg, config_foreach_cb, p );
+   free(p);
+   if( ret )
    {
       ERROR_ABORT( L )
    }
-   free( p );
    return 0;
 }
 
@@ -495,14 +501,18 @@ int luagi_config_foreach_match( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
    const char *regexp = luaL_checkstring( L, 2 );
+   luaL_checktype( L, 3, LUA_TFUNCTION );
 
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
+   p->L = L;
+   p->callback_pos = 3;
 
-   if( git_config_foreach_match( *cfg, regexp, config_foreach_cb, p ) )
+   int ret = git_config_foreach_match( *cfg, regexp, config_foreach_cb, p ); 
+   free( p );
+   if( ret )
    {
       ERROR_ABORT( L )
    }
-   free( p );
    return 0;
 }
 
