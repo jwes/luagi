@@ -286,24 +286,37 @@ static int config_foreach_cb( const git_config_entry *entry, void *payload )
    lua_pop( p->L, 1 );
    return ret;
 }
+static int check_regexp( const char *regexp )
+{
+   if( regexp == NULL )
+      return 0;
 
-int luagi_config_get_mulitvar_foreach( lua_State *L )
+   return regexp[0] == '*'; // segmentation faults occur if the first char is a *
+}
+
+int luagi_config_get_multivar_foreach( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
    const char *name = luaL_checkstring( L, 2 );
-   const char *regexp = luaL_checkstring( L, 3 );
-
-   luaL_checktype( L, 4, LUA_TFUNCTION );
+   luaL_checktype( L, 3, LUA_TFUNCTION );
+   const char *regexp = luaL_optstring( L, 4, NULL );
+   if( check_regexp( regexp ) )
+   {
+      luaL_error( L, "invalid regexp" );
+      return 0;
+   }
+        
 
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    p->L = L;
-   p->callback_pos = 4;
+   p->callback_pos = 3;
 
-   if( git_config_get_multivar_foreach( *cfg, name, regexp, config_foreach_cb, p ) )
+   int ret = git_config_get_multivar_foreach( *cfg, name, regexp, config_foreach_cb, p ); 
+   free( p );
+   if( ret )
    {
       ERROR_ABORT( L )
    }
-   free( p );
    return 0;
 }
 
@@ -346,7 +359,11 @@ int luagi_config_multivar_iterator( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
    const char *name = luaL_checkstring( L, 2 );
-   const char *regexp = luaL_checkstring( L, 3 );
+   const char *regexp = luaL_optstring( L, 3, NULL );
+   if( check_regexp( regexp ) )
+   {
+      luaL_error( L, "invalid regexp" );
+   }
 
    git_config_iterator **out = lua_newuserdata( L, sizeof( git_config_iterator *) );
 
@@ -365,6 +382,10 @@ int luagi_config_iterator_glob_new( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
    const char *regexp = luaL_checkstring( L, 2 );
+   if( check_regexp( regexp ) )
+   {
+      luaL_error( L, "invalid regexp" );
+   }
 
    git_config_iterator **out = lua_newuserdata( L, sizeof( git_config_iterator *) );
 
@@ -446,6 +467,10 @@ int luagi_config_set_multivar( lua_State *L )
    git_config **cfg = checkconfig( L );
    const char *name = luaL_checkstring( L, 2 );
    const char *regexp = luaL_checkstring( L, 3 );
+   if( check_regexp( regexp ) )
+   {
+      luaL_error( L, "invalid regexp" );
+   }
    const char *value = luaL_checkstring( L, 4 );
 
    if( git_config_set_multivar( *cfg, name, regexp, value ) )
@@ -467,11 +492,15 @@ int luagi_config_delete_entry( lua_State *L )
    return 0;
 }
 
-int luagi_config_delete_mulitvar( lua_State *L )
+int luagi_config_delete_multivar( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
    const char *name = luaL_checkstring( L, 2 );
    const char *regexp = luaL_checkstring( L, 3 );
+   if( check_regexp( regexp ) )
+   {
+      luaL_error( L, "invalid regexp" );
+   }
 
    if( git_config_delete_multivar( *cfg, name, regexp ) )
    {
@@ -501,6 +530,10 @@ int luagi_config_foreach_match( lua_State *L )
 {
    git_config **cfg = checkconfig( L );
    const char *regexp = luaL_checkstring( L, 2 );
+   if( check_regexp( regexp ) )
+   {
+      luaL_error( L, "invalid regexp" );
+   }
    luaL_checktype( L, 3, LUA_TFUNCTION );
 
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );

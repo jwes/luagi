@@ -26,7 +26,7 @@ int luagi_config_get_int64( lua_State *L );
 int luagi_config_get_bool( lua_State *L );
 int luagi_config_get_string( lua_State *L );
 
-int luagi_config_get_mulitvar_foreach( lua_State *L );
+int luagi_config_get_multivar_foreach( lua_State *L );
 
 int luagi_config_iterator_new( lua_State *L );
 int luagi_config_iterator_glob_new( lua_State *L );
@@ -39,7 +39,7 @@ int luagi_config_set_bool( lua_State *L );
 int luagi_config_set_string( lua_State *L );
 int luagi_config_set_multivar( lua_State *L );
 int luagi_config_delete_entry( lua_State *L );
-int luagi_config_delete_mulitvar( lua_State *L );
+int luagi_config_delete_multivar( lua_State *L );
 
 int luagi_config_foreach( lua_State *L );
 int luagi_config_foreach_match( lua_State *L );
@@ -77,7 +77,7 @@ static const struct luaL_Reg luagi_config_funcs [] = {
    { "get_bool", luagi_config_get_bool },
    { "get_string", luagi_config_get_string },
 
-   { "get_multivar", luagi_config_get_mulitvar_foreach },
+   { "get_multivar", luagi_config_get_multivar_foreach },
 
    { "iterator", luagi_config_iterator_new },
    { "iterator_glob", luagi_config_iterator_glob_new },
@@ -89,7 +89,7 @@ static const struct luaL_Reg luagi_config_funcs [] = {
    { "set_string", luagi_config_set_string },
    { "set_multivar", luagi_config_set_multivar },
    { "delete_entry", luagi_config_delete_entry },
-   { "delete_multivar", luagi_config_delete_mulitvar },
+   { "delete_multivar", luagi_config_delete_multivar },
 
    { "foreach", luagi_config_foreach },
    { "foreach_match", luagi_config_foreach_match },

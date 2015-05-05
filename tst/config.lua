@@ -357,11 +357,131 @@ describe( "iterator #config", function()
    end)
 end)
 
-describe( "snapshot #config", function() pending("luagi_config_snapshot ") end)
-describe( "refresh #config", function() pending("luagi_config_refresh ") end)
-describe( "get_multivar #config", function() pending("luagi_config_get_mulitvar_foreach ") end)
-describe( "multivar_iterator #config", function() pending("luagi_config_multivar_iterator ") end)
-describe( "set_multivar #config", function() pending("luagi_config_set_multivar ") end)
-describe( "delete_multivar #config", function() pending("luagi_config_delete_mulitvar ") end)
+describe( "[s|g]et_multivar #config", function()
+   local config = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      config, err = luagi.new_config()
+      config:add_file_ondisk( test_helper.path.."/my_config", "app" )
+      config:set_multivar( "foo.baz","bax", "bax for somwhere.org" )
+      config:set_multivar( "foo.baz","bar", "bar for somwhere-else.org" )
+      config:set_multivar( "foo.baz","baz", "baz" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( config.get_bool )
+   end)
+
+   describe( "multivar_iterator #config", function() 
+      it( "should return three elements", function()
+         count = 0
+         for v,k,l in config:multivar_iterator( "foo.baz" ) do
+            count = count + 1
+         end
+         assert.are.equal( 3, count )
+         count = 0
+         for v,k,l in config:multivar_iterator( "foo.baz", ".*for") do
+            count = count + 1
+         end
+         assert.are.equal( 2, count )
+      end)
+   end)
+   describe( "multivar_foreach #config", function() 
+      it( "should return three elements", function()
+         count = 0
+         function c( v, k, l )
+            count = count + 1
+            return 0
+         end
+         config:get_multivar( "foo.baz", c )
+         assert.are.equal( 3, count )
+         count = 0
+         config:get_multivar( "foo.baz", c, ".*for" )
+         assert.are.equal( 2, count )
+      end)
+      it( "should be hardend against invalid regexpressions", function()
+         function c( v, k, l )
+            return 0
+         end
+         assert.has.error( function()
+            config:get_multivar( "foo.baz", c, "*" )
+         end)
+      end)
+   end)
+end)
+
+describe( "delete_multivar #config", function()
+   local config = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      config, err = luagi.new_config()
+      config:add_file_ondisk( test_helper.path.."/my_config", "app" )
+      config:set_multivar( "foo.baz","bax", "bax for somwhere.org" )
+      config:set_multivar( "foo.baz","bar", "bar for somwhere-else.org" )
+      config:set_multivar( "foo.baz","baz", "baz" )
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( config.get_bool )
+      count = 0
+      for v,k,l in config:multivar_iterator( "foo.baz" ) do
+         count = count + 1
+      end
+      assert.are.equal( 3, count )
+   end)
+
+   it("should delete two elements", function()
+      config:delete_multivar( "foo.baz", "ba[x|r]" )
+      count = 0
+      for v,k,l in config:multivar_iterator( "foo.baz" ) do
+         count = count + 1
+      end
+      assert.are.equal( 1, count )
+   end)
+end)
+describe( "snapshot #config", function()
+   local config = nil
+   local snapshot = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      config, err = luagi.new_config()
+      config:add_file_ondisk( test_helper.path.."/my_config", "app" )
+      config:set_multivar( "foo.baz","bax", "bax for somwhere.org" )
+      config:set_multivar( "foo.baz","bar", "bar for somwhere-else.org" )
+      config:set_multivar( "foo.baz","baz", "baz" )
+      if err then return end 
+      snapshot, err = config:snapshot()
+   end)
+
+   it("should be prepared", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( config.get_bool )
+      assert.is.not_nil( snapshot.get_bool )
+   end)
+
+   it("should delete two elements", function()
+      config:delete_multivar( "foo.baz", "ba[x|r]" )
+      count = 0
+      for v,k,l in config:multivar_iterator( "foo.baz" ) do
+         count = count + 1
+      end
+      assert.are.equal( 1, count )
+      count = 0
+      for v,k,l in snapshot:multivar_iterator( "foo.baz" ) do
+         count = count + 1
+      end
+      assert.are.equal( 3, count )
+   end)
+   describe( "refresh #config", function()
+      it("should not have an error", function()
+         config:refresh()
+      end)
+   end)
+end)
 describe( "get_mapped #config", function() pending("luagi_config_get_mapped ") end)
 describe( "backend_foreach_match #config", function() pending("luagi_config_backend_foreach_match ") end)
