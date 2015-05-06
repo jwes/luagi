@@ -18,7 +18,6 @@ int luagi_submodule_reload_all( lua_State *L );
 int luagi_submodule_open( lua_State *L );
 int luagi_submodule_free( lua_State *L );
 int luagi_submodule_add_finalize( lua_State *L );
-int luagi_submodule_owner( lua_State *L );
 int luagi_submodule_name( lua_State *L );
 int luagi_submodule_path( lua_State *L );
 int luagi_submodule_url( lua_State *L );
@@ -44,7 +43,6 @@ int luagi_submodule_save( lua_State *L );
 static const struct luaL_Reg luagi_submodule_funcs [] = {
    { "__gc",  luagi_submodule_free },
    { "add_finalize", luagi_submodule_add_finalize },
-   { "owner", luagi_submodule_owner },
    { "name", luagi_submodule_name },
    { "__tostring", luagi_submodule_name },
    { "path", luagi_submodule_path },

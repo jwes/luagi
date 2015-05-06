@@ -135,16 +135,6 @@ int luagi_blob_id( lua_State *L )
    return luagi_push_oid( L, oid );
 }
 
-int luagi_blob_owner( lua_State *L )
-{
-   git_blob **blob = check_blob_at( L, 1 );
-   git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
-   *repo = git_blob_owner( *blob );
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
-   return  1;
-}
-
 int luagi_blob_rawsize( lua_State *L )
 {
    git_blob **blob = check_blob_at( L, 1 );

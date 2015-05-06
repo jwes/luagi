@@ -200,20 +200,6 @@ int luagi_index_free( lua_State *L )
    return 0;
 }
 
-int luagi_index_owner( lua_State *L )
-{
-   git_index **index = checkindex_at( L, 1 );
-   git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
-   *repo = git_index_owner( *index );
-   if( *repo == NULL )
-   {
-      ERROR_PUSH( L )
-   }
-   luaL_getmetatable(L, REPO_NAME );
-   lua_setmetatable(L, -2);
-   return 1;
-}
-
 int luagi_index_caps( lua_State *L )
 {
    git_index **index = checkindex_at( L, 1 );

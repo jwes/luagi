@@ -267,11 +267,6 @@ int luagi_reference_branch_resolve( lua_State *L )
    return luagi_reference_gen_resolve( L, LUAGI_BRANCH_FUNCS );
 }
 
-int luagi_reference_branch_owner( lua_State *L )
-{
-   return luagi_reference_gen_owner( L, LUAGI_BRANCH_FUNCS );
-}
-
 int luagi_reference_branch_symbolic_set_target( lua_State *L )
 {
    return luagi_reference_gen_symbolic_set_target( L, LUAGI_BRANCH_FUNCS );

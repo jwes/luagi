@@ -183,18 +183,6 @@ describe( "with blob", function()
       end)
    end)
 
-   describe( "owner #blob", function()
-      local owner, err = blob:owner()
-      local ownerhead = owner:head()
-      local repohead = repo:head()
-
-      it( "should have an owner", function()
-         assert.is.falsy( err )
-         assert.is.not_nil( owner )
-         assert.are.equal( repohead:name(), ownerhead:name() )
-      end)
-   end)
-
    describe( "is_binary #blob", function()
       it( "should be false", function()
          assert.is.False( blob:is_binary() )

@@ -7,7 +7,6 @@
 
 int luagi_index_new( lua_State *L );
 int luagi_index_free( lua_State *L );
-int luagi_index_owner( lua_State *L );
 int luagi_index_caps( lua_State *L );
 int luagi_index_set_caps( lua_State *L );
 int luagi_index_read( lua_State *L );
@@ -51,7 +50,6 @@ int luagi_push_index_entry( lua_State *L, const git_index_entry *entry );
       ( git_index_conflict_iterator**) luaL_checkudata( L, N, LUAGI_INDEX_CONFLICT_FUNCS )
 
 static const struct luaL_Reg luagi_index_funcs [] = {
-   { "owner",   luagi_index_owner },
    { "caps",   luagi_index_caps },
    { "set_caps",   luagi_index_set_caps },
    { "read",   luagi_index_read },

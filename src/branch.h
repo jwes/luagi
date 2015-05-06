@@ -10,7 +10,6 @@ int luagi_reference_branch_target_peel( lua_State *L );
 int luagi_reference_branch_symbolic_target( lua_State *L );
 int luagi_reference_branch_type( lua_State *L );
 int luagi_reference_branch_resolve( lua_State *L );
-int luagi_reference_branch_owner( lua_State *L );
 int luagi_reference_branch_symbolic_set_target( lua_State *L );
 int luagi_reference_branch_set_target( lua_State *L );
 int luagi_reference_branch_rename( lua_State *L );
@@ -51,7 +50,6 @@ static const struct luaL_Reg luagi_branch_funcs [] = {
    { "symbolic_target", luagi_reference_branch_symbolic_target },
    { "type", luagi_reference_branch_type },
    { "resolve", luagi_reference_branch_resolve },
-   { "owner", luagi_reference_branch_owner },
    { "set_symbolic_target", luagi_reference_branch_symbolic_set_target },
    { "set_target", luagi_reference_branch_set_target },
    { "rename", luagi_reference_branch_rename },

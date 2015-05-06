@@ -151,7 +151,6 @@ describe( "set_url #remote", function()
 end)
 
 describe( "save #remote", function() pending("              luagi_remote_save                    ") end)
-describe( "owner #remote", function() pending("             luagi_remote_owner                   ") end)
 describe( "add_fetch #remote", function() pending("         luagi_remote_add_fetch               ") end)
 describe( "fetch_refspecs #remote", function() pending("    luagi_remote_get_fetch_refspecs      ") end)
 describe( "set_fetch_refspecs #remote", function() pending("luagi_remote_set_fetch_refspecs      ") end)

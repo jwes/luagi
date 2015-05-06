@@ -131,18 +131,6 @@ int luagi_submodule_add_finalize( lua_State *L )
    return 0;
 }
 
-int luagi_submodule_owner( lua_State *L )
-{
-   git_submodule **sub = checksubmodule_at( L, 1 );
-   git_repository **out = lua_newuserdata( L, sizeof( git_repository* ) );
-
-   *out = git_submodule_owner( *sub );
-
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
 static int luagi_sub_get_string( lua_State *L, const char * (*func)( git_submodule *sub ) )
 {
    git_submodule **sub = checksubmodule_at( L, 1 );

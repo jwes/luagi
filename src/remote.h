@@ -7,7 +7,6 @@ int luagi_remote_create_anonymous( lua_State *L );
 int luagi_remote_create_with_fetchspec( lua_State *L );
 int luagi_remote_create( lua_State *L );
 int luagi_remote_save( lua_State *L );
-int luagi_remote_owner( lua_State *L );
 int luagi_remote_name( lua_State *L );
 int luagi_remote_url( lua_State *L );
 int luagi_remote_pushurl( lua_State *L );
@@ -46,7 +45,6 @@ int luagi_remote_supported_url( lua_State *L );
 
 static const struct luaL_Reg luagi_remote_funcs [] = {
    { "save",               luagi_remote_save                    },
-   { "owner",              luagi_remote_owner                   },
    { "name",               luagi_remote_name                    },
    { "url",                luagi_remote_url                     },
    { "pushurl",            luagi_remote_pushurl                 },
@@ -68,7 +66,7 @@ static const struct luaL_Reg luagi_remote_funcs [] = {
    { "is_connected",       luagi_remote_connected               },
    { "stop",               luagi_remote_stop                    },
    { "disconnect",         luagi_remote_disconnect              },
-   { "__gc",               ligt_remote_free                    },
+   { "__gc",               ligt_remote_free                     },
    { "check_cert",         luagi_remote_check_cert              },
    { "set_transport",      luagi_remote_set_transport           },
    { "set_callbacks",      luagi_remote_set_callbacks           },

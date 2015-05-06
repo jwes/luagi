@@ -243,12 +243,6 @@ describe( "tag object methods", function()
       end)
    end)
 
-   describe( "owner #tag", function()
-      it("should belong to the correct repo", function()
-         assert.are.equal( repo:path(), tag:owner():path())
-      end)
-   end)
-
    describe( "target #tag", function()
       it("should have the correct target", function()
          assert.are.equal( target:id(), tag:target():id() )

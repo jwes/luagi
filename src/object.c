@@ -73,20 +73,6 @@ int luagi_object_type( lua_State *L )
    return 1;
 }
 
-int luagi_object_owner( lua_State *L )
-{
-   git_object **obj = checkobject_at( L, 1 );
-   git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
-   *repo = git_object_owner( *obj );
-   if( *repo == NULL )
-   {
-      ERROR_PUSH( L )
-   }
-   luaL_getmetatable(L, REPO_NAME );
-   lua_setmetatable(L, -2);
-   return 1;
-}
-
 int luagi_object_free( lua_State *L )
 {
 

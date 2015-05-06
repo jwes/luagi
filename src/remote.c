@@ -116,12 +116,6 @@ int luagi_remote_save( lua_State *L )
    return 0; 
 }
 
-int luagi_remote_owner( lua_State *L )
-{ 
-   lua_pushnil( L ); 
-   lua_pushstring( L, "not yet implemented" );
-   return 2;
-}
 static int get_param( lua_State *L, const char *(*func)( const git_remote *remote ) )
 {
    git_remote** rem = checkremote( L );

@@ -23,7 +23,6 @@ int luagi_tag_foreach( lua_State *L );
 // tag functions
 int luagi_tag_free( lua_State *L );
 int luagi_tag_id( lua_State *L );
-int luagi_tag_owner( lua_State *L );
 int luagi_tag_target( lua_State *L );
 int luagi_tag_target_id( lua_State *L );
 int luagi_tag_target_type( lua_State *L );
@@ -35,7 +34,6 @@ int luagi_tag_peel( lua_State *L );
 static const struct luaL_Reg luagi_tag_funcs [] = {
    { "__gc", luagi_tag_free },
    { "id", luagi_tag_id },
-   { "owner", luagi_tag_owner },
    { "target", luagi_tag_target },
    { "target_id", luagi_tag_target_id },
    { "name", luagi_tag_name },

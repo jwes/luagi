@@ -192,17 +192,6 @@ int luagi_tag_id( lua_State *L )
    return luagi_push_oid( L, oid );
 }
 
-int luagi_tag_owner( lua_State *L )
-{
-   git_tag **tag = checktag_at( L, 1 );
-   git_repository **repo = lua_newuserdata( L, sizeof( git_repository * ) );
-
-   *repo = git_tag_owner( *tag );
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
 int luagi_tag_target( lua_State *L )
 {
    git_tag **tag = checktag_at( L, 1 );

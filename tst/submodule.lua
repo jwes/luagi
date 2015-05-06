@@ -5,7 +5,6 @@ describe( "resolve_submodule_url #submodule", function() pending("luagi_submodul
 describe( "reload_all_submodules #submodule", function() pending("luagi_submodule_reload_all") end)
 
 describe( "add_finalize #submodule", function() pending("luagi_submodule_add_finalize ") end)
-describe( "owner #submodule", function() pending("luagi_submodule_owner ") end)
 describe( "name #submodule", function() pending("luagi_submodule_name ") end)
 describe( "__tostring #submodule", function() pending("luagi_submodule_name ") end)
 describe( "path #submodule", function() pending("luagi_submodule_path ") end)

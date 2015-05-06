@@ -254,20 +254,6 @@ int luagi_reference_gen_resolve( lua_State *L, const char *tablename )
    return 1;
 }
 
-int luagi_reference_gen_owner( lua_State *L, const char *tablename )
-{
-   git_reference **ref = luaL_checkudata( L, 1, tablename );
-   git_repository **owner = lua_newuserdata( L, sizeof( git_repository * ) );
-   *owner = git_reference_owner( *ref );
-   if( *owner == NULL )
-   {
-      ERROR_PUSH( L )
-   }
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
-   return 1;
-}
-
 int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename )
 {
    git_reference **ref = luaL_checkudata( L, 1, tablename );
@@ -673,11 +659,6 @@ int luagi_reference_name( lua_State *L )
 int luagi_reference_resolve( lua_State *L )
 {
    return luagi_reference_gen_resolve( L, LUAGI_REFERENCE_FUNCS );
-}
-
-int luagi_reference_owner( lua_State *L )
-{
-   return luagi_reference_gen_owner( L, LUAGI_REFERENCE_FUNCS );
 }
 
 int luagi_reference_symbolic_set_target( lua_State *L )

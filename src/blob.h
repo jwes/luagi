@@ -12,7 +12,6 @@ int luagi_blob_create_frombuffer( lua_State *L );
 // blob
 int luagi_blob_free( lua_State *L );
 int luagi_blob_id( lua_State *L );
-int luagi_blob_owner( lua_State *L );
 int luagi_blob_rawsize( lua_State *L );
 int luagi_blob_rawcontent( lua_State *L );
 
@@ -31,7 +30,6 @@ static const struct luaL_Reg luagi_blob_funcs [] = {
    { "__gc", luagi_blob_free },
    { "__tostring", luagi_blob_id },
    { "id", luagi_blob_id },
-   { "owner", luagi_blob_owner },
    { "filtered_content", luagi_blob_filtered_content },
    { "is_binary", luagi_blob_is_binary },
    { "raw_size", luagi_blob_rawsize },

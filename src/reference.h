@@ -10,7 +10,6 @@ int luagi_reference_gen_symbolic_target( lua_State *L, const char *tablename );
 int luagi_reference_gen_type( lua_State *L, const char *tablename );
 int luagi_reference_gen_name( lua_State *L, const char *tablename );
 int luagi_reference_gen_resolve( lua_State *L, const char *tablename );
-int luagi_reference_gen_owner( lua_State *L, const char *tablename );
 int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename );
 int luagi_reference_gen_set_target( lua_State *L, const char *tablename );
 int luagi_reference_gen_rename( lua_State *L, const char *tablename );
@@ -41,7 +40,6 @@ int luagi_reference_symbolic_target( lua_State *L );
 int luagi_reference_type( lua_State *L );
 int luagi_reference_name( lua_State *L );
 int luagi_reference_resolve( lua_State *L );
-int luagi_reference_owner( lua_State *L );
 int luagi_reference_symbolic_set_target( lua_State *L );
 int luagi_reference_set_target( lua_State *L );
 int luagi_reference_rename( lua_State *L );
@@ -83,7 +81,6 @@ static const struct luaL_Reg luagi_reference_funcs [] = {
    { "type", luagi_reference_type },
    { "name", luagi_reference_name },
    { "resolve", luagi_reference_resolve },
-   { "owner", luagi_reference_owner },
    { "set_symbolic_target", luagi_reference_symbolic_set_target },
    { "set_target", luagi_reference_set_target },
    { "rename", luagi_reference_rename },
