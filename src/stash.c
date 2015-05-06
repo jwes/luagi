@@ -1,7 +1,10 @@
 #include "stash.h"
+
 #include <git2/oid.h>
-#include <git2/stash.h>
 #include <git2/signature.h>
+#include <git2/stash.h>
+
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -13,7 +16,7 @@ int luagi_stash_save( lua_State *L )
    git_signature *stasher;
    if( table_to_signature( L, &stasher, 2 ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    const char *message = luaL_optstring( L, 3, NULL );
@@ -31,7 +34,7 @@ int luagi_stash_save( lua_State *L )
    git_signature_free( stasher );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_oid( L, &out );
@@ -74,7 +77,7 @@ int luagi_stash_foreach( lua_State *L )
 
    if( git_stash_foreach( *repo, callback, p ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    free( p );
    return 0;
@@ -87,7 +90,7 @@ int luagi_stash_drop( lua_State *L )
 
    if( git_stash_drop( *repo, index ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

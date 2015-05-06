@@ -1,5 +1,8 @@
-#include <git2/refdb.h>
 #include "refdb.h"
+
+#include <git2/refdb.h>
+
+#include "ltk.h"
 #include "luagi.h"
 
 int luagi_refdb_new( lua_State *L )
@@ -9,7 +12,7 @@ int luagi_refdb_new( lua_State *L )
 
    if( git_refdb_new( refdb, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
    lua_setmetatable( L, -2 );
@@ -23,7 +26,7 @@ int luagi_refdb_open( lua_State *L )
 
    if( git_refdb_open( refdb, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
    lua_setmetatable( L, -2 );
@@ -39,7 +42,7 @@ int luagi_refdb_compress( lua_State *L )
 
    if( git_refdb_compress( *refdb ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

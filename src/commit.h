@@ -1,6 +1,8 @@
 #ifndef IS_LUAGI_COMMIT
 #define IS_LUAGI_COMMIT
+
 #include <lua.h>
+#include <lauxlib.h>
 
 int luagi_commit_lookup( lua_State *L );
 int luagi_commit_gc( lua_State *L );

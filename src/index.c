@@ -1,8 +1,11 @@
 #include "index.h"
-#include <string.h>
+
 #include <git2/errors.h>
 #include <git2/repository.h>
 #include <lua.h>
+#include <string.h>
+
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -177,14 +180,14 @@ int luagi_index_new( lua_State *L )
    {
       if( git_index_new( index ) )
       {
-         ERROR_PUSH( L )
+         return ltk_push_error( L );
       }
    }
    else 
    {
       if( git_index_open( index, path ) )
       {
-         ERROR_PUSH( L )
+         return ltk_push_error( L );
       }
    }
 
@@ -226,7 +229,7 @@ int luagi_index_set_caps( lua_State *L )
 
    if( ! lua_istable( L, 2 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
       return 0;
    }
    int caps = 0;
@@ -260,7 +263,7 @@ int luagi_index_set_caps( lua_State *L )
 
    if( git_index_set_caps( *index, caps ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -277,7 +280,7 @@ int luagi_index_read( lua_State *L )
 
    if( git_index_read( *index, force ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -288,7 +291,7 @@ int luagi_index_write( lua_State *L )
 
    if( git_index_write( *index ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -307,7 +310,7 @@ int luagi_index_read_tree( lua_State *L )
 
    if( git_index_read_tree( *index, *tree ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -321,14 +324,14 @@ int luagi_index_write_tree( lua_State *L )
       git_repository **repo = checkrepo( L, 2 );
       if( git_index_write_tree_to( &out, *index, *repo ) )
       {
-         ERROR_PUSH( L )
+         return ltk_push_error( L );
       }
    }
    else
    {
       if( git_index_write_tree( &out, *index ) )
       {
-         ERROR_PUSH( L )
+         return ltk_push_error( L );
       }
    }
    return luagi_push_oid( L, &out );
@@ -348,7 +351,7 @@ int luagi_index_clear( lua_State *L )
 
    if( git_index_clear( *index ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -369,7 +372,7 @@ int luagi_index_get_byindex( lua_State *L )
    const git_index_entry *out = git_index_get_byindex( *index, pos );
    if( out == NULL )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_index_entry( L, out );
@@ -384,7 +387,7 @@ int luagi_index_get_bypath( lua_State *L )
    const git_index_entry *out = git_index_get_bypath( *index, path, stage );
    if( out == NULL )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_index_entry( L, out );
@@ -398,7 +401,7 @@ static int luagi_remove_func( lua_State *L, int (*func)( git_index *index, const
 
    if( func( *index, path, stage ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -421,7 +424,7 @@ int luagi_index_add( lua_State *L )
 
    if( git_index_add( *index, &entry ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -433,7 +436,7 @@ static int luagi_index_do_bypath( lua_State *L, int (*func)( git_index *index, c
 
    if( func( *index, path ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -504,7 +507,7 @@ int luagi_index_add_all( lua_State *L )
 
    if( git_index_add_all( *index, &array, flags, index_matched_pathspec, p ) )
    {
-      ERROR_ABORT( L );
+      ltk_error_abort( L );;
    }
    git_strarray_free( &array );
    free( p );
@@ -525,7 +528,7 @@ int luagi_index_remove_all( lua_State *L )
    
    if( git_index_remove_all( *index, &array, index_matched_pathspec, p ) )
    {
-      ERROR_ABORT( L );
+      ltk_error_abort( L );;
    }
    git_strarray_free( &array );
    free( p );
@@ -545,7 +548,7 @@ int luagi_index_update_all( lua_State *L )
    
    if( git_index_update_all( *index, &array, index_matched_pathspec, p ) )
    {
-      ERROR_ABORT( L );
+      ltk_error_abort( L );;
    }
    git_strarray_free( &array );
    free( p );
@@ -581,7 +584,7 @@ int luagi_index_conflict_add( lua_State *L )
 
    if( git_index_conflict_add( *index, &ancestor_entry, &our_entry, &their_entry ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -601,7 +604,7 @@ int luagi_index_conflict_get( lua_State *L )
    }
    else if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
       return 0;
    }
 
@@ -656,7 +659,7 @@ static int conflict_iter( lua_State *L )
    }
    else if ( ret < 0 )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
       return 0;
    }
 
@@ -673,7 +676,7 @@ int luagi_index_conflict_iterator( lua_State *L )
    git_index_conflict_iterator **out = lua_newuserdata( L, sizeof( git_index_conflict_iterator *) );
    if( git_index_conflict_iterator_new( out, *index ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
 
    luaL_getmetatable(L, LUAGI_INDEX_CONFLICT_FUNCS);

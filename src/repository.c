@@ -1,18 +1,19 @@
+#include "repository.h"
+
 #include <git2/repository.h>
 #include <git2/signature.h>
 
 #include <lauxlib.h>
 
-#include "repository.h"
-#include "luagi.h"
-#include "reference.h"
-#include "index.h"
-#include "types.h"
-#include "oid.h"
-#include "odb.h"
-#include "refdb.h"
-
 #include "config.h"
+#include "index.h"
+#include "ltk.h"
+#include "luagi.h"
+#include "types.h"
+#include "odb.h"
+#include "oid.h"
+#include "refdb.h"
+#include "reference.h"
 
 int luagi_open( lua_State *L )
 {
@@ -23,7 +24,7 @@ int luagi_open( lua_State *L )
    
    if( git_repository_open( repo, path ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, REPO_NAME );
@@ -46,7 +47,7 @@ int luagi_repository_wrap_odb( lua_State *L )
 
    if( git_repository_wrap_odb( repo, *odb ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, REPO_NAME );
@@ -64,7 +65,7 @@ int luagi_repository_discover( lua_State *L )
 
    if( git_repository_discover( &out, start_path, across_fs, ceiling_dirs ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    lua_pushlstring( L, out.ptr, out.size );
@@ -92,7 +93,7 @@ int luagi_repository_open_ext( lua_State *L )
    git_repository **repo = lua_newuserdata( L, sizeof( git_repository *) );
    if( git_repository_open_ext( repo, path, flags, ceiling_dirs ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
@@ -106,7 +107,7 @@ int luagi_repository_open_bare( lua_State *L )
 
    if( git_repository_open_bare( repo, bare_path ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
@@ -122,7 +123,7 @@ int luagi_repository_init( lua_State *L )
 
    if( git_repository_init( repo, path, is_bare ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
@@ -208,7 +209,7 @@ int luagi_repository_init_ext( lua_State *L )
 
    if( git_repository_init_ext( repo, path, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
@@ -222,7 +223,7 @@ int luagi_repository_head( lua_State *L )
 
    if( git_repository_head( reference, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
@@ -276,7 +277,7 @@ int luagi_repository_set_workdir( lua_State *L )
 
    if( git_repository_set_workdir( *repo, workdir, update_gitlink ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -294,7 +295,7 @@ int luagi_get_config( lua_State *L, int (*func)( git_config **out, git_repositor
 
    if( func( out, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -319,7 +320,7 @@ int luagi_repository_odb( lua_State *L )
 
    if( git_repository_odb( odb, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_ODB_FUNCS );
@@ -334,7 +335,7 @@ int luagi_repository_refdb( lua_State *L )
 
    if( git_repository_refdb( refdb, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
    lua_setmetatable( L, -2 );
@@ -349,7 +350,7 @@ int luagi_repository_index( lua_State *L )
 
    if( git_repository_index( index, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
    lua_setmetatable( L, -2 );
@@ -364,7 +365,7 @@ int luagi_repository_message( lua_State *L )
 
    if( git_repository_message( &buf, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    lua_pushlstring( L, buf.ptr, buf.size );
@@ -377,7 +378,7 @@ int luagi_repository_message_remove( lua_State *L )
 
    if( git_repository_message_remove( *repo ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -388,7 +389,7 @@ int luagi_repository_state_cleanup( lua_State *L )
 
    if( git_repository_state_cleanup( *repo ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -472,7 +473,7 @@ int luagi_repository_hashfile( lua_State *L )
    git_oid oid;
    if( git_repository_hashfile( &oid, *repo, path, type, as_path ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -491,7 +492,7 @@ int luagi_repository_set_head( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -510,7 +511,7 @@ int luagi_repository_set_head_detached( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -527,7 +528,7 @@ int luagi_repository_detach_head( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -586,7 +587,7 @@ int luagi_repository_set_namespace( lua_State *L )
 
    if( git_repository_set_namespace( *repo, namespace ) )
    {
-      ERROR_ABORT( L );
+      ltk_error_abort( L );
    }
    return 0;
 }

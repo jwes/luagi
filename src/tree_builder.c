@@ -1,10 +1,13 @@
-#include <git2/types.h>
-#include <lua.h>
-#include <lauxlib.h>
-#include <string.h>
 #include "tree.h"
-#include "oid.h"
+
+#include <git2/types.h>
+#include <lauxlib.h>
+#include <lua.h>
+#include <string.h>
+
 #include "defines.h"
+#include "ltk.h"
+#include "oid.h"
 
 #define checktreebuilder(L) \
       (git_treebuilder**) luaL_checkudata( L, 1, LUAGI_TREE_BUILDER_FUNCS )
@@ -117,12 +120,12 @@ int luagi_tree_builder_insert( lua_State *L )
    ret = git_treebuilder_insert( &e, *builder, filename, &oid, mode );
    if( ret != 0 )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    ret = git_tree_entry_dup( entry, e );
    if( ret != 0 )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );

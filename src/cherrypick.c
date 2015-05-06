@@ -1,10 +1,12 @@
+#include "cherrypick.h"
+
 #include <git2/cherrypick.h>
 #include <lauxlib.h>
 
-#include "cherrypick.h"
-#include "luagi.h"
 #include "commit.h"
 #include "index.h"
+#include "ltk.h"
+#include "luagi.h"
 #include "merge.h"
 
 static int luagi_cherry_pick_init_options( lua_State *L __attribute__((unused)), int index __attribute__((unused)), git_cherry_pick_options *opts )
@@ -28,7 +30,7 @@ int luagi_cherry_pick_commit( lua_State *L )
 
    if( git_cherry_pick_commit( out, *repo, *cherry_pick_commit, *our_commit, mainline, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
    lua_setmetatable( L, -2 );
@@ -45,7 +47,7 @@ int luagi_cherry_pick( lua_State *L )
 
    if( git_cherry_pick( *repo, *commit, &opts ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

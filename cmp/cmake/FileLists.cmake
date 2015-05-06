@@ -13,6 +13,7 @@ set( SRC_FILES
    ${SRC_DIR}/ignore.c
    ${SRC_DIR}/index.c
    ${SRC_DIR}/indexer.c
+   ${SRC_DIR}/ltk.c
    ${SRC_DIR}/luagi.c
    ${SRC_DIR}/merge.c
    ${SRC_DIR}/note.c

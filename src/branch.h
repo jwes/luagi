@@ -1,6 +1,8 @@
 #ifndef IS_LUAGI_BRANCH
 #define IS_LUAGI_BRANCH
+
 #include <lua.h>
+#include <lauxlib.h>
 
 #define LUAGI_BRANCH_FUNCS "is.westh.luagi.branch"
 #define LUAGI_BRANCH_STATICS "is.westhu.luagi.branch.iter"

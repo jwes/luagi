@@ -1,9 +1,11 @@
+#include "patch.h"
+
 #include <git2/patch.h>
 
-#include "patch.h"
-#include "diff.h"
-#include "luagi.h"
 #include "blob.h"
+#include "diff.h"
+#include "ltk.h"
+#include "luagi.h"
 
 int luagi_patch_from_diff( lua_State *L )
 {
@@ -20,7 +22,7 @@ int luagi_patch_from_diff( lua_State *L )
    git_patch **out = lua_newuserdata( L, sizeof( git_patch *) );
    if( git_patch_from_diff( out, *diff, idx ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
@@ -43,7 +45,7 @@ int luagi_patch_from_blobs( lua_State *L )
    if( git_patch_from_blobs( out, *old, old_as_path, 
                                *new, new_as_path, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
@@ -66,7 +68,7 @@ int luagi_patch_from_blob_and_buffer( lua_State *L )
    if( git_patch_from_blob_and_buffer( out, *old, old_as_path, 
                                new, new_len, new_as_path, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
@@ -90,7 +92,7 @@ int luagi_patch_from_buffers( lua_State *L )
    if( git_patch_from_buffers( out, old, old_len, old_as_path, 
                                new, new_len, new_as_path, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
    lua_setmetatable( L, -2 );
@@ -127,7 +129,7 @@ int luagi_patch_line_stats( lua_State *L )
    size_t context, additions, deletions;
    if( git_patch_line_stats( &context, &additions, &deletions, *patch ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushinteger( L, context );
    lua_pushinteger( L, additions );
@@ -150,7 +152,7 @@ int luagi_patch_get_hunk( lua_State *L )
 
    if( git_patch_get_hunk( &out, &lines_in_hunk, *patch, hunk_idx ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    diff_hunk_to_table( L, out );
@@ -192,7 +194,7 @@ int luagi_patch_get_line_in_hunk( lua_State *L )
 
    if( git_patch_get_line_in_hunk( &out, *patch, hunk_idx, line_of_hunk ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    diff_line_to_table( L, out );
@@ -226,7 +228,7 @@ int luagi_patch_print( lua_State *L )
    free( f );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -238,7 +240,7 @@ int luagi_patch_to_buf( lua_State *L )
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_patch_to_buf( &out, *patch ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushlstring( L, out.ptr, out.size );
    return 1;

@@ -1,12 +1,14 @@
-#include <lauxlib.h>
+#include "remote.h"
+
 #include <git2/errors.h>
 #include <git2/remote.h>
 #include <git2/signature.h>
 #include <string.h>
-#include "remote.h"
+
+#include "ltk.h"
 #include "luagi.h"
-#include "transport.h"
 #include "oid.h"
+#include "transport.h"
 
 int luagi_remote_list( lua_State *L )
 { 
@@ -311,7 +313,7 @@ int luagi_remote_connect( lua_State *L )
 
    if( git_remote_connect( *rem, dir ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -331,7 +333,7 @@ int luagi_remote_ls( lua_State *L )
    size_t size;
    if( git_remote_ls( &heads, &size, *remote ) )
    {
-      ERROR_PUSH( L )
+      ltk_push_error( L );
    }
    //return a table
    lua_newtable( L );
@@ -463,7 +465,7 @@ int luagi_remote_stats( lua_State *L )
    const git_transfer_progress *progress = git_remote_stats( *rem );
    if( ! progress )
    {
-      ERROR_PUSH( L )
+      ltk_push_error( L );
    }
 
    luagi_push_transfer_stats( L, progress );

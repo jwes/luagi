@@ -1,6 +1,9 @@
 #include "object.h"
+
 #include <git2/object.h>
 #include <git2/oid.h>
+
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -11,7 +14,7 @@ int luagi_object_lookup( lua_State *L )
    git_oid id;
    if(luagi_check_oid( &id, L, 2 ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    const char *typestr = luaL_checkstring( L, 3 );
@@ -20,7 +23,7 @@ int luagi_object_lookup( lua_State *L )
    git_object **out = lua_newuserdata( L, sizeof( git_object *) );
    if( git_object_lookup( out, *repo, &id, type ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable(L, LUAGI_OBJECT_FUNCS );
@@ -40,7 +43,7 @@ int luagi_object_lookup_bypath( lua_State *L )
    git_object **out = lua_newuserdata( L, sizeof( git_object *) );
    if( git_object_lookup_bypath( out, *obj, path, type ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable(L, LUAGI_OBJECT_FUNCS );
@@ -57,7 +60,7 @@ int luagi_object_id( lua_State *L )
    const git_oid *oid = git_object_id( *obj );
    if( oid == NULL )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_oid( L, oid );

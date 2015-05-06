@@ -1,8 +1,11 @@
+#include "pack.h"
+
 #include <git2/buffer.h>
 #include <git2/pack.h>
-#include "pack.h"
-#include "oid.h"
+
+#include "ltk.h"
 #include "luagi.h"
+#include "oid.h"
 
 int luagi_packbuilder_new( lua_State *L )
 {
@@ -11,7 +14,7 @@ int luagi_packbuilder_new( lua_State *L )
 
    if( git_packbuilder_new( out, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_PACK_FUNCS );
    lua_setmetatable( L, -2 );
@@ -26,7 +29,7 @@ static int generic_insert( lua_State *L, int (*func)( git_packbuilder *pb, const
 
    if( func( *pack, &oid ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -51,7 +54,7 @@ int luagi_packbuilder_insert( lua_State *L )
 
    if( git_packbuilder_insert( *pack, &oid, name ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -71,7 +74,7 @@ int luagi_packbuilder_write_buf( lua_State *L )
    git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_packbuilder_write_buf( &buf, *pack ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushlstring( L, buf.ptr, buf.size );
    return 1;
@@ -86,7 +89,7 @@ int luagi_packbuilder_write( lua_State *L )
    
    if( git_packbuilder_write( *pack, path, mode, NULL, NULL ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -129,7 +132,7 @@ int luagi_packbuilder_foreach( lua_State *L )
    free( p );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

@@ -1,10 +1,12 @@
-#include <git2/tag.h>
-#include <git2/signature.h>
-
 #include "tag.h"
+
+#include <git2/signature.h>
+#include <git2/tag.h>
+
+#include "ltk.h"
 #include "luagi.h"
-#include "oid.h"
 #include "object.h"
+#include "oid.h"
 #include "types.h"
 
 int luagi_tag_lookup( lua_State *L )
@@ -26,7 +28,7 @@ int luagi_tag_lookup( lua_State *L )
 
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_TAG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -48,7 +50,7 @@ int luagi_tag_create( lua_State *L )
    git_signature_free( sig );
    if(ret)
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -67,7 +69,7 @@ int luagi_tag_annotation_create( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -81,7 +83,7 @@ int luagi_tag_create_frombuffer( lua_State *L )
    git_oid out;
    if( git_tag_create_frombuffer( &out, *repo, buffer, force ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_oid( L, &out );
@@ -97,7 +99,7 @@ int luagi_tag_create_lightweight( lua_State *L )
    git_oid oid;
    if( git_tag_create_lightweight( &oid, *repo, tag_name, *target, force ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    
    return luagi_push_oid( L, &oid );
@@ -110,7 +112,7 @@ int luagi_tag_delete( lua_State *L )
 
    if( git_tag_delete( *repo, tag_name ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -121,7 +123,7 @@ int luagi_tag_list( lua_State *L )
    git_strarray *data = lua_newuserdata( L, sizeof( git_strarray ) );
    if( git_tag_list( data, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_STRARRAY );
    lua_setmetatable( L, -2 );
@@ -136,7 +138,7 @@ int luagi_tag_list_match( lua_State *L )
    git_strarray *data = lua_newuserdata( L, sizeof( git_strarray ) );
    if( git_tag_list_match( data, pattern, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_STRARRAY );
    lua_setmetatable( L, -2 );
@@ -170,7 +172,7 @@ int luagi_tag_foreach( lua_State *L )
    p->callback_pos = 2;
    if( git_tag_foreach( *repo, foreach_cb, p ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    free( p );
    return 0;
@@ -199,7 +201,7 @@ int luagi_tag_target( lua_State *L )
 
    if( git_tag_target( target, *tag ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable( L, -2 );
@@ -254,7 +256,7 @@ int luagi_tag_peel( lua_State *L )
 
    if( git_tag_peel( object, *tag ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable( L, -2 );

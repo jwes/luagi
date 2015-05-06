@@ -1,8 +1,10 @@
+#include "ignore.h"
+
 #include <git2/ignore.h>
 #include <lauxlib.h>
-#include "ignore.h"
-#include "luagi.h"
 
+#include "ltk.h"
+#include "luagi.h"
 
 int luagi_ignore_add_rules( lua_State *L )
 {
@@ -11,7 +13,7 @@ int luagi_ignore_add_rules( lua_State *L )
 
    if( git_ignore_add_rule( *repo, rules ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -22,7 +24,7 @@ int luagi_ignore_clear_internal_rules( lua_State *L )
 
    if( git_ignore_clear_internal_rules( *repo ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -35,7 +37,7 @@ int luagi_ignore_path_is_ignored( lua_State *L )
    int ignored;
    if( git_ignore_path_is_ignored( &ignored, *repo, path ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushboolean( L, ignored );
    return 1;

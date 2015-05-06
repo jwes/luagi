@@ -1,7 +1,9 @@
+#include "graph.h"
+
 #include <git2/graph.h>
 #include <lauxlib.h>
 
-#include "graph.h"
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -16,7 +18,7 @@ int luagi_graph_ahead_behind( lua_State *L )
 
    if( git_graph_ahead_behind( &ahead, &behind, *repo, &local, &upstream ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    lua_pushinteger( L, ahead );

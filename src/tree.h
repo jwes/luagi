@@ -1,7 +1,10 @@
 #ifndef IS_LUAGI_TREE
 #define IS_LUAGI_TREE
-#include <lua.h>
+
 #include <git2/tree.h>
+#include <lauxlib.h>
+#include <lua.h>
+
 #include "luagi.h"
 
 int luagi_tree_lookup( lua_State *L );

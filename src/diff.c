@@ -1,14 +1,16 @@
 #include "diff.h" 
+
 #include <git2/diff.h>
 #include <git2/errors.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "luagi.h" 
-#include "index.h"
 #include "commit.h"
-#include "submodule.h"
+#include "index.h"
+#include "ltk.h"
+#include "luagi.h" 
 #include "oid.h"
+#include "submodule.h"
 
 int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
 {
@@ -628,7 +630,7 @@ int luagi_diff_get_stats( lua_State *L )
    git_diff_stats **out = lua_newuserdata( L, sizeof( git_diff_stats *) );
    if( git_diff_get_stats( out, *diff ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_DIFF_STATS_FUNCS );
    lua_setmetatable( L, -2 );
@@ -691,7 +693,7 @@ int luagi_diff_stats_to_buf( lua_State *L )
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_diff_stats_to_buf( &out, *stats, format, width ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushlstring( L, out.ptr, out.size );
    return 1;
@@ -751,7 +753,7 @@ int luagi_diff_format_email( lua_State *L )
 
    if( git_diff_format_email( &out, *diff, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    lua_pushlstring( L, out.ptr, out.size );
@@ -784,7 +786,7 @@ int luagi_diff_commit_as_email( lua_State *L )
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_diff_commit_as_email( &out, *repo, *commit, patch_no, total_patches, flags, &diff_opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    lua_pushlstring( L, out.ptr, out.size );

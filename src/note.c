@@ -1,6 +1,9 @@
+#include "note.h"
+
 #include <git2/notes.h>
 #include <git2/signature.h>
-#include "note.h"
+
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -25,7 +28,7 @@ static int note_iter( lua_State *L )
    }
    else 
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
       return 0;
    }
 }
@@ -39,7 +42,7 @@ int luagi_note_iterator( lua_State *L )
 
    if( git_note_iterator_new( iter, *repo, note_ref ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_NOTE_ITER_FUNCS );
@@ -65,8 +68,8 @@ static int note_foreach_cb( const git_oid *blob_id, const git_oid *annotated_obj
 
    if( lua_pcall( p->L, 2, 1, 0 ) )
    {
-       ERROR_ABORT( p->L )
-       return 1;
+      ltk_error_abort( p->L );
+      return 1;
    }
 
    int ret = luaL_checkinteger( p->L, -1 );
@@ -86,7 +89,7 @@ int luagi_note_foreach( lua_State *L )
    
    if( git_note_foreach( *repo, notes_ref, note_foreach_cb, p ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
 
    return 0;
@@ -103,7 +106,7 @@ int luagi_note_read( lua_State *L )
 
    if( git_note_read( note, *repo, notes_ref, &oid ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_NOTE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -129,7 +132,7 @@ int luagi_note_create( lua_State *L )
    git_signature_free( committer );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_oid( L, &out );
@@ -152,7 +155,7 @@ int luagi_note_remove( lua_State *L )
 
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -165,7 +168,7 @@ int luagi_note_default_ref( lua_State *L )
 
    if( git_note_default_ref( &out, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushstring( L, out );
    return 1;

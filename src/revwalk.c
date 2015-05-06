@@ -1,5 +1,8 @@
-#include <git2/revwalk.h>
 #include "revwalk.h"
+
+#include <git2/revwalk.h>
+
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -11,7 +14,7 @@ int luagi_revwalk_new( lua_State *L )
 
    if( git_revwalk_new( out, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REVWALK_FUNCS );
    lua_setmetatable( L, -2 );
@@ -35,7 +38,7 @@ int luagi_revwalk_push( lua_State *L )
 
    if( git_revwalk_push( *rev, &oid ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -47,7 +50,7 @@ int luagi_revwalk_push_glob( lua_State *L )
    const char *glob = luaL_checkstring( L, 2 );
    if( git_revwalk_push_glob( *rev, glob ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -58,7 +61,7 @@ int luagi_revwalk_push_head( lua_State *L )
 
    if( git_revwalk_push_head( *rev ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -71,7 +74,7 @@ int luagi_revwalk_hide( lua_State *L )
 
    if( git_revwalk_hide( *rev, &oid ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -83,7 +86,7 @@ int luagi_revwalk_hide_glob( lua_State *L )
 
    if( git_revwalk_hide_glob( *rev, glob ) )
    {
-        ERROR_ABORT( L )
+        ltk_error_abort( L );
    }
    return 0;
 }
@@ -95,7 +98,7 @@ int luagi_revwalk_hide_head( lua_State *L )
    if( git_revwalk_hide_head( *rev ) )
 
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -108,7 +111,7 @@ int luagi_revwalk_push_ref( lua_State *L )
 
    if( git_revwalk_push_ref( *rev, ref ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -120,7 +123,7 @@ int luagi_revwalk_hide_ref( lua_State *L )
 
    if( git_revwalk_hide_ref( *rev, ref ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -132,7 +135,7 @@ int luagi_revwalk_next( lua_State *L )
 
    if( git_revwalk_next( &out, *rev ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_oid( L, &out );
@@ -163,7 +166,7 @@ int luagi_revwalk_push_range( lua_State *L )
 
    if( git_revwalk_push_range( *rev, range ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -195,7 +198,7 @@ int luagi_revwalk_repository( lua_State *L )
    *repo = git_revwalk_repository( *rev );
    if( *repo == NULL )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, REPO_NAME );

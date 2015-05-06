@@ -1,7 +1,9 @@
+#include "reset.h"
+
 #include <string.h>
 #include <git2/signature.h>
 
-#include "reset.h"
+#include "ltk.h"
 #include "luagi.h"
 #include "object.h"
 
@@ -41,7 +43,7 @@ int luagi_reset( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -57,7 +59,7 @@ int luagi_reset_default( lua_State *L )
 
    if( git_reset_default( *repo, *target, &array ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -71,7 +73,7 @@ int luagi_reset_index( lua_State *L )
 
    if( git_reset_default( *repo, NULL, &array ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

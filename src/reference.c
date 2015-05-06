@@ -1,18 +1,20 @@
 #include "reference.h"
-#include <string.h>
-#include <git2/refs.h>
+
 #include <git2/oid.h>
+#include <git2/refs.h>
 #include <git2/signature.h>
 #include <git2/strarray.h>
+#include <string.h>
 
-#include "luagi.h"
-#include "oid.h"
-#include "object.h"
-#include "types.h"
+#include "blob.h"
 #include "commit.h"
+#include "ltk.h"
+#include "luagi.h"
+#include "object.h"
+#include "oid.h"
 #include "tag.h"
 #include "tree.h"
-#include "blob.h"
+#include "types.h"
 
 #define bufsize 1024
 int luagi_reference_lookup( lua_State *L )
@@ -23,7 +25,7 @@ int luagi_reference_lookup( lua_State *L )
    git_reference **out = lua_newuserdata( L, sizeof( git_reference *) );
    if( git_reference_lookup( out, *repo, name ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
@@ -39,7 +41,7 @@ int luagi_reference_name_to_id( lua_State *L )
    git_oid out;
    if(git_reference_name_to_id( &out, *repo, name ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -53,7 +55,7 @@ int luagi_reference_dwim( lua_State *L )
 
    if( git_reference_dwim( out, *repo, shorthand ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -83,7 +85,7 @@ int luagi_reference_symbolic_create_matching( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -112,7 +114,7 @@ int luagi_reference_symbolic_create( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -131,7 +133,7 @@ int luagi_reference_create( lua_State *L )
    git_oid oid;
    if( luagi_check_oid( &oid, L, 3 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
 
    git_signature *sig;
@@ -146,7 +148,7 @@ int luagi_reference_create( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -165,12 +167,12 @@ int luagi_reference_create_matching( lua_State *L )
    git_oid oid;
    if( luagi_check_oid( &oid, L, 3 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    git_oid curr_oid;
    if( luagi_check_oid( &curr_oid, L, 4 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
 
    git_signature *sig;
@@ -185,7 +187,7 @@ int luagi_reference_create_matching( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -247,7 +249,7 @@ int luagi_reference_gen_resolve( lua_State *L, const char *tablename )
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
    if( git_reference_resolve( out, *ref ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -261,7 +263,7 @@ int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename
    git_signature *sig;
    if( table_to_signature( L, &sig, 3 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    const char *log_message = luaL_checkstring( L, 4 );
 
@@ -270,7 +272,7 @@ int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -283,13 +285,13 @@ int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
    git_oid oid;
    if( luagi_check_oid( &oid, L, 2 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    luaL_checktype( L, 3, LUA_TTABLE );
    git_signature *sig;
    if( table_to_signature( L, &sig, 3 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    const char *log_message = luaL_checkstring( L, 4 );
 
@@ -298,7 +300,7 @@ int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -313,7 +315,7 @@ int luagi_reference_gen_rename( lua_State *L, const char *tablename )
    git_signature *sig;
    if( table_to_signature( L, &sig, 3 ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    const char *log_message = luaL_checkstring( L, 4 );
    int force = lua_toboolean( L, 5 );
@@ -323,7 +325,7 @@ int luagi_reference_gen_rename( lua_State *L, const char *tablename )
    git_signature_free( sig );
    if( ret )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -335,7 +337,7 @@ int luagi_reference_gen_delete( lua_State *L, const char *tablename )
    git_reference **ref = luaL_checkudata( L, 1, tablename );
    if( git_reference_delete( *ref ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -347,7 +349,7 @@ int luagi_reference_remove( lua_State *L )
 
    if( git_reference_remove( *repo, name ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -358,7 +360,7 @@ int luagi_reference_list( lua_State *L )
    git_strarray array;
    if( git_reference_list( &array, *repo ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luagi_lua_list_from_string( L, &array );
    git_strarray_free( &array );
@@ -412,14 +414,14 @@ int luagi_reference_foreach( lua_State *L )
    {
       if( git_reference_foreach_name( *repo, name_callback, p ))
       {
-         ERROR_ABORT( L )
+         ltk_error_abort( L );
       }
    }
    else
    {
       if( git_reference_foreach( *repo, ref_callback, p ))
       {
-         ERROR_ABORT( L )
+         ltk_error_abort( L );
       }
    }
    free( p );
@@ -462,7 +464,7 @@ int luagi_reference_gen_peel( lua_State *L, const char *tablename )
 
    if( git_reference_peel( out, *ref, type ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    switch( type)
    {
@@ -512,7 +514,7 @@ static int reference_iter( lua_State *L )
    }
    else if( ret != 0 )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
       return 0;
    }
 
@@ -540,7 +542,7 @@ int luagi_reference_iterator( lua_State *L )
 
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
       return 0;
    }
 
@@ -571,7 +573,7 @@ int luagi_reference_foreach_glob( lua_State *L )
    free( p );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;   
 }
@@ -594,7 +596,7 @@ int luagi_reference_ensure_log( lua_State *L )
 
    if( git_reference_ensure_log( *repo, refname ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -617,7 +619,7 @@ int luagi_reference_normalize_name( lua_State *L )
    memset( buffer_out, 0, bufsize );
    if( git_reference_normalize_name( buffer_out, bufsize, name, flags ) != 0 )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    lua_pushstring( L, buffer_out );
    return 1;

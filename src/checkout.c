@@ -1,8 +1,10 @@
 #include "checkout.h"
+
 #include <git2/checkout.h>
 
-#include "luagi.h"
 #include "index.h"
+#include "ltk.h"
+#include "luagi.h"
 #include "object.h"
 #include "tree.h"
 
@@ -147,7 +149,7 @@ int luagi_checkout_head( lua_State *L )
 
    if( git_checkout_head( *repo, &opts ) )
    {
-      ERROR_ABORT( L ) 
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -162,7 +164,7 @@ int luagi_checkout_index( lua_State *L )
 
    if( git_checkout_index( *repo, *index, &opts ) )
    {
-      ERROR_ABORT( L ) 
+      ltk_error_abort( L );
    }
 
    return 0;
@@ -178,7 +180,7 @@ int luagi_checkout_tree( lua_State *L )
 
    if( git_checkout_tree( *repo, *obj, &opts ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

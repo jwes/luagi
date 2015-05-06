@@ -15,16 +15,6 @@
 #define LUAGI_REMOTE_FUNCS "is.luagi.remote"
 #define LUAGI_STRARRAY "is.luagi.strarray"
 
-#define ERROR_ABORT( L ) \
-   const git_error *err = giterr_last(); \
-   luaL_error( L, err ? err->message : "unknown" );
-
-#define ERROR_PUSH( L ) \
-   const git_error *err = giterr_last(); \
-   lua_pushnil( L ); \
-   lua_pushstring( L, err ? err->message : "unknown" ); \
-   return 2;
-
 #define checkrepo(L, n) \
       (git_repository**) luaL_checkudata( L, n, REPO_NAME )
 #define checktree_at(L, n) \

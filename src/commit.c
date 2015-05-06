@@ -1,10 +1,13 @@
-#include <stdio.h>
-#include <lauxlib.h>
+#include "commit.h"
+
 #include <git2/commit.h>
+#include <git2/errors.h>
 #include <git2/oid.h>
 #include <git2/signature.h>
-#include <git2/errors.h>
-#include "commit.h"
+#include <lauxlib.h>
+#include <stdio.h>
+
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -167,7 +170,7 @@ int luagi_commit_nth_gen_ancestor( lua_State *L )
    int ret = git_commit_nth_gen_ancestor( anc, *commit, n );
    if( ret != 0 )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
    lua_setmetatable( L, -2 );
@@ -206,7 +209,7 @@ int luagi_commit_create( lua_State *L )
    git_signature_free( committer );
    if( ret != 0 )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    return luagi_push_oid( L, &oid );
 }

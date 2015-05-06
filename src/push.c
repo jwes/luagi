@@ -1,7 +1,10 @@
+#include "push.h"
+
 #include <git2/buffer.h>
 #include <git2/push.h>
 #include <git2/signature.h>
-#include "push.h"
+
+#include "ltk.h"
 #include "luagi.h"
 #include "remote.h"
 
@@ -12,7 +15,7 @@ int luagi_push_new( lua_State *L )
 
    if( git_push_new( out, *remote ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    } 
    luaL_getmetatable( L, LUAGI_PUSH_FUNCS );
    lua_setmetatable( L, -2 );
@@ -38,7 +41,7 @@ int luagi_push_set_options( lua_State *L )
 
    if( git_push_set_options( *push, &opts ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -56,7 +59,7 @@ int luagi_push_add_refspec( lua_State *L )
 
    if( git_push_add_refspec( *push, refspec ) )
    {
-      ERROR_ABORT( L );
+      ltk_error_abort( L );;
    }
    return 0;
 }
@@ -72,7 +75,7 @@ int luagi_push_update_tips( lua_State *L )
    git_signature_free( signature );
    if( ret )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -82,7 +85,7 @@ int luagi_push_finish( lua_State *L )
    git_push **push = checkpush_at( L, 1 );
    if( git_push_finish( *push ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -104,7 +107,7 @@ static int foreach_callback( const char *ref, const char *msg, void *data )
 
    if( lua_pcall( p->L, 2, 1, 0 ) )
    {
-      ERROR_ABORT( p->L )
+      ltk_error_abort( p->L );
       return -1;
    }
    int ret = luaL_checkinteger( p->L, -1 );
@@ -123,7 +126,7 @@ int luagi_push_status_foreach( lua_State *L )
 
    if( git_push_status_foreach( *push, foreach_callback, p ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
 
    free( p );

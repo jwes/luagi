@@ -1,5 +1,6 @@
 #ifndef IS_LUAGI_RESET
 #define IS_LUAGI_RESET
+
 #include <lua.h>
 
 int luagi_reset( lua_State *L );

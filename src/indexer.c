@@ -1,6 +1,8 @@
-#include <git2/indexer.h>
 #include "indexer.h"
 
+#include <git2/indexer.h>
+
+#include "ltk.h"
 #include "luagi.h"
 #include "odb.h"
 #include "oid.h"
@@ -38,7 +40,7 @@ int luagi_indexer_new( lua_State *L )
 
    if( git_indexer_new(  out, path, mode, *odb, luagi_transfer_progress_cb, p ) )
    {
-      ERROR_PUSH( L );
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_INDEXER_FUNCS );
    lua_setmetatable( L, -2 );
@@ -55,7 +57,7 @@ int luagi_indexer_append( lua_State *L )
 
    if( git_indexer_append( *indexer, data, size, &stats ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    return luagi_push_transfer_stats( L, &stats );
 }
@@ -67,7 +69,7 @@ int luagi_indexer_commit( lua_State *L )
 
    if( git_indexer_commit( *indexer, &stats ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    return luagi_push_transfer_stats( L, &stats );

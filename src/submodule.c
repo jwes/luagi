@@ -1,7 +1,9 @@
+#include "submodule.h"
+
 #include <git2/buffer.h>
 #include <git2/submodule.h>
 
-#include "submodule.h"
+#include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
 
@@ -13,7 +15,7 @@ int luagi_submodule_lookup( lua_State *L )
    git_submodule **sub = lua_newuserdata( L, sizeof( git_submodule * ) );
    if( git_submodule_lookup( sub, *repo, name ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_SUBMODULE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -49,7 +51,7 @@ int luagi_submodule_foreach( lua_State *L )
 
    if( git_submodule_foreach( *repo, sub_foreach, p ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    free( p );
    return 0;
@@ -65,7 +67,7 @@ int luagi_submodule_add_setup( lua_State *L )
    git_submodule **sub = lua_newuserdata( L, sizeof( git_submodule * ) ); 
    if( git_submodule_add_setup( sub, *repo, url, path, use_gitlink ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, LUAGI_SUBMODULE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -80,7 +82,7 @@ int luagi_submodule_resolve_url( lua_State *L )
    git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_submodule_resolve_url( &buf, *repo, url ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    lua_pushlstring( L, buf.ptr, buf.size );
@@ -94,7 +96,7 @@ int luagi_submodule_reload_all( lua_State *L )
 
    if( git_submodule_reload_all( *repo, force ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -107,7 +109,7 @@ int luagi_submodule_open( lua_State *L )
 
    if( git_submodule_open( out, *sub ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
@@ -126,7 +128,7 @@ int luagi_submodule_add_finalize( lua_State *L )
    git_submodule **sub = checksubmodule_at( L, 1 );
    if( git_submodule_add_finalize( *sub ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -165,7 +167,7 @@ static int luagi_sub_set_string( lua_State *L, int (*func)( git_submodule *sub, 
 
    if( func( *sub, str ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -385,7 +387,7 @@ int luagi_submodule_init( lua_State *L )
 
    if( git_submodule_init( *sub, overwrite ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -396,7 +398,7 @@ int luagi_submodule_sync( lua_State *L )
 
    if( git_submodule_sync( *sub ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -408,7 +410,7 @@ int luagi_submodule_reload( lua_State *L )
 
    if( git_submodule_reload( *sub, force ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -453,7 +455,7 @@ static int luagi_get_status( lua_State *L, int (*func)( unsigned int *status, gi
 
    if( func( &status, *sub ) )
    {
-      ERROR_PUSH( L );
+      return ltk_push_error( L );
    }
 
    return luagi_push_status( L, status );
@@ -476,7 +478,7 @@ int luagi_submodule_add_to_index( lua_State *L )
 
    if( git_submodule_add_to_index( *sub, write_index ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -487,7 +489,7 @@ int luagi_submodule_save( lua_State *L )
 
    if( git_submodule_save( *sub ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
    return 0;
 }

@@ -1,15 +1,15 @@
-#include <lauxlib.h>
+#include "tree.h"
+
 #include <git2/oid.h>
 #include <git2/errors.h>
+#include <stdio.h>
 #define __USE_BSD
 #include <string.h>
 #undef __USE_BSD
 
-#include "tree.h"
+#include "ltk.h"
 #include "luagi.h"
 #include "object.h"
-
-#include <stdio.h>
 #include "oid.h"
 #include "types.h"
 
@@ -132,13 +132,13 @@ int luagi_tree_entry_byid( lua_State *L )
    int ret = luagi_check_oid( &oid, L, 2 );
    if( ret != 0 )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    const git_tree_entry* e = git_tree_entry_byid( *tree, &oid );
    if( e == NULL )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
    return tree_entry_by_final(L, e );
 }
@@ -232,7 +232,7 @@ int luagi_tree_entry_to_object( lua_State *L )
    git_object **out = lua_newuserdata( L, sizeof( git_object *) );
    if( git_tree_entry_to_object( out, *repo, *entry ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );

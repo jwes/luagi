@@ -1,6 +1,9 @@
 #ifndef IS_LUAGI_REMOTE
 #define IS_LUAGI_REMOTE
+
+#include <lauxlib.h>
 #include <lua.h>
+
 int luagi_remote_list( lua_State *L );
 int luagi_remote_load( lua_State *L );
 int luagi_remote_create_anonymous( lua_State *L );
