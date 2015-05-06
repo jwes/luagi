@@ -218,7 +218,7 @@ describe( "remove_reference, list_references #reference", function()
       local refs, err = repo:list_references()
       assert.is.falsy( err )
       assert.are.equal( "table", type( refs ))
-      assert.are.equal( 5, #refs )
+      assert.are.equal( 6, #refs )
    end)
 
    it( "should remove a normal ref", function()
@@ -252,7 +252,7 @@ describe( "foreach_reference #reference", function()
       is_string = true
 
       repo:foreach_reference( f )
-      assert.are.equal( 3, count )
+      assert.are.equal( 4, count )
       assert.is.False( is_string )
    end)
    it("should iterate all references", function()
@@ -260,7 +260,7 @@ describe( "foreach_reference #reference", function()
       is_string = true
 
       repo:foreach_reference( f, true )
-      assert.are.equal( 3, count )
+      assert.are.equal( 4, count )
       assert.is.True( is_string )
    end)
 end)
@@ -522,7 +522,7 @@ describe( "delete #reference", function()
       ref, err = repo:create_reference( direct_name, "3a3e73745d1a2ba679362d51e0a090a3ee03aad6",
                                  test_helper.signature,
                                  "another ref" )
-      assert.are.equal( 4, #repo:list_references())
+      assert.are.equal( 5, #repo:list_references())
    end)
 
    it("should be prepared", function()
@@ -532,7 +532,7 @@ describe( "delete #reference", function()
    end)
    it("should delete itself", function()
       ref:delete()
-      assert.are.equal( 3, #repo:list_references())
+      assert.are.equal( 4, #repo:list_references())
    end)
 end)
 

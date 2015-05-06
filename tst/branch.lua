@@ -48,7 +48,7 @@ describe( "branch lookup", function()
          
          assert.is.True( master:is_head() )
          assert.are.equal( "master", master:name() )
-         assert.is.falsy( master:get_upstream() )
+         assert.are.not_nil( master:get_upstream() )
       end)
 
    end)

@@ -74,7 +74,7 @@ describe( "status_for_each_ext #status", function()
          count = count + 1
          assert_status( status, "nothing" )
       end
-      assert.equal( 3, count )
+      assert.equal( 5, count )
    end)
 
    it( "should return path", function()
