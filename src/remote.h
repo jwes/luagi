@@ -80,10 +80,10 @@ static const struct luaL_Reg luagi_remote_funcs [] = {
    { "set_fetch_head",     luagi_remote_set_update_fetch_head   },
    { "update_tips",        luagi_remote_update_tips             },
    //transport
-   { "transport_from_url",     luagi_transport_new   },
-   { "create_local_transport", luagi_transport_local },
-   { "create_dummy_transport", luagi_transport_dummy },
-   { "create_smart_transport", luagi_transport_smart },
+   // { "transport_from_url",     luagi_transport_new   },
+   // { "create_local_transport", luagi_transport_local },
+   // { "create_dummy_transport", luagi_transport_dummy },
+   // { "create_smart_transport", luagi_transport_smart },
    { NULL,                 NULL                                },
 };
 #endif
