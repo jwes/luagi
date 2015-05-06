@@ -19,4 +19,10 @@ inline int ltk_push_error( lua_State *L )
    return 2;
 }
 
+inline void ltk_setmetatable( lua_State *L, const char *name )
+{
+   luaL_getmetatable( L, name );
+   lua_setmetatable( L, -2 );
+}
+
 #endif
