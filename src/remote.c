@@ -20,15 +20,10 @@ int luagi_remote_list( lua_State *L )
       lua_pushstring( L, err->message );
       return 2;
    }
-   lua_newtable( L );
-   for( unsigned int i = 0; i < array.count; i++ )
-   {
-      lua_pushinteger( L, i + 1 );
-      lua_pushstring( L, array.strings[i] );
-      lua_settable( L, -3 );
-   }
-   return 1; 
+   luagi_lua_list_from_string( L, &array );
+   return 1;
 }
+
 int luagi_remote_load( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
@@ -145,7 +140,7 @@ static int get_param( lua_State *L, const char *(*func)( const git_remote *remot
 static void set_param( lua_State* L, int (*func)(git_remote *remote, const char* param ) )
 {
    git_remote** rem = checkremote( L );
-   const char *param = luaL_checkstring( L, 1 );
+   const char *param = luaL_checkstring( L, 2 );
 
    if( func( *rem, param ) )
    {
@@ -322,8 +317,7 @@ int luagi_remote_connect( lua_State *L )
 
    if( git_remote_connect( *rem, dir ) )
    {
-      const git_error* err = giterr_last();
-      luaL_error( L, err->message );
+      ERROR_ABORT( L )
    }
    return 0;
 }
@@ -577,6 +571,6 @@ int luagi_remote_valid_url( lua_State *L )
 int luagi_remote_supported_url( lua_State *L )
 { 
    const char *url = luaL_checkstring( L, 1 );
-   lua_pushboolean( L, git_remote_valid_url( url ) );
+   lua_pushboolean( L, git_remote_supported_url( url ) );
    return 1; 
 }

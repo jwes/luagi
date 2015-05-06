@@ -57,11 +57,6 @@ static const struct luaL_Reg repofuncs [] = {
    { "create_anon_remote", luagi_remote_create_anonymous },
    { "create_remote_with_fetch", luagi_remote_create_with_fetchspec },
    { "create_remote", luagi_remote_create },
-   //transport
-   { "transport_from_url",     luagi_transport_new   },
-   { "create_local_transport", luagi_transport_local },
-   { "create_dummy_transport", luagi_transport_dummy },
-   { "create_smart_transport", luagi_transport_smart },
    //status
    { "status_for_each", luagi_status_foreach },
    { "status_for_each_ext", luagi_status_foreach_ext },
