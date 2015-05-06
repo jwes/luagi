@@ -34,7 +34,6 @@ set( SRC_FILES
    ${SRC_DIR}/status.c
    ${SRC_DIR}/submodule.c
    ${SRC_DIR}/tag.c
-   ${SRC_DIR}/transport.c
    ${SRC_DIR}/tree.c
    ${SRC_DIR}/tree_builder.c
    ${SRC_DIR}/types.c

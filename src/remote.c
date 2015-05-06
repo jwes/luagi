@@ -8,7 +8,6 @@
 #include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
-#include "transport.h"
 
 int luagi_remote_list( lua_State *L )
 { 
@@ -17,12 +16,10 @@ int luagi_remote_list( lua_State *L )
    git_strarray array;
    if( git_remote_list( &array, *repo ) )
    {
-      const git_error *err = giterr_last();
-      lua_pushnil( L );
-      lua_pushstring( L, err->message );
-      return 2;
+      return ltk_push_error( L );
    }
    luagi_lua_list_from_string( L, &array );
+   git_strarray_free( &array );
    return 1;
 }
 
@@ -35,13 +32,9 @@ int luagi_remote_load( lua_State *L )
 
    if( git_remote_load( out, *repo, name ) )
    {
-      const git_error* err = giterr_last();
-      lua_pushnil( L );
-      lua_pushstring( L, err->message );
-      return 2;
+      return ltk_push_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
 }
 
@@ -55,13 +48,9 @@ int luagi_remote_create_anonymous( lua_State *L )
 
    if( git_remote_create_anonymous( out, *repo, url, fetch ) )
    {
-      const git_error* err = giterr_last();
-      lua_pushnil( L );
-      lua_pushstring( L, err->message );
-      return 2;
+      return ltk_push_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
 }
 
@@ -76,13 +65,9 @@ int luagi_remote_create_with_fetchspec( lua_State *L )
 
    if( git_remote_create_with_fetchspec( out, *repo, name, url, fetch ))
    {
-      const git_error* err = giterr_last();
-      lua_pushnil( L );
-      lua_pushstring( L, err->message );
-      return 2;
+      return ltk_push_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
 }
 
@@ -96,14 +81,10 @@ int luagi_remote_create( lua_State *L )
 
    if( git_remote_create( out, *repo, name, url ) )
    {
-      const git_error* err = giterr_last();
-      lua_pushnil( L );
-      lua_pushstring( L, err->message );
-      return 2;
+      return ltk_push_error( L );
    }
    
-   luaL_getmetatable( L, LUAGI_REMOTE_FUNCS  );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
 }
 
@@ -112,8 +93,7 @@ int luagi_remote_save( lua_State *L )
    git_remote** rem = checkremote( L );
    if( git_remote_save( *rem ) )
    {
-      const git_error* err = giterr_last();
-      luaL_error( L, err->message );
+      ltk_error_abort( L );
    }
    return 0; 
 }
@@ -183,17 +163,7 @@ int get_refspecs( lua_State *L, int (*func)(git_strarray *array, const git_remot
       const git_error *err = giterr_last();
       luaL_error( L, err->message );
    }
-   lua_newtable( L );
-   int nextstr = 0;
-   for( unsigned int i = 0; i < array.count; i++)
-   {
-      char* next = *(array.strings + nextstr );
-      lua_pushstring( L, next );
-      lua_pushinteger( L, i + 1 );
-      lua_settable( L, -3 );
-
-      nextstr += strlen( next ) + 1;
-   }
+   luagi_lua_list_from_string( L, &array );
    git_strarray_free( &array );
    return 1; 
 }
@@ -261,13 +231,19 @@ int luagi_remote_get_refspec( lua_State *L )
 { 
    git_remote** rem = checkremote( L );
    size_t n = luaL_checkinteger( L , 2 );
+   size_t size = git_remote_refspec_count( *rem );
+   if( n <= 0 || n > size )
+   {
+      lua_pushnil( L );
+      lua_pushstring( L, "index out of bounds" );
+      return 2;
+   }
+   n--;
 
    const git_refspec *spec = git_remote_get_refspec( *rem, n );
    if( spec == NULL )
    {
-      lua_pushnil( L );
-      lua_pushfstring( L, "no element at pos %d ", n );
-      return 2;
+      return ltk_push_error( L );
    }
    
    lua_newtable( L );
@@ -333,7 +309,7 @@ int luagi_remote_ls( lua_State *L )
    size_t size;
    if( git_remote_ls( &heads, &size, *remote ) )
    {
-      ltk_push_error( L );
+      return ltk_push_error( L );
    }
    //return a table
    lua_newtable( L );
@@ -369,8 +345,7 @@ int luagi_remote_download( lua_State *L )
    git_remote **rem = checkremote( L );
    if( git_remote_download( *rem ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ltk_error_abort( L );
    }
    return 0;
 }
@@ -387,8 +362,7 @@ static int call_with_sig( lua_State *L, int (*func)( git_remote *remote, const g
    if( func( *rem, sig, reflog_message ))
    {
       git_signature_free( sig );
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ltk_error_abort( L );
    }
    git_signature_free( sig );
    return 0;
@@ -423,7 +397,7 @@ int luagi_remote_disconnect( lua_State *L )
    return 0; 
 }
 
-int ligt_remote_free( lua_State *L )
+int luagi_remote_free( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
 
@@ -439,16 +413,106 @@ int luagi_remote_check_cert( lua_State *L )
    git_remote_check_cert( *rem, check );
    return 0; 
 }
-int luagi_remote_set_transport( lua_State *L )
+
+int luagi_remote_set_transport_from_url( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
-   git_transport **transport = checktransport_at( L , 2 );
-   if( git_remote_set_transport( *rem, *transport ) )
+   const char* url = luaL_checkstring( L, 2 );
+   // create 
+   git_transport *out;
+   if( git_transport_new( &out, *rem, url ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ltk_error_abort( L );
+   }
+
+   if( git_remote_set_transport( *rem, out ) )
+   {
+      ltk_error_abort( L );
    }
    return 0; 
+}
+
+int luagi_remote_set_transport_dummy( lua_State *L )
+{ 
+   git_remote **rem = checkremote( L );
+   git_transport *out;
+   if( git_transport_dummy( &out, *rem, NULL ) )
+   {
+      ltk_error_abort( L );
+   }
+
+   if( git_remote_set_transport( *rem, out ) )
+   {
+      ltk_error_abort( L );
+   }
+   return 0; 
+}
+
+int luagi_remote_set_transport_local( lua_State *L )
+{ 
+   git_remote **rem = checkremote( L );
+   git_transport *out;
+   if( git_transport_local( &out, *rem, NULL ) )
+   {
+      ltk_error_abort( L );
+   }
+
+   if( git_remote_set_transport( *rem, out ) )
+   {
+      ltk_error_abort( L );
+   }
+   return 0; 
+}
+
+static int callback ( git_smart_subtransport **out, 
+                      git_transport *owner )
+{
+   return git_smart_subtransport_git( out, owner );
+}
+
+static int ssh_callback ( git_smart_subtransport **out, 
+                      git_transport *owner )
+{
+   return git_smart_subtransport_ssh( out, owner );
+}
+static int http_callback ( git_smart_subtransport **out, 
+                      git_transport *owner )
+{
+   return git_smart_subtransport_http( out, owner );
+}
+
+int luagi_remote_set_transport_smart( lua_State *L )
+{
+   git_remote **remote = checkremote( L );     
+   const char *tstring = luaL_checkstring( L, 2 );
+   git_smart_subtransport_definition def;
+   if( strncmp( tstring, HTTP, strlen( HTTP ) ) )
+   {
+      def.callback = http_callback;
+      def.rpc = 1;
+   }
+   else if ( strncmp( tstring, SSH, strlen( SSH ) ) )
+   {
+      def.callback = ssh_callback;
+      def.rpc = 0;
+   }
+   else 
+   {
+      def.callback = callback;
+      def.rpc = 0;
+   }
+      
+   git_transport *out; 
+   if( git_transport_smart( &out, *remote, &def ) )
+   {
+      ltk_error_abort( L );
+   }
+
+   if( git_remote_set_transport( *remote, out ) )
+   {
+      ltk_error_abort( L );
+   }
+   return 0;
 }
 
 int luagi_remote_set_callbacks( lua_State *L )
@@ -465,7 +529,7 @@ int luagi_remote_stats( lua_State *L )
    const git_transfer_progress *progress = git_remote_stats( *rem );
    if( ! progress )
    {
-      ltk_push_error( L );
+      return ltk_push_error( L );
    }
 
    luagi_push_transfer_stats( L, progress );

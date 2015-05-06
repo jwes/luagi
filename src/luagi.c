@@ -13,7 +13,6 @@
 #include "commit.h"
 #include "clone.h"
 #include "remote.h"
-#include "transport.h"
 #include "status.h"
 #include "diff.h"
 #include "index.h"

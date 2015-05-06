@@ -148,22 +148,46 @@ describe( "set_url #remote", function()
       remote:set_pushurl( url )
       assert.are.equal( url, remote:pushurl() )
    end)
+   describe( "refspec_count #remote", function()
+      it( "should have one refspec", function()
+         assert.are.equal( 1, remote:refspec_count() )
+      end)
+   end)
+   describe( "get_refspec #remote", function()
+      it( "should check bounds", function()
+         local spec, err = remote:get_refspec( 0 )
+         assert.is.truthy( err:find( "bounds" ))
+         spec, err = remote:get_refspec( 1000 )
+         assert.is.truthy( err:find( "bounds" ))
+      end)
+      it( "should return the refspec", function()
+         spec = {
+            dest = "refs/remotes/origin/*",
+            force = true,
+            src = "refs/heads/*",
+            direction = "fetch",
+            representation = "+refs/heads/*:refs/remotes/origin/*"
+         }
+         assert.are.same( spec, remote:get_refspec(1) )
+      end)
+   end)
+   describe( "get_fetch_refspecs #remote", function()
+      it("should return a list of fetch refspecs", function()
+         local list, err = remote:get_fetch_refspecs()
+         assert.are.equal( 1, #list )
+         assert.are.equal( "+refs/heads/*:refs/remotes/origin/*", list[1] )
+      end)
+   end)
 end)
 
 describe( "save #remote", function() pending("              luagi_remote_save                    ") end)
 describe( "add_fetch #remote", function() pending("         luagi_remote_add_fetch               ") end)
-describe( "fetch_refspecs #remote", function() pending("    luagi_remote_get_fetch_refspecs      ") end)
 describe( "set_fetch_refspecs #remote", function() pending("luagi_remote_set_fetch_refspecs      ") end)
 describe( "add_push #remote", function() pending("          luagi_remote_add_push                ") end)
 describe( "get_push_refspecs #remote", function() pending(" luagi_remote_get_push_refspecs       ") end)
 describe( "set_push_refspecs #remote", function() pending(" luagi_remote_set_push_refspecs       ") end)
 describe( "clear_refspecs #remote", function() pending("    luagi_remote_clear_refspecs          ") end)
-describe( "refspec_count #remote", function() pending("     luagi_remote_refspec_count           ") end)
-describe( "get_refspec #remote", function() pending("       luagi_remote_get_refspec             ") end)
-describe( "connect #remote", function() pending("           luagi_remote_connect                 ") end)
 describe( "ls #remote", function()
-   pending("ls review transports")
-   --[[
    local repo = nil
    local err = nil
    local remote = nil
@@ -179,24 +203,33 @@ describe( "ls #remote", function()
       assert.is.not_nil( remote.pushurl )
    end)
 
-   it("should return", function()
+   it("should return list of heads", function()
+      assert.is.False( remote:is_connected())
       local heads, err = remote:ls()
       assert.is.truthy( err:find( "connected" ))
-      local transport = remote:transport_local()
+      remote:set_url( test_helper.remote_path )
+      remote:set_local_transport()
       remote:connect()
+      assert.is.True( remote:is_connected())
 
       local heads, err = remote:ls()
+      local master = "refs/heads/master"
+      local oid = "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09"
       assert.is.falsy( err )
-      assert.are.equal( {}, heads )
+      for i, head in ipairs( heads ) do
+         if( head.name == "HEAD" ) then
+            assert.are.equal( master, head.target )
+         else
+            assert.are.equal( master, head.name )
+         end
+         assert.are.equal( oid, head.oid )
+      end
    end)
-   ]]
 end)
 
 describe( "download #remote", function() pending("          luagi_remote_download                ") end)
 describe( "fetch #remote", function() pending("             luagi_remote_fetch                   ") end)
-describe( "is_connected #remote", function() pending("      luagi_remote_connected               ") end)
 describe( "stop #remote", function() pending("              luagi_remote_stop                    ") end)
-describe( "disconnect #remote", function() pending("        luagi_remote_disconnect              ") end)
 describe( "check_cert #remote", function() pending("        luagi_remote_check_cert              ") end)
 describe( "set_transport #remote", function() pending("     luagi_remote_set_transport           ") end)
 describe( "set_callbacks #remote", function() pending("     luagi_remote_set_callbacks           ") end)
