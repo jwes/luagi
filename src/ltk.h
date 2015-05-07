@@ -25,4 +25,7 @@ inline void ltk_setmetatable( lua_State *L, const char *name )
    lua_setmetatable( L, -2 );
 }
 
+
+void ltk_dump_stack( lua_State* L );
+
 #endif

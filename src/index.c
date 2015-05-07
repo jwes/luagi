@@ -466,7 +466,7 @@ static int index_matched_pathspec( const char *path, const char *matched_pathspe
 
    if( lua_pcall( p->L, 2, 1, 0 ) != LUA_OK )
    {
-      dumpStack( p->L );
+      ltk_dump_stack( p->L );
       luaL_error( p->L, "can not call path callback" );
    }
 

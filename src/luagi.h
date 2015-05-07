@@ -37,7 +37,6 @@ typedef struct luagi_foreach_payload
    int callback_pos;
 } luagi_foreach_t;
 
-void dumpStack( lua_State* L );
 #ifdef STACK_DEBUG
 #define debugStack( L ); dumpStack( L );
 #else

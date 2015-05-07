@@ -425,7 +425,7 @@ static int diff_file_callback( const git_diff_delta *delta,
 
    if( lua_pcall( f->L, 2, 1, 0 ) != LUA_OK )
    {
-      dumpStack( f->L );
+      ltk_dump_stack( f->L );
       luaL_error( f->L, "can not call file callback" );
    }
 
