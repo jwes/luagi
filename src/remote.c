@@ -585,8 +585,7 @@ int luagi_remote_rename( lua_State *L )
    git_strarray problems;
    if( git_remote_rename( &problems, *rem, new_name ) )
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ltk_error_abort( L );
    }
 
    for( unsigned int i = 0; i < problems.count; i++ )
