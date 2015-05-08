@@ -83,8 +83,8 @@ int luagi_blame_file( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_BLAME_FUNCS );
-   lua_setmetatable( L, -2 );
+
+   ltk_setmetatable( L, LUAGI_BLAME_FUNCS );
    return 1;
 }
 
@@ -101,8 +101,7 @@ int luagi_blame_buffer( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_BLAME_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_BLAME_FUNCS );
    return 1;
 }
 

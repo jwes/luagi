@@ -49,8 +49,7 @@ int luagi_tree_lookup( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LUAGI_TREE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_FUNCS );
    return 1;
 }
 
@@ -88,8 +87,7 @@ static int tree_entry_by_final( lua_State *L, const git_tree_entry* entry )
       lua_pushfstring( L, "dup failed, %d", ret );
       return 2;
    }
-   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    return 1;
 }
 
@@ -165,8 +163,7 @@ int luagi_tree_entry_bypath( lua_State *L )
       }
       return 2;
    }
-   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    return 1;
 }
 
@@ -235,8 +232,7 @@ int luagi_tree_entry_to_object( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_OBJECT_FUNCS );
    return 1;
 }
 
@@ -304,9 +300,8 @@ int luagi_tree_walk( lua_State *L )
       luaL_error( L, "wrong order, user 'pre' or 'post'" );
    }
    struct walk_info* info = (struct walk_info*) lua_newuserdata(L, sizeof(struct walk_info ) );
-   luaL_getmetatable( L, LUAGI_TREE_WALK_STATICS );
-   lua_setmetatable( L, -2 );
-
+   ltk_setmetatable( L, LUAGI_TREE_WALK_STATICS );
+   
    info->next = NULL;
    info->last = NULL;
    info->mode = mode;
@@ -340,8 +335,7 @@ static int luagi_walker( lua_State *L )
          lua_pushstring( L, "out of memory - dup failed" );
       }  
       
-      luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
-      lua_setmetatable( L, -2 );
+      ltk_setmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
       free_elem( elem );
       return 2;
    }//iteration finished

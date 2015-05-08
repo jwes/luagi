@@ -14,8 +14,7 @@ int luagi_refdb_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFDB_FUNCS );
    return 1;
 }
 
@@ -28,8 +27,7 @@ int luagi_refdb_open( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFDB_FUNCS );
    return 1;
 }
 

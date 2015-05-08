@@ -161,8 +161,7 @@ int luagi_diff_tree_to_tree( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_DIFF_FUNCS );
 
    return 1;
 }
@@ -186,8 +185,7 @@ int luagi_diff_tree_to_index( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_DIFF_FUNCS );
    return 1; 
 }
 
@@ -209,8 +207,7 @@ int luagi_diff_index_to_workdir( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_DIFF_FUNCS );
 
    return 1; 
 }
@@ -232,8 +229,7 @@ static int tree_to_workdir( lua_State *L, int (*func)(git_diff **diff, git_repos
       return 2;
    }
 
-   luaL_getmetatable(L, LUAGI_DIFF_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_DIFF_FUNCS );
 
    return 1;
 
@@ -630,8 +626,7 @@ int luagi_diff_get_stats( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_DIFF_STATS_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_DIFF_STATS_FUNCS );
    return 1;
 }
 

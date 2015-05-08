@@ -18,8 +18,7 @@ int luagi_reflog_read( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFLOG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFLOG_FUNCS );
    return 1;
 }
    

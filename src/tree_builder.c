@@ -29,8 +29,7 @@ int luagi_tree_builder_create( lua_State *L )
       return 2;
    }
    
-   luaL_getmetatable( L, LUAGI_TREE_BUILDER_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_BUILDER_FUNCS );
    return 1;
 }
 
@@ -65,8 +64,7 @@ int luagi_tree_builder_get( lua_State *L )
       lua_pushfstring( L, "git_tree_entry_dup failed %d", ret );
       return 2;
    }
-   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    return 1;
 }
 int luagi_tree_builder_insert( lua_State *L )
@@ -127,8 +125,7 @@ int luagi_tree_builder_insert( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    return 1;
 }
 int luagi_tree_builder_remove( lua_State *L )
@@ -178,8 +175,7 @@ static int builder_filter( const git_tree_entry *entry, void *payload )
       return -1;
    }
 
-   luaL_getmetatable( fp->L, LUAGI_TREE_ENTRY_FUNCS );
-   lua_setmetatable( fp->L, -2 );
+   ltk_setmetatable( fp->L, LUAGI_TREE_ENTRY_FUNCS );
 
    if(lua_pcall( fp->L, 1, 1, 0) )
    {

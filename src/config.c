@@ -41,8 +41,7 @@ int luagi_config_open_default( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_FUNCS );
    return 1;
 }
 
@@ -54,8 +53,7 @@ int luagi_config_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_FUNCS );
    return 1;
 }
 
@@ -68,8 +66,7 @@ int luagi_config_open_ondisk( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_FUNCS );
    return 1;
 }
 
@@ -144,8 +141,7 @@ int luagi_config_open_level( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_FUNCS );
    return 1;
 }
 
@@ -159,8 +155,7 @@ int luagi_config_open_global( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_FUNCS );
    return 1;
 }
 
@@ -174,8 +169,7 @@ int luagi_config_snapshot( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_FUNCS );
    return 1;
 }
 
@@ -351,8 +345,7 @@ int luagi_config_iterator_new( lua_State *L )
       return ltk_push_git_error( L );
    }
    
-   luaL_getmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
 
    lua_pushcclosure( L, config_iter, 1 );
    return 1;
@@ -375,8 +368,7 @@ int luagi_config_multivar_iterator( lua_State *L )
       return ltk_push_git_error( L );
    }
    
-   luaL_getmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
 
    lua_pushcclosure( L, config_iter, 1 );
    return 1;
@@ -397,8 +389,7 @@ int luagi_config_iterator_glob_new( lua_State *L )
       return ltk_push_git_error( L );
    }
    
-   luaL_getmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
 
    lua_pushcclosure( L, config_iter, 1 );
    return 1;

@@ -16,8 +16,7 @@ int luagi_odb_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_ODB_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_ODB_FUNCS );
    return 1;
 }
 
@@ -31,8 +30,7 @@ int luagi_odb_open( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_ODB_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_ODB_FUNCS );
    return 1;
 }
 
@@ -78,8 +76,7 @@ int luagi_odb_read( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_ODB_OBJECT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_ODB_OBJECT_FUNCS );
    return 1;
 }
 
@@ -221,8 +218,7 @@ int luagi_odb_open_wstream( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_ODB_STREAM_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_ODB_STREAM_FUNCS );
    return 1;
 }
 
@@ -240,8 +236,7 @@ int luagi_odb_open_rstream( lua_State *L )
       return ltk_push_git_error( L );
    }
    
-   luaL_getmetatable( L, LUAGI_ODB_STREAM_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_ODB_STREAM_FUNCS );
    return 1;
 } 
 

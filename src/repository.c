@@ -27,8 +27,7 @@ int luagi_open( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
 
@@ -50,8 +49,7 @@ int luagi_repository_wrap_odb( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
 
@@ -95,8 +93,7 @@ int luagi_repository_open_ext( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
 
@@ -109,8 +106,7 @@ int luagi_repository_open_bare( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
    
@@ -125,8 +121,7 @@ int luagi_repository_init( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
 
@@ -211,8 +206,7 @@ int luagi_repository_init_ext( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
 

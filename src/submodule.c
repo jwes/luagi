@@ -17,8 +17,7 @@ int luagi_submodule_lookup( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_SUBMODULE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_SUBMODULE_FUNCS );
    return 1;
 }
 int sub_foreach( git_submodule *sm, const char *name, void *payload )
@@ -69,8 +68,7 @@ int luagi_submodule_add_setup( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_SUBMODULE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_SUBMODULE_FUNCS );
    return 1;
 }
 

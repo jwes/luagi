@@ -28,8 +28,7 @@ int luagi_reference_lookup( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -57,8 +56,7 @@ int luagi_reference_dwim( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -87,8 +85,7 @@ int luagi_reference_symbolic_create_matching( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -116,8 +113,7 @@ int luagi_reference_symbolic_create( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -150,8 +146,7 @@ int luagi_reference_create( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -189,8 +184,7 @@ int luagi_reference_create_matching( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -251,8 +245,7 @@ int luagi_reference_gen_resolve( lua_State *L, const char *tablename )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -274,8 +267,7 @@ int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -302,8 +294,7 @@ int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -327,8 +318,7 @@ int luagi_reference_gen_rename( lua_State *L, const char *tablename )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 
@@ -518,8 +508,7 @@ static int reference_iter( lua_State *L )
       return 0;
    }
 
-   luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REFERENCE_FUNCS );
    return 1;
 }
 

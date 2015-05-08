@@ -152,8 +152,7 @@ int luagi_merge_head_from_ref( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_MERGEHEAD_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_MERGEHEAD_FUNCS );
    return 1;
 }
    
@@ -176,8 +175,7 @@ int luagi_merge_head_from_fetchhead( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_MERGEHEAD_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_MERGEHEAD_FUNCS );
    return 1;
 }
 
@@ -198,8 +196,7 @@ int luagi_merge_head_from_id( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_MERGEHEAD_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_MERGEHEAD_FUNCS );
    return 1;
 }
 
@@ -383,8 +380,7 @@ int luagi_merge_trees( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_INDEX_FUNCS );
    return 1;
 }
 
@@ -403,8 +399,7 @@ int luagi_merge_commits( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_INDEX_FUNCS );
    return 1;
 }
 

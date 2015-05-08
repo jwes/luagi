@@ -32,8 +32,7 @@ int luagi_cherry_pick_commit( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_INDEX_FUNCS );
    return 1;
 }
 

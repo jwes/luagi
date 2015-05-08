@@ -16,8 +16,7 @@ int luagi_revwalk_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_REVWALK_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_REVWALK_FUNCS );
    return 1;
 }
 
@@ -200,9 +199,7 @@ int luagi_revwalk_repository( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
    

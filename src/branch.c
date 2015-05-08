@@ -42,8 +42,7 @@ int luagi_create_branch( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_BRANCH_FUNCS );
    return 1;      
 }
 
@@ -87,8 +86,7 @@ int luagi_move_branch( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_BRANCH_FUNCS );
    return 1;
 
 }
@@ -116,8 +114,7 @@ int luagi_branches( lua_State *L )
 
    /* create iterator userdata and open iterator */
    git_branch_iterator** iter =(git_branch_iterator**) lua_newuserdata(L, sizeof(git_branch_iterator*));
-   luaL_getmetatable(L, LUAGI_BRANCH_STATICS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_BRANCH_STATICS );
 
    int ret = git_branch_iterator_new( iter, *repo, flags);
    if( ret != 0 )
@@ -139,8 +136,7 @@ static int branch_iter( lua_State *L )
    int ret = git_branch_next( out, &type, iter );
    if( ret == 0 )
    {
-      luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
-      lua_setmetatable( L, -2 );
+      ltk_setmetatable( L, LUAGI_BRANCH_FUNCS );
 
       lua_pushboolean(L, type == GIT_BRANCH_REMOTE );
 
@@ -177,8 +173,7 @@ int luagi_branch_upstream_get( lua_State *L )
       return ltk_push_git_error( L );
    }
    
-   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_BRANCH_FUNCS );
    return 1;
 }
 
@@ -210,8 +205,7 @@ int luagi_branch_lookup( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_BRANCH_FUNCS );
    return 1;
 }
 

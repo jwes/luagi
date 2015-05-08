@@ -25,8 +25,7 @@ int luagi_patch_from_diff( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_PATCH_FUNCS );
    return 1;
 }
 
@@ -48,8 +47,7 @@ int luagi_patch_from_blobs( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_PATCH_FUNCS );
    return 1;
 }
 
@@ -71,8 +69,7 @@ int luagi_patch_from_blob_and_buffer( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_PATCH_FUNCS );
    return 1;
 }
 
@@ -94,8 +91,7 @@ int luagi_patch_from_buffers( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_PATCH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_PATCH_FUNCS );
    return 1;
 }
 

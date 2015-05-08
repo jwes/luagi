@@ -26,8 +26,7 @@ int luagi_object_lookup( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable(L, LUAGI_OBJECT_FUNCS );
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_OBJECT_FUNCS );
 
    return 1;
 }
@@ -46,8 +45,7 @@ int luagi_object_lookup_bypath( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable(L, LUAGI_OBJECT_FUNCS );
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_OBJECT_FUNCS );
 
    return 1;
 }

@@ -16,8 +16,7 @@ int luagi_packbuilder_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_PACK_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_PACK_FUNCS );
    return 1;
 }
 

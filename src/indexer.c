@@ -42,8 +42,7 @@ int luagi_indexer_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_INDEXER_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_INDEXER_FUNCS );
    return 1;
 }
 

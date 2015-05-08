@@ -31,8 +31,7 @@ int luagi_commit_lookup( lua_State *L )
       lua_pushnil( L );
       lua_pushfstring( L, "lookup failed - %d", ret );
    }
-   luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_COMMIT_FUNCS );
    return 1;
 }
 
@@ -113,8 +112,7 @@ int luagi_commit_tree( lua_State *L )
       return 2;
    }
 
-   luaL_getmetatable( L, LUAGI_TREE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TREE_FUNCS );
    return 1;
 }
 
@@ -141,8 +139,7 @@ int luagi_commit_parent( lua_State *L )
       lua_pushfstring( L, "can't find parent %d: %d", n, ret );
       return 2;
    }
-   luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_COMMIT_FUNCS );
    return 1;
 }
 
@@ -172,8 +169,7 @@ int luagi_commit_nth_gen_ancestor( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_COMMIT_FUNCS );
    return 1;
 }
 

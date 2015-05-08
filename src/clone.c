@@ -1,9 +1,12 @@
-#include <lauxlib.h>
+#include "clone.h"
+
 #include <git2/clone.h>
 #include <git2/errors.h>
-#include "luagi.h"
-#include "clone.h"
+#include <lauxlib.h>
+
 #include "checkout.h"
+#include "ltk.h"
+#include "luagi.h"
 
 static void parse_options( git_clone_options* options, lua_State *L, const int tableIndex )
 {
@@ -51,13 +54,12 @@ int luagi_clone( lua_State *L )
       lua_pushfstring( L, "unable to clone repository from %s to %s --> %s", url, local_path, err->message );
       return 2;
    }
-   luaL_getmetatable( L, REPO_NAME );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, REPO_NAME );
    return 1;
 }
 
 int luagi_clone_into( lua_State *L )
 {
-   luaL_error(L, "not yet implemented");
+   luaL_error( L, "not yet implemented" );
    return 0;
 }

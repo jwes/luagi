@@ -30,8 +30,7 @@ int luagi_tag_lookup( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_TAG_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_TAG_FUNCS );
    return 1;
 }
 
@@ -203,8 +202,7 @@ int luagi_tag_target( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_OBJECT_FUNCS );
    return 1;
 }
 
@@ -258,7 +256,6 @@ int luagi_tag_peel( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_OBJECT_FUNCS );
    return 1;
 }

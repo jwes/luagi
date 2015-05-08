@@ -191,8 +191,7 @@ int luagi_index_new( lua_State *L )
       }
    }
 
-   luaL_getmetatable(L, LUAGI_INDEX_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_INDEX_FUNCS );
    return 1;
 }
 
@@ -677,8 +676,7 @@ int luagi_index_conflict_iterator( lua_State *L )
       ltk_error_abort( L );
    }
 
-   luaL_getmetatable(L, LUAGI_INDEX_CONFLICT_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable( L, LUAGI_INDEX_CONFLICT_FUNCS );
 
    lua_pushcclosure( L, conflict_iter, 1 );
    return 1; 

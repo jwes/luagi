@@ -45,8 +45,7 @@ int luagi_note_iterator( lua_State *L )
       return ltk_push_git_error( L );
    }
 
-   luaL_getmetatable( L, LUAGI_NOTE_ITER_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_NOTE_ITER_FUNCS );
 
    lua_pushcclosure( L, note_iter, 1 );
    return 1;
@@ -108,8 +107,7 @@ int luagi_note_read( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-   luaL_getmetatable( L, LUAGI_NOTE_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_NOTE_FUNCS );
    return 1;
 }
 

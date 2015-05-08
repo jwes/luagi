@@ -17,8 +17,7 @@ int luagi_push_new( lua_State *L )
    {
       return ltk_push_git_error( L );
    } 
-   luaL_getmetatable( L, LUAGI_PUSH_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_PUSH_FUNCS );
    return 1;
 }
 static int luagi_push_init_options( lua_State *L __attribute__(( unused )), int index __attribute__(( unused )), git_push_options *opts )

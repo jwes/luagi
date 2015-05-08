@@ -24,11 +24,9 @@ int luagi_revert_commit( lua_State *L )
    git_index **out = lua_newuserdata( L, sizeof(git_index *) );
    if( git_revert_commit( out, *repo, *revert_commit, *commit, mainline, &opts ) )
    {
-      ERROR_PUSH( L )
+      return ltk_push_git_error( L );
    }
-   
-   luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
-   lua_setmetatable( L, -2 );
+   ltk_setmetatable( L, LUAGI_INDEX_FUNCS );
    return 1;
 }
 static int luagi_revert_init_options( lua_State *L __attribute__((unused)),
