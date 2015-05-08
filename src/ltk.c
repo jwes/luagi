@@ -8,6 +8,8 @@
 
 extern inline void ltk_setmetatable( lua_State *L, const char *name );
 
+extern inline int ltk_push_error_msg( lua_State *L, const char *msg );
+
 void ltk_dump_stack( lua_State *L )
 {
    int top = lua_gettop( L ); /* depth of the stack */

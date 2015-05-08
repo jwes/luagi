@@ -180,12 +180,13 @@ static int set_refspecs( lua_State *L, int (*func)(git_remote *remote, git_strar
 
    git_strarray array = ltk_check_strarray( L, 2 );
 
-   if( func( *rem, &array))
+   int ret = func( *rem, &array);
+   git_strarray_free( &array );
+   if( ret ) 
    {
-      const git_error *err = giterr_last();
-      luaL_error( L, err->message );
+      ltk_error_abort( L );
    }
-
+ 
    return 0; 
 }
 
@@ -234,9 +235,7 @@ int luagi_remote_get_refspec( lua_State *L )
    size_t size = git_remote_refspec_count( *rem );
    if( n <= 0 || n > size )
    {
-      lua_pushnil( L );
-      lua_pushstring( L, "index out of bounds" );
-      return 2;
+      return ltk_push_error_msg( L, "index out of bounds" );
    }
    n--;
 

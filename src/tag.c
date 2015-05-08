@@ -120,13 +120,13 @@ int luagi_tag_delete( lua_State *L )
 int luagi_tag_list( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   git_strarray *data = lua_newuserdata( L, sizeof( git_strarray ) );
-   if( git_tag_list( data, *repo ) )
+   git_strarray data;
+   if( git_tag_list( &data, *repo ) )
    {
       return ltk_push_error( L );
    }
-   luaL_getmetatable( L, LUAGI_STRARRAY );
-   lua_setmetatable( L, -2 );
+   ltk_push_strarray( L, data );
+   git_strarray_free( &data );
    return 1;
 }
    
@@ -135,13 +135,13 @@ int luagi_tag_list_match( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    const char *pattern = luaL_checkstring( L, 2 );
 
-   git_strarray *data = lua_newuserdata( L, sizeof( git_strarray ) );
-   if( git_tag_list_match( data, pattern, *repo ) )
+   git_strarray data;
+   if( git_tag_list_match( &data, pattern, *repo ) )
    {
       return ltk_push_error( L );
    }
-   luaL_getmetatable( L, LUAGI_STRARRAY );
-   lua_setmetatable( L, -2 );
+   ltk_push_strarray( L, data );
+   git_strarray_free( &data );
    return 1;
 }
 

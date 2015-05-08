@@ -391,9 +391,7 @@ int luagi_diff_get_delta( lua_State *L )
    int num = git_diff_num_deltas( *diff );
    if( idx <= 0 || idx > num )
    {
-        lua_pushnil( L );
-        lua_pushstring( L, "index out of bounds" );
-        return 2;
+        return ltk_push_error_msg( L, "index out of bounds" );
    }
    idx--;
 

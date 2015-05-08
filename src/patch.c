@@ -14,7 +14,7 @@ int luagi_patch_from_diff( lua_State *L )
    size_t size = git_diff_num_deltas( *diff );
    if( idx <= 0 || idx > size )
    {
-      luaL_error( L, "index out of bounds" );
+      return ltk_push_error_msg( L, "index out of bounds" );
    }
 
    idx--;
@@ -143,7 +143,7 @@ int luagi_patch_get_hunk( lua_State *L )
    size_t hunk_idx = luaL_checkinteger( L, 2 );
    size_t size = git_patch_num_hunks( *patch );
    if( hunk_idx <= 0 || hunk_idx > size )
-      luaL_error( L, "index out of bounds");
+      return ltk_push_error_msg( L, "index out of bounds");
 
    hunk_idx--;
 
@@ -165,7 +165,7 @@ int luagi_patch_num_lines_in_hunk( lua_State *L )
    size_t hunk_idx = luaL_checkinteger( L, 2 );
    size_t size = git_patch_num_hunks( *patch );
    if( hunk_idx <= 0 || hunk_idx > size )
-      luaL_error( L, "index out of bounds");
+      return ltk_push_error_msg( L, "index out of bounds");
 
    hunk_idx--;
 
@@ -180,13 +180,13 @@ int luagi_patch_get_line_in_hunk( lua_State *L )
    size_t hunk_idx = luaL_checkinteger( L, 2 );
    size_t size = git_patch_num_hunks( *patch );
    if( hunk_idx <= 0 || hunk_idx > size )
-      luaL_error( L, "index out of bounds");
+      return ltk_push_error_msg( L, "index out of bounds");
 
    hunk_idx--;
    size_t line_of_hunk = luaL_checkinteger( L, 3 );
    size = git_patch_num_lines_in_hunk( *patch, hunk_idx );
    if( line_of_hunk <= 0 || line_of_hunk > size )
-      luaL_error( L, "line index out of bounds");
+      return ltk_push_error_msg( L, "line index out of bounds");
 
    line_of_hunk--;
 

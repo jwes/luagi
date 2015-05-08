@@ -7,6 +7,7 @@
 #define __USE_BSD
 #include <string.h>
 #undef __USE_BSD
+#include "ltk.h"
 
 #include "diff.h"
 #include "ltk.h"
@@ -89,11 +90,9 @@ int luagi_status_foreach( lua_State *L )
    list->last = NULL;
    if( git_status_foreach( *repo, luagi_status_callback, list ) )
    {
-      const git_error* err = giterr_last();
-      luaL_error( L, "error iterating the files %s", err->message );
+      ltk_error_abort( L );
    }
-   luaL_getmetatable(L, LUAGI_STATUS_FOREACH);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable(L, LUAGI_STATUS_FOREACH);
 
    lua_pushcclosure( L, luagi_status_walker, 1 );
    return 1;
@@ -139,11 +138,9 @@ int luagi_status_foreach_ext( lua_State *L )
    list->last = NULL;
    if( git_status_foreach_ext( *repo, &opts, luagi_status_callback, list ) )
    {
-      const git_error* err = giterr_last();
-      luaL_error( L, "error iterating the files %s", err->message );
+      ltk_error_abort( L );
    }
-   luaL_getmetatable(L, LUAGI_STATUS_FOREACH);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable(L, LUAGI_STATUS_FOREACH);
 
    lua_pushcclosure( L, luagi_status_walker, 1 );
    return 1;
@@ -158,8 +155,7 @@ int luagi_status_file ( lua_State *L )
 
    if( git_status_file( &flags, *repo, path ) )
    {
-      const git_error* err = giterr_last();
-      luaL_error( L, "status for the fle %s failed: %s", path, err->message );
+      ltk_error_abort( L );
    }
 
    luagi_status_flags_to_table( L, flags );
@@ -174,8 +170,7 @@ int luagi_status_should_ignore( lua_State *L )
 
    if( git_status_should_ignore( &ignored, *repo, path ) )
    {
-      const git_error* err = giterr_last();
-      luaL_error( L, "ignore failed %s", err->message );
+      ltk_error_abort( L );
    }
 
    lua_pushboolean( L,  ignored );
@@ -195,14 +190,10 @@ int luagi_status_list_new ( lua_State *L )
 
    if( git_status_list_new( out, *repo, &opts ) )
    {
-      const git_error *err = giterr_last();
-      lua_pushnil( L );
-      lua_pushfstring( L, "new failed, %s", err->message );
-      return 2;
+      return ltk_push_error( L );
    }
 
-   luaL_getmetatable(L, LUAGI_STATUS_FUNCS);
-   lua_setmetatable(L, -2);
+   ltk_setmetatable(L, LUAGI_STATUS_FUNCS);
    return 1;
 }
 // list operations
@@ -224,9 +215,7 @@ int luagi_status_by_index( lua_State *L )
 
    if( entry == NULL )
    {
-      lua_pushnil( L );
-      lua_pushstring( L, "index out of bounds");
-      return 2;
+      return ltk_push_error_msg( L, "index out of bounds" );
    }
 
    lua_newtable( L );

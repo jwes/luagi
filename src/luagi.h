@@ -13,7 +13,6 @@
 #define LUAGI_TREE_BUILDER_FUNCS "is.luagi.tree.builder"
 #define LUAGI_TREE_WALK_STATICS "is.luagi.tree.walk"
 #define LUAGI_REMOTE_FUNCS "is.luagi.remote"
-#define LUAGI_STRARRAY "is.luagi.strarray"
 
 #define checkrepo(L, n) \
       (git_repository**) luaL_checkudata( L, n, REPO_NAME )
