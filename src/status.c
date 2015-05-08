@@ -1,13 +1,16 @@
 #include "status.h"
-#include "luagi.h"
-#include "diff.h"
-#include <git2/strarray.h>
+
 #include <git2/diff.h>
-#include <git2/status.h>
 #include <git2/errors.h>
+#include <git2/status.h>
+#include <git2/strarray.h>
 #define __USE_BSD
 #include <string.h>
 #undef __USE_BSD
+
+#include "diff.h"
+#include "ltk.h"
+#include "luagi.h"
 
 void  luagi_status_flags_to_table( lua_State *L, const int f )
 {      
@@ -116,7 +119,7 @@ static int luagi_status_init_options( lua_State *L, int idx, git_status_options 
    {
       opts->show = show;
       opts->flags = flags_from_lua( L, idx );
-      opts->pathspec = luagi_strings_from_lua_list( L, idx );
+      opts->pathspec = ltk_check_strarray( L, idx );
    }
 
    return ret; 

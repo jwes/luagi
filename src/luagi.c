@@ -396,37 +396,6 @@ int table_to_signature( lua_State *L, git_signature **sig, int tablepos )
    }
 }
 
-git_strarray luagi_strings_from_lua_list( lua_State *L, int table_idx )
-{
-   git_strarray array;
-   array.count = luaL_len( L, table_idx );
-   
-   array.strings = calloc( array.count, sizeof( char * ) );
-   for( size_t i = 1; i <= array.count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_gettable( L, table_idx );
-      const char* str = luaL_checkstring( L, -1 );
-      size_t len = strlen( str ) + 1;
-      char* tmpStr = malloc( len );
-      strncpy( tmpStr, str, len );
-      array.strings[ i - 1 ] = tmpStr;
-   }
-
-   return array;
-}
-
-void luagi_lua_list_from_string( lua_State *L, git_strarray *array )
-{
-   lua_newtable( L );
-   for( size_t i = 1; i <= array->count; i++ )
-   {
-      lua_pushinteger( L, i );
-      lua_pushstring( L, array->strings[i-1]);
-      lua_settable( L, -3 );
-   }
-}
-
 int luagi_push_transfer_stats( lua_State *L, const git_transfer_progress *stats )
 {
    lua_newtable( L );

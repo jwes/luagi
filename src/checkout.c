@@ -106,7 +106,7 @@ int luagi_parse_checkout_options( git_checkout_options *opts, lua_State *L, cons
    lua_getfield( L, tableIndex, PATHS );
    if( lua_type( L, -1 ) == LUA_TTABLE )
    {
-      opts->paths = luagi_strings_from_lua_list( L, -1 );
+      opts->paths = ltk_check_strarray( L, -1 );
    }
 
    lua_getfield( L, tableIndex, BASELINE );

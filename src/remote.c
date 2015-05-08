@@ -18,7 +18,7 @@ int luagi_remote_list( lua_State *L )
    {
       return ltk_push_error( L );
    }
-   luagi_lua_list_from_string( L, &array );
+   ltk_push_strarray( L, array );
    git_strarray_free( &array );
    return 1;
 }
@@ -163,7 +163,7 @@ int get_refspecs( lua_State *L, int (*func)(git_strarray *array, const git_remot
       const git_error *err = giterr_last();
       luaL_error( L, err->message );
    }
-   luagi_lua_list_from_string( L, &array );
+   ltk_push_strarray( L, array );
    git_strarray_free( &array );
    return 1; 
 }
@@ -178,7 +178,7 @@ static int set_refspecs( lua_State *L, int (*func)(git_remote *remote, git_strar
    // get table an build git_strarray  
    luaL_checktype( L, 2, LUA_TTABLE ); 
 
-   git_strarray array = luagi_strings_from_lua_list( L, 2 );
+   git_strarray array = ltk_check_strarray( L, 2 );
 
    if( func( *rem, &array))
    {

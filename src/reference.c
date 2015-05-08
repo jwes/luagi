@@ -362,7 +362,7 @@ int luagi_reference_list( lua_State *L )
    {
       return ltk_push_error( L );
    }
-   luagi_lua_list_from_string( L, &array );
+   ltk_push_strarray( L, array );
    git_strarray_free( &array );
    return 1;
 }

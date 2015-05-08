@@ -101,7 +101,7 @@ int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
       opts->ignore_submodules = luagi_sub_check_ignore( L, -1 );
    
       lua_getfield( L, idx, PATHSPEC );
-      opts->pathspec = luagi_strings_from_lua_list( L, -1 );
+      opts->pathspec = ltk_check_strarray( L, -1 );
 
       //TODO notify_cb
    

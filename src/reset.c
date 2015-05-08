@@ -54,7 +54,7 @@ int luagi_reset_default( lua_State *L )
    git_object **target = checkobject_at( L, 2 );
 
    luaL_checktype( L, 3, LUA_TTABLE );
-   git_strarray array = luagi_strings_from_lua_list( L, 3 );
+   git_strarray array = ltk_check_strarray( L, 3 );
 
 
    if( git_reset_default( *repo, *target, &array ) )
@@ -69,7 +69,7 @@ int luagi_reset_index( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
 
    luaL_checktype( L, 2, LUA_TTABLE );
-   git_strarray array = luagi_strings_from_lua_list( L, 2 );
+   git_strarray array = ltk_check_strarray( L, 2 );
 
    if( git_reset_default( *repo, NULL, &array ) )
    {

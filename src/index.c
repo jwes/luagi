@@ -481,7 +481,7 @@ int luagi_index_add_all( lua_State *L )
    luaL_checktype( L, 2, LUA_TTABLE );
    luaL_checktype( L, 3, LUA_TTABLE );
    luaL_checktype( L, 4, LUA_TFUNCTION );
-   git_strarray array = luagi_strings_from_lua_list( L, 2 );
+   git_strarray array = ltk_check_strarray( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
@@ -520,7 +520,7 @@ int luagi_index_remove_all( lua_State *L )
    git_index **index = checkindex_at( L, 1 );
    luaL_checktype( L, 2, LUA_TTABLE );
    luaL_checktype( L, 3, LUA_TFUNCTION );
-   git_strarray array = luagi_strings_from_lua_list( L, 2 );
+   git_strarray array = ltk_check_strarray( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
@@ -540,7 +540,7 @@ int luagi_index_update_all( lua_State *L )
    git_index **index = checkindex_at( L, 1 );
    luaL_checktype( L, 2, LUA_TTABLE );
    luaL_checktype( L, 3, LUA_TFUNCTION );
-   git_strarray array = luagi_strings_from_lua_list( L, 2 );
+   git_strarray array = ltk_check_strarray( L, 2 );
 
    struct pathspec_payload* p = malloc( sizeof( struct pathspec_payload ) );
    p->L = L;
