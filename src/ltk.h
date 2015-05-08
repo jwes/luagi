@@ -11,12 +11,17 @@ inline void ltk_error_abort( lua_State *L )
    luaL_error( L, err ? err->message : "unknown" );
 }
 
+inline int ltk_push_error_msg( lua_State *L, const char *msg )
+{
+   lua_pushnil( L );
+   lua_pushstring( L, msg );
+   return 2;
+}
+
 inline int ltk_push_error( lua_State *L )
 {
    const git_error *err = giterr_last();
-   lua_pushnil( L );
-   lua_pushstring( L, err ? err->message : "unknown" );
-   return 2;
+   return ltk_push_error_msg( L, err ? err->message : "unknown" );
 }
 
 inline void ltk_setmetatable( lua_State *L, const char *name )

@@ -94,9 +94,7 @@ int luagi_reflog_entry_byindex( lua_State *L )
    //check bounds
    if( idx <= 0 || idx > git_reflog_entrycount( *log ) )
    {
-      lua_pushnil( L );
-      lua_pushstring( L, "index out of bounds" );
-      return 2;
+      return ltk_push_error_msg( L, "index out of bounds");
    }
    idx--;
 
@@ -116,7 +114,6 @@ int luagi_reflog_drop( lua_State *L )
    if( idx <= 0 || idx > git_reflog_entrycount( *log ) )
    {
       luaL_error( L, "index out of bounds" );
-      return 0;
    }
    idx--;
 

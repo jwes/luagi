@@ -362,9 +362,7 @@ int luagi_index_get_byindex( lua_State *L )
    unsigned int pos = luaL_checkinteger( L, 2 );
    if( pos < 1 || pos > git_index_entrycount( *index ))
    {
-        lua_pushnil( L );
-        lua_pushstring( L, "index out of bounds");
-        return 2;
+        return ltk_push_error_msg( L, "index out of bounds" );
    }
    // indexes are 1 based
    pos--;
