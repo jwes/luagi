@@ -628,7 +628,7 @@ int luagi_diff_get_stats( lua_State *L )
    git_diff_stats **out = lua_newuserdata( L, sizeof( git_diff_stats *) );
    if( git_diff_get_stats( out, *diff ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_DIFF_STATS_FUNCS );
    lua_setmetatable( L, -2 );
@@ -691,7 +691,7 @@ int luagi_diff_stats_to_buf( lua_State *L )
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_diff_stats_to_buf( &out, *stats, format, width ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    lua_pushlstring( L, out.ptr, out.size );
    return 1;
@@ -751,7 +751,7 @@ int luagi_diff_format_email( lua_State *L )
 
    if( git_diff_format_email( &out, *diff, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushlstring( L, out.ptr, out.size );
@@ -784,7 +784,7 @@ int luagi_diff_commit_as_email( lua_State *L )
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_diff_commit_as_email( &out, *repo, *commit, patch_no, total_patches, flags, &diff_opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushlstring( L, out.ptr, out.size );

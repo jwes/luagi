@@ -30,7 +30,7 @@ int luagi_cherry_pick_commit( lua_State *L )
 
    if( git_cherry_pick_commit( out, *repo, *cherry_pick_commit, *our_commit, mainline, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
    lua_setmetatable( L, -2 );

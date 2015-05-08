@@ -37,7 +37,7 @@ int luagi_ignore_path_is_ignored( lua_State *L )
    int ignored;
    if( git_ignore_path_is_ignored( &ignored, *repo, path ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    lua_pushboolean( L, ignored );
    return 1;

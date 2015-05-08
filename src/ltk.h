@@ -41,7 +41,7 @@ inline void ltk_error_abort( lua_State *L )
    luaL_error( L, err ? err->message : "unknown" );
 }
 
-inline int ltk_push_error( lua_State *L )
+inline int ltk_push_git_error( lua_State *L )
 {
    const git_error *err = giterr_last();
    return ltk_push_error_msg( L, err ? err->message : "unknown" );

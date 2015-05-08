@@ -14,7 +14,7 @@ int luagi_packbuilder_new( lua_State *L )
 
    if( git_packbuilder_new( out, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_PACK_FUNCS );
    lua_setmetatable( L, -2 );
@@ -74,7 +74,7 @@ int luagi_packbuilder_write_buf( lua_State *L )
    git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_packbuilder_write_buf( &buf, *pack ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    lua_pushlstring( L, buf.ptr, buf.size );
    return 1;

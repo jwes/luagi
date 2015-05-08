@@ -180,14 +180,14 @@ int luagi_index_new( lua_State *L )
    {
       if( git_index_new( index ) )
       {
-         return ltk_push_error( L );
+         return ltk_push_git_error( L );
       }
    }
    else 
    {
       if( git_index_open( index, path ) )
       {
-         return ltk_push_error( L );
+         return ltk_push_git_error( L );
       }
    }
 
@@ -324,14 +324,14 @@ int luagi_index_write_tree( lua_State *L )
       git_repository **repo = checkrepo( L, 2 );
       if( git_index_write_tree_to( &out, *index, *repo ) )
       {
-         return ltk_push_error( L );
+         return ltk_push_git_error( L );
       }
    }
    else
    {
       if( git_index_write_tree( &out, *index ) )
       {
-         return ltk_push_error( L );
+         return ltk_push_git_error( L );
       }
    }
    return luagi_push_oid( L, &out );
@@ -370,7 +370,7 @@ int luagi_index_get_byindex( lua_State *L )
    const git_index_entry *out = git_index_get_byindex( *index, pos );
    if( out == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_index_entry( L, out );
@@ -385,7 +385,7 @@ int luagi_index_get_bypath( lua_State *L )
    const git_index_entry *out = git_index_get_bypath( *index, path, stage );
    if( out == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_index_entry( L, out );

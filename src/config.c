@@ -11,7 +11,7 @@ static int luagi_find_config( lua_State *L, int (*func)( git_buf *out ) )
    git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( func( &buf ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    lua_pushlstring( L, buf.ptr, buf.size );
    git_buf_free( &buf );
@@ -39,7 +39,7 @@ int luagi_config_open_default( lua_State *L )
 
    if( git_config_open_default( cfg ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -52,7 +52,7 @@ int luagi_config_new( lua_State *L )
 
    if( git_config_new( cfg ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -66,7 +66,7 @@ int luagi_config_open_ondisk( lua_State *L )
 
    if( git_config_open_ondisk( cfg, path ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -142,7 +142,7 @@ int luagi_config_open_level( lua_State *L )
 
    if( git_config_open_level( out, *cfg, level ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -157,7 +157,7 @@ int luagi_config_open_global( lua_State *L )
 
    if( git_config_open_global( out, *cfg ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -172,7 +172,7 @@ int luagi_config_snapshot( lua_State *L )
 
    if( git_config_snapshot( out, *cfg ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_CONFIG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -205,7 +205,7 @@ int luagi_config_get_entry( lua_State *L )
    const git_config_entry *entry;
    if( git_config_get_entry( &entry, *cfg, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_config_entry( L, entry );
@@ -219,7 +219,7 @@ int luagi_config_get_int32( lua_State *L )
 
    if( git_config_get_int32( &out, *cfg, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushinteger( L, out );
@@ -234,7 +234,7 @@ int luagi_config_get_int64( lua_State *L )
 
    if( git_config_get_int64( &out, *cfg, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushinteger( L, out );
@@ -249,7 +249,7 @@ int luagi_config_get_bool( lua_State *L )
    int out;
    if( git_config_get_bool( &out, *cfg, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushboolean( L, out );
@@ -265,7 +265,7 @@ int luagi_config_get_string( lua_State *L )
 
    if( git_config_get_string( &out, *cfg, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushstring( L, out );
@@ -334,7 +334,7 @@ static int config_iter( lua_State *L )
    }
    else if( ret < 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_config_entry( L, entry );
@@ -348,7 +348,7 @@ int luagi_config_iterator_new( lua_State *L )
 
    if( git_config_iterator_new( out, *cfg ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    luaL_getmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
@@ -372,7 +372,7 @@ int luagi_config_multivar_iterator( lua_State *L )
 
    if( git_config_multivar_iterator_new( out, *cfg, name, regexp ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    luaL_getmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );
@@ -394,7 +394,7 @@ int luagi_config_iterator_glob_new( lua_State *L )
 
    if( git_config_iterator_glob_new( out, *cfg, regexp ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    luaL_getmetatable( L, LUAGI_CONFIG_ITERATOR_FUNCS );

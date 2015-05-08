@@ -120,12 +120,12 @@ int luagi_tree_builder_insert( lua_State *L )
    ret = git_treebuilder_insert( &e, *builder, filename, &oid, mode );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ret = git_tree_entry_dup( entry, e );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_TREE_ENTRY_FUNCS );
    lua_setmetatable( L, -2 );

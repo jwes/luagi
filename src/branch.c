@@ -39,7 +39,7 @@ int luagi_create_branch( lua_State *L )
    git_signature_free( sig );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
@@ -85,7 +85,7 @@ int luagi_move_branch( lua_State *L )
    git_signature_free( sig );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );
@@ -174,7 +174,7 @@ int luagi_branch_upstream_get( lua_State *L )
    int ret = git_branch_upstream( out, *ref );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
@@ -208,7 +208,7 @@ int luagi_branch_lookup( lua_State *L )
    int ret = git_branch_lookup( out, *repo, branch_name, type );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_BRANCH_FUNCS );
    lua_setmetatable( L, -2 );

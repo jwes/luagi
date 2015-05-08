@@ -25,7 +25,7 @@ int luagi_reference_lookup( lua_State *L )
    git_reference **out = lua_newuserdata( L, sizeof( git_reference *) );
    if( git_reference_lookup( out, *repo, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
@@ -41,7 +41,7 @@ int luagi_reference_name_to_id( lua_State *L )
    git_oid out;
    if(git_reference_name_to_id( &out, *repo, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -55,7 +55,7 @@ int luagi_reference_dwim( lua_State *L )
 
    if( git_reference_dwim( out, *repo, shorthand ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -85,7 +85,7 @@ int luagi_reference_symbolic_create_matching( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -114,7 +114,7 @@ int luagi_reference_symbolic_create( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -148,7 +148,7 @@ int luagi_reference_create( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -187,7 +187,7 @@ int luagi_reference_create_matching( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -249,7 +249,7 @@ int luagi_reference_gen_resolve( lua_State *L, const char *tablename )
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
    if( git_reference_resolve( out, *ref ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -272,7 +272,7 @@ int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -300,7 +300,7 @@ int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -325,7 +325,7 @@ int luagi_reference_gen_rename( lua_State *L, const char *tablename )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFERENCE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -360,7 +360,7 @@ int luagi_reference_list( lua_State *L )
    git_strarray array;
    if( git_reference_list( &array, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_push_strarray( L, array );
    git_strarray_free( &array );
@@ -464,7 +464,7 @@ int luagi_reference_gen_peel( lua_State *L, const char *tablename )
 
    if( git_reference_peel( out, *ref, type ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    switch( type)
    {
@@ -619,7 +619,7 @@ int luagi_reference_normalize_name( lua_State *L )
    memset( buffer_out, 0, bufsize );
    if( git_reference_normalize_name( buffer_out, bufsize, name, flags ) != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    lua_pushstring( L, buffer_out );
    return 1;

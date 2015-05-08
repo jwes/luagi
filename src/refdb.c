@@ -12,7 +12,7 @@ int luagi_refdb_new( lua_State *L )
 
    if( git_refdb_new( refdb, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
    lua_setmetatable( L, -2 );
@@ -26,7 +26,7 @@ int luagi_refdb_open( lua_State *L )
 
    if( git_refdb_open( refdb, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFDB_FUNCS );
    lua_setmetatable( L, -2 );

@@ -15,7 +15,7 @@ int luagi_submodule_lookup( lua_State *L )
    git_submodule **sub = lua_newuserdata( L, sizeof( git_submodule * ) );
    if( git_submodule_lookup( sub, *repo, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_SUBMODULE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -67,7 +67,7 @@ int luagi_submodule_add_setup( lua_State *L )
    git_submodule **sub = lua_newuserdata( L, sizeof( git_submodule * ) ); 
    if( git_submodule_add_setup( sub, *repo, url, path, use_gitlink ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_SUBMODULE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -82,7 +82,7 @@ int luagi_submodule_resolve_url( lua_State *L )
    git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_submodule_resolve_url( &buf, *repo, url ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushlstring( L, buf.ptr, buf.size );
@@ -109,7 +109,7 @@ int luagi_submodule_open( lua_State *L )
 
    if( git_submodule_open( out, *sub ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, REPO_NAME );
    lua_setmetatable( L, -2 );
@@ -455,7 +455,7 @@ static int luagi_get_status( lua_State *L, int (*func)( unsigned int *status, gi
 
    if( func( &status, *sub ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_status( L, status );

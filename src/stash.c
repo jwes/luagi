@@ -16,7 +16,7 @@ int luagi_stash_save( lua_State *L )
    git_signature *stasher;
    if( table_to_signature( L, &stasher, 2 ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    const char *message = luaL_optstring( L, 3, NULL );
@@ -34,7 +34,7 @@ int luagi_stash_save( lua_State *L )
    git_signature_free( stasher );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &out );

@@ -31,7 +31,7 @@ int luagi_blob_lookup( lua_State *L )
 
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_BLOB_FUNCS );
@@ -47,7 +47,7 @@ int luagi_blob_create_fromworkdir( lua_State *L )
    git_oid oid;
    if( git_blob_create_fromworkdir( &oid, *repo, path ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -61,7 +61,7 @@ int luagi_blob_create_fromdisk( lua_State *L )
    git_oid oid;
    if( git_blob_create_fromdisk( &oid, *repo, path ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -101,7 +101,7 @@ int luagi_blob_create_fromchunks( lua_State *L )
    if( git_blob_create_fromchunks( &oid, *repo, hintpath, chunk_cb, p ) )
    {
       free( p );
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    free( p );
@@ -117,7 +117,7 @@ int luagi_blob_create_frombuffer( lua_State *L )
    git_oid oid;
    if( git_blob_create_frombuffer( &oid, *repo, buffer, len ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -163,7 +163,7 @@ int luagi_blob_filtered_content( lua_State *L )
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    if( git_blob_filtered_content( &out, *blob, as_path, check_for_binary ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushlstring( L, out.ptr, out.size );

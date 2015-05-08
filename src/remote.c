@@ -16,7 +16,7 @@ int luagi_remote_list( lua_State *L )
    git_strarray array;
    if( git_remote_list( &array, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_push_strarray( L, array );
    git_strarray_free( &array );
@@ -32,7 +32,7 @@ int luagi_remote_load( lua_State *L )
 
    if( git_remote_load( out, *repo, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
@@ -48,7 +48,7 @@ int luagi_remote_create_anonymous( lua_State *L )
 
    if( git_remote_create_anonymous( out, *repo, url, fetch ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
@@ -65,7 +65,7 @@ int luagi_remote_create_with_fetchspec( lua_State *L )
 
    if( git_remote_create_with_fetchspec( out, *repo, name, url, fetch ))
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
    return 1; 
@@ -81,7 +81,7 @@ int luagi_remote_create( lua_State *L )
 
    if( git_remote_create( out, *repo, name, url ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
@@ -242,7 +242,7 @@ int luagi_remote_get_refspec( lua_State *L )
    const git_refspec *spec = git_remote_get_refspec( *rem, n );
    if( spec == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    lua_newtable( L );
@@ -308,7 +308,7 @@ int luagi_remote_ls( lua_State *L )
    size_t size;
    if( git_remote_ls( &heads, &size, *remote ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    //return a table
    lua_newtable( L );
@@ -528,7 +528,7 @@ int luagi_remote_stats( lua_State *L )
    const git_transfer_progress *progress = git_remote_stats( *rem );
    if( ! progress )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luagi_push_transfer_stats( L, progress );

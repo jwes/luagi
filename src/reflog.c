@@ -16,7 +16,7 @@ int luagi_reflog_read( lua_State *L )
 
    if( git_reflog_read( log, *repo, name ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_REFLOG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -101,7 +101,7 @@ int luagi_reflog_entry_byindex( lua_State *L )
    const git_reflog_entry *entry = git_reflog_entry_byindex( *log, idx );
    if( entry == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_reflog_entry_totable( L, entry );

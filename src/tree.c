@@ -132,13 +132,13 @@ int luagi_tree_entry_byid( lua_State *L )
    int ret = luagi_check_oid( &oid, L, 2 );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    const git_tree_entry* e = git_tree_entry_byid( *tree, &oid );
    if( e == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return tree_entry_by_final(L, e );
 }
@@ -232,7 +232,7 @@ int luagi_tree_entry_to_object( lua_State *L )
    git_object **out = lua_newuserdata( L, sizeof( git_object *) );
    if( git_tree_entry_to_object( out, *repo, *entry ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );

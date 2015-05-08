@@ -31,7 +31,7 @@ int luagi_merge_analysis( lua_State *L )
 
    if( git_merge_analysis( &anout, &pout, *repo, heads, len ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    const char *aoutstr = NONE;
    const char *poutstr = NONE;
@@ -103,7 +103,7 @@ int luagi_merge_base( lua_State *L )
 
    if( git_merge_base( &out, *repo, &one, &two ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L , &out );
 }
@@ -125,7 +125,7 @@ static int base_for_multiple( lua_State *L, int (*func)( git_oid *out, git_repos
    git_oid out;
    if( func( &out, *repo, count, input_array ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -149,7 +149,7 @@ int luagi_merge_head_from_ref( lua_State *L )
 
    if( git_merge_head_from_ref( head, *repo, *ref ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_MERGEHEAD_FUNCS );
@@ -173,7 +173,7 @@ int luagi_merge_head_from_fetchhead( lua_State *L )
 
    if( git_merge_head_from_fetchhead( head, *repo, branch_name, remote_url, &oid ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_MERGEHEAD_FUNCS );
@@ -195,7 +195,7 @@ int luagi_merge_head_from_id( lua_State *L )
 
    if( git_merge_head_from_id( head, *repo, &oid ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_MERGEHEAD_FUNCS );
@@ -337,7 +337,7 @@ int luagi_merge_file( lua_State *L )
 
    if( git_merge_file( &out, &ancestor, &ours, &theirs, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    int ret = push_merge_file_result( L, &out );
@@ -360,7 +360,7 @@ int luagi_merge_file_from_index( lua_State *L )
    git_merge_file_result out;
    if( git_merge_file_from_index( &out, *repo, &ancestor, &ours, &theirs, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    int ret = push_merge_file_result( L, &out );
    git_merge_file_result_free( &out );
@@ -380,7 +380,7 @@ int luagi_merge_trees( lua_State *L )
    git_index **index = lua_newuserdata( L, sizeof( git_index *) );
    if( git_merge_trees( index, *repo, *ancestor_tree, *our_tree, *their_tree, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_INDEX_FUNCS );
@@ -400,7 +400,7 @@ int luagi_merge_commits( lua_State *L )
    git_index **index = lua_newuserdata( L, sizeof( git_index *) );
    if( git_merge_commits( index, *repo, *our, *their, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_INDEX_FUNCS );

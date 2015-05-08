@@ -15,7 +15,7 @@ int luagi_push_new( lua_State *L )
 
    if( git_push_new( out, *remote ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    } 
    luaL_getmetatable( L, LUAGI_PUSH_FUNCS );
    lua_setmetatable( L, -2 );

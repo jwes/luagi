@@ -170,7 +170,7 @@ int luagi_commit_nth_gen_ancestor( lua_State *L )
    int ret = git_commit_nth_gen_ancestor( anc, *commit, n );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_COMMIT_FUNCS );
    lua_setmetatable( L, -2 );
@@ -209,7 +209,7 @@ int luagi_commit_create( lua_State *L )
    git_signature_free( committer );
    if( ret != 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L, &oid );
 }

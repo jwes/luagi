@@ -18,7 +18,7 @@ int luagi_graph_ahead_behind( lua_State *L )
 
    if( git_graph_ahead_behind( &ahead, &behind, *repo, &local, &upstream ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushinteger( L, ahead );

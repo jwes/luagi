@@ -190,7 +190,7 @@ int luagi_status_list_new ( lua_State *L )
 
    if( git_status_list_new( out, *repo, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    ltk_setmetatable(L, LUAGI_STATUS_FUNCS);

@@ -42,7 +42,7 @@ int luagi_note_iterator( lua_State *L )
 
    if( git_note_iterator_new( iter, *repo, note_ref ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_NOTE_ITER_FUNCS );
@@ -106,7 +106,7 @@ int luagi_note_read( lua_State *L )
 
    if( git_note_read( note, *repo, notes_ref, &oid ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_NOTE_FUNCS );
    lua_setmetatable( L, -2 );
@@ -132,7 +132,7 @@ int luagi_note_create( lua_State *L )
    git_signature_free( committer );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &out );
@@ -168,7 +168,7 @@ int luagi_note_default_ref( lua_State *L )
 
    if( git_note_default_ref( &out, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    lua_pushstring( L, out );
    return 1;

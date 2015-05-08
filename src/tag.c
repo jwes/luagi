@@ -28,7 +28,7 @@ int luagi_tag_lookup( lua_State *L )
 
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_TAG_FUNCS );
    lua_setmetatable( L, -2 );
@@ -50,7 +50,7 @@ int luagi_tag_create( lua_State *L )
    git_signature_free( sig );
    if(ret)
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -69,7 +69,7 @@ int luagi_tag_annotation_create( lua_State *L )
    git_signature_free( sig );
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L, &out );
 }
@@ -83,7 +83,7 @@ int luagi_tag_create_frombuffer( lua_State *L )
    git_oid out;
    if( git_tag_create_frombuffer( &out, *repo, buffer, force ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &out );
@@ -99,7 +99,7 @@ int luagi_tag_create_lightweight( lua_State *L )
    git_oid oid;
    if( git_tag_create_lightweight( &oid, *repo, tag_name, *target, force ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    return luagi_push_oid( L, &oid );
@@ -123,7 +123,7 @@ int luagi_tag_list( lua_State *L )
    git_strarray data;
    if( git_tag_list( &data, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_push_strarray( L, data );
    git_strarray_free( &data );
@@ -138,7 +138,7 @@ int luagi_tag_list_match( lua_State *L )
    git_strarray data;
    if( git_tag_list_match( &data, pattern, *repo ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    ltk_push_strarray( L, data );
    git_strarray_free( &data );
@@ -201,7 +201,7 @@ int luagi_tag_target( lua_State *L )
 
    if( git_tag_target( target, *tag ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable( L, -2 );
@@ -256,7 +256,7 @@ int luagi_tag_peel( lua_State *L )
 
    if( git_tag_peel( object, *tag ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_OBJECT_FUNCS );
    lua_setmetatable( L, -2 );

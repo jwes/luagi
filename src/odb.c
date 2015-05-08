@@ -14,7 +14,7 @@ int luagi_odb_new( lua_State *L )
 
    if( git_odb_new( odb ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_ODB_FUNCS );
    lua_setmetatable( L, -2 );
@@ -29,7 +29,7 @@ int luagi_odb_open( lua_State *L )
 
    if( git_odb_open( odb, objects_dir ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_ODB_FUNCS );
    lua_setmetatable( L, -2 );
@@ -75,7 +75,7 @@ int luagi_odb_read( lua_State *L )
    }
    if( ret )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_ODB_OBJECT_FUNCS );
@@ -94,7 +94,7 @@ int luagi_odb_read_header( lua_State *L )
 
    if( git_odb_read_header( &len_out, &type, *odb, &oid ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushinteger( L, len_out );
@@ -133,7 +133,7 @@ int luagi_odb_exists( lua_State *L )
    }
    if( ret < 0 )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    lua_pushboolean( L, ret );
@@ -202,7 +202,7 @@ int luagi_odb_write( lua_State *L )
    git_oid oid;
    if( git_odb_write( &oid, *odb, data, len, type ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -218,7 +218,7 @@ int luagi_odb_open_wstream( lua_State *L )
 
    if( git_odb_open_wstream( out, *odb, size, type ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_ODB_STREAM_FUNCS );
@@ -237,7 +237,7 @@ int luagi_odb_open_rstream( lua_State *L )
 
    if( git_odb_open_rstream( out, *odb, &oid ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    luaL_getmetatable( L, LUAGI_ODB_STREAM_FUNCS );
@@ -256,7 +256,7 @@ int luagi_odb_hash( lua_State *L )
    git_oid oid;
    if( git_odb_hash( &oid, data, len, type ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -271,7 +271,7 @@ int luagi_odb_hashfile( lua_State *L )
    git_oid oid;
    if( git_odb_hashfile( &oid, path, type ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, &oid );
@@ -311,7 +311,7 @@ int luagi_odb_stream_finalize_write( lua_State *L )
 
    if( git_odb_stream_finalize_write( &oid, *stream ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    return luagi_push_oid( L, &oid );
 }
@@ -359,7 +359,7 @@ int luagi_odb_object_id( lua_State *L )
    const git_oid *oid = git_odb_object_id( *obj );
    if( oid == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    return luagi_push_oid( L, oid );

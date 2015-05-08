@@ -81,7 +81,7 @@ int luagi_blame_file( lua_State *L )
 
    if( git_blame_file( out, *repo, path, &opts ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    luaL_getmetatable( L, LUAGI_BLAME_FUNCS );
    lua_setmetatable( L, -2 );
@@ -98,7 +98,7 @@ int luagi_blame_buffer( lua_State *L )
 
    if( git_blame_buffer( out, *reference, buffer, len ) )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
 
    luaL_getmetatable( L, LUAGI_BLAME_FUNCS );
@@ -175,7 +175,7 @@ int luagi_blame_get_hunk_byindex( lua_State *L )
    const git_blame_hunk *hunk = git_blame_get_hunk_byindex( *blame, index );
    if( hunk == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    return luagi_hunk_to_table( L, hunk );
@@ -196,7 +196,7 @@ int luagi_blame_get_hunk_byline( lua_State *L )
    const git_blame_hunk *hunk = git_blame_get_hunk_byline( *blame, line );
    if( hunk == NULL )
    {
-      return ltk_push_error( L );
+      return ltk_push_git_error( L );
    }
    
    return luagi_hunk_to_table( L, hunk );
