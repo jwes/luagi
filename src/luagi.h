@@ -37,12 +37,6 @@ typedef struct luagi_foreach_payload
    int callback_pos;
 } luagi_foreach_t;
 
-#ifdef STACK_DEBUG
-#define debugStack( L ); dumpStack( L );
-#else
-#define debugStack( L );
-#endif
-
 #define add_flag( out,  L, idx, name, flag ) \
    lua_getfield( L, idx, name ); \
    if( lua_toboolean( L, -1 ) ) \

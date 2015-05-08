@@ -421,7 +421,7 @@ static int diff_file_callback( const git_diff_delta *delta,
    diff_delta_to_table( f->L, delta );
    lua_pushnumber( f->L, progress );
 
-   debugStack( f->L );
+   ltk_debug_stack( f->L );
 
    if( lua_pcall( f->L, 2, 1, 0 ) != LUA_OK )
    {
@@ -830,7 +830,7 @@ void diff_file_to_table( lua_State *L, const git_diff_file file )
    lua_pushinteger( L, file.mode );
    lua_setfield( L, -2, MODE );
 
-   debugStack( L );
+   ltk_debug_stack( L );
 }
 
 
@@ -855,7 +855,7 @@ void diff_delta_to_table( lua_State *L, const git_diff_delta *delta )
    diff_file_to_table( L, delta->new_file );
    lua_setfield( L, -2, NEW_FILE );
   
-   debugStack( L );
+   ltk_debug_stack( L );
 
 }
 

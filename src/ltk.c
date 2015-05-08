@@ -1,8 +1,10 @@
 #include "ltk.h"
 
-extern inline void ltk_error_abort( lua_State *L );
+#include <string.h>
 
-extern inline int ltk_push_error( lua_State *L );
+/*******************************************************************************
+ lua util functions
+*******************************************************************************/
 
 extern inline void ltk_setmetatable( lua_State *L, const char *name );
 
@@ -30,4 +32,43 @@ void ltk_dump_stack( lua_State *L )
       printf( " " ); /* put a separator */
    }
    printf( "\n" ); /* end the listing */
+}
+
+/*******************************************************************************
+ lua+libgit2 util functions
+*******************************************************************************/
+
+extern inline void ltk_error_abort( lua_State *L );
+
+extern inline int ltk_push_error( lua_State *L );
+
+git_strarray ltk_check_strarray( lua_State* L, int table_idx )
+{
+   git_strarray array;
+   array.count = luaL_len( L, table_idx );
+   
+   array.strings = calloc( array.count, sizeof( char * ) );
+   for( size_t i = 1; i <= array.count; i++ )
+   {
+      lua_pushinteger( L, i );
+      lua_gettable( L, table_idx );
+      const char* srcStr = luaL_checkstring( L, -1 );
+      size_t len = strlen( srcStr ) + 1;
+      char* dstStr = malloc( len );
+      strncpy( dstStr, srcStr, len );
+      array.strings[ i - 1 ] = dstStr;
+   }
+
+   return array;
+}
+
+void ltk_push_strarray( lua_State *L, git_strarray array )
+{
+   lua_newtable( L );
+   for( size_t i = 1; i <= array.count; i++ )
+   {
+      lua_pushinteger( L, i );
+      lua_pushstring( L, array.strings[ i - 1 ]);
+      lua_settable( L, -3 );
+   }
 }
