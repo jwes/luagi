@@ -9,6 +9,12 @@
 #include "luagi.h"
 #include "oid.h"
 
+typedef struct
+{
+   lua_State *L;
+   int table_pos;
+} remote_callback_t;
+
 int luagi_remote_list( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
@@ -400,6 +406,13 @@ int luagi_remote_free( lua_State *L )
 { 
    git_remote **rem = checkremote( L );
 
+   const git_remote_callbacks *callbacks = git_remote_get_callbacks( *rem );
+   if( callbacks && callbacks->payload )
+   {
+      remote_callback_t *c = callbacks->payload;
+      free( c );
+   }
+
    git_remote_free( *rem );
    return 0;
 }
@@ -514,11 +527,143 @@ int luagi_remote_set_transport_smart( lua_State *L )
    return 0;
 }
 
+// callback functions
+static int completion(git_remote_completion_type type, void *data)
+{
+   remote_callback_t *f = data;
+ 
+   lua_getfield( f->L, f->table_pos, COMPLETION );
+   if( lua_type( f->L, f->table_pos + 1) != LUA_TFUNCTION )
+   {
+      return 1;
+   }
+   lua_pushvalue( f->L, f->table_pos + 1 );
+   lua_pushnumber( f->L, type );
+
+   ltk_debug_stack( f->L );
+
+   if( lua_pcall( f->L, 1, 0, 0 ) != LUA_OK )
+   {
+      ltk_dump_stack( f->L );
+      return 1;
+   }
+
+   return 0;
+
+}
+static int cred_acquire_cb(
+	git_cred **cred __attribute__((unused)),
+	const char *url __attribute__((unused)),
+	const char *username_from_url __attribute__((unused)),
+	unsigned int allowed_types __attribute__((unused)),
+	void *payload __attribute__((unused)))
+{
+ // TODO implement
+   return 0;
+}
+
+static int transport_message_cb(const char *str, int len, void *data)
+{
+   remote_callback_t *f = data;
+
+   lua_getfield( f->L, f->table_pos, SIDEBAND_PROGRESS );
+   if( lua_type( f->L, f->table_pos + 1 ) != LUA_TFUNCTION )
+   {
+      return 1;
+   }
+   lua_pushvalue( f->L, f->table_pos + 1 );
+   lua_pushlstring( f->L, str, len );
+ 
+   ltk_debug_stack( f->L );
+
+   if( lua_pcall( f->L, 1, 0, 0 ) != LUA_OK )
+   {
+      ltk_dump_stack( f->L );
+      return 1;
+   }
+   return 0;
+}
+static int progress_cb( const git_transfer_progress *progress, void *payload )
+{
+   remote_callback_t *f = payload;
+
+   lua_getfield( f->L, f->table_pos, TRANSFER_PROGRESS );
+   if( lua_type( f->L, f->table_pos + 1 ) != LUA_TFUNCTION )
+   {
+      return 1;
+   }
+   lua_pushvalue( f->L, f->table_pos + 1 );
+   lua_pushnumber( f->L, progress->total_objects );
+   lua_pushnumber( f->L, progress->indexed_objects );
+   lua_pushnumber( f->L, progress->received_objects );
+   lua_pushnumber( f->L, progress->local_objects );
+   lua_pushnumber( f->L, progress->total_deltas );
+   lua_pushnumber( f->L, progress->indexed_deltas );
+   lua_pushnumber( f->L, progress->received_bytes );
+ 
+   if( lua_pcall( f->L, 7, 0, 0 ) != LUA_OK )
+   {
+      ltk_dump_stack( f->L );
+      return 1;
+   }
+   return 0;
+}
+static int update_tips(const char *refname, const git_oid *a, const git_oid *b, void *data)
+{
+   remote_callback_t *f = data;
+
+   lua_getfield( f->L, f->table_pos, UPDATE_TIPS );
+   if( lua_type( f->L, f->table_pos + 1 ) != LUA_TFUNCTION )
+   {
+      return 1;
+   }
+   lua_pushvalue( f->L, f->table_pos + 1 );
+   lua_pushstring( f->L, refname );
+   luagi_push_oid( f->L, a );
+   luagi_push_oid( f->L, b );
+
+   if( lua_pcall( f->L, 3, 0, 0 ) != LUA_OK )
+   {
+      ltk_dump_stack( f->L );
+      return 1;
+   }
+   return 0;
+}
+
 int luagi_remote_set_callbacks( lua_State *L )
 { 
-   //TODO callbacks
-   lua_pushnil( L ); 
-   return 1; 
+   git_remote **rem = checkremote( L );
+   luaL_checktype( L, 2, LUA_TTABLE );
+   
+   remote_callback_t *c = NULL;
+   const git_remote_callbacks *cbs = git_remote_get_callbacks( *rem );
+   if( cbs && cbs->payload )
+   {
+      c = cbs->payload;  
+   }
+   else
+   {
+      c = malloc( sizeof( remote_callback_t ) );
+   }
+   c->L = L;
+   c->table_pos = 2;
+
+   git_remote_callbacks callbacks;
+   git_remote_init_callbacks( &callbacks, GIT_REMOTE_CALLBACKS_VERSION );
+   callbacks.sideband_progress = transport_message_cb;
+   callbacks.completion = completion;
+   callbacks.credentials = cred_acquire_cb;
+   callbacks.transfer_progress = progress_cb;
+   callbacks.update_tips = update_tips;
+   callbacks.payload = c;
+
+   int ret = git_remote_set_callbacks( *rem, &callbacks);
+   if( ret )
+   {
+      free( c);
+      ltk_error_abort( L );
+   }
+   return 0; 
 }
 
 int luagi_remote_stats( lua_State *L )

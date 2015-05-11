@@ -339,4 +339,15 @@
 
 #define AUTOMERGEABLE "automergeable"
 #define TOPOLOGICAL "topological"
+
+#define SIDEBAND_PROGRESS "sideband_progress"
+#define COMPLETION "completion"
+#define TRANSFER_PROGRESS "transfer_progress"
+#define CREDENTIALS "credentials"
+#define UPDATE_TIPS "update_tips"
+
+#define ERROR "error"
+#define INDEXING "indexing"
+#define DOWNLOAD "download"
+
 #endif

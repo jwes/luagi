@@ -323,7 +323,25 @@ describe( "ls #remote", function()
 end)
 
 describe( "download #remote", function() pending("          luagi_remote_download                ") end)
-describe( "fetch #remote", function() pending("             luagi_remote_fetch                   ") end)
+describe( "fetch #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:load_remote( "origin" )
+   end)
+
+   it("should load without an error", function()
+
+      remote:set_local_transport()
+      remote:set_url( test_helper.remote_path )
+      remote:fetch( test_helper.signature )
+   end)
+
+end)
 describe( "stop #remote", function() pending("              luagi_remote_stop                    ") end)
 describe( "check_cert #remote", function() pending("        luagi_remote_check_cert              ") end)
 describe( "set_transport #remote", function() pending("     luagi_remote_set_transport           ") end)
