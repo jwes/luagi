@@ -118,7 +118,26 @@ describe( "load_remote #remote", function()
    end)
 end)
 
-describe( "create_anon_remote #remote", function() pending("luagi_remote_create_anonymous") end)
+describe( "create_anon_remote #remote", function()
+   pending(" check why this produces an error" )
+--[[   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:create_anon_remote( test_helper.remote_path, "+refs/heads/*" ) 
+   end)
+
+   it("should return a valid remote", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( remote )
+      assert.is.not_nil( remote.pushurl )
+      assert.are.equal( "", remote:name() )
+   end)
+]]
+end)
 describe( "create_remote_with_fetch #remote", function() pending("luagi_remote_create_with_fetchspec") end)
 describe( "create_remote #remote", function() pending("luagi_remote_create") end)
 
@@ -322,8 +341,7 @@ describe( "ls #remote", function()
    end)
 end)
 
-describe( "download #remote", function() pending("          luagi_remote_download                ") end)
-describe( "fetch #remote", function()
+describe( "fetch and download #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
@@ -338,16 +356,108 @@ describe( "fetch #remote", function()
 
       remote:set_local_transport()
       remote:set_url( test_helper.remote_path )
-      remote:fetch( test_helper.signature )
+      assert.has_error( function()
+         remote:download()
+      end)
+      assert.has_no_error( function()
+         remote:fetch( test_helper.signature )
+      end)
+      assert.has_no_error( function()
+         remote:download()
+      end)
+   end)
+end)
+
+describe( "stop #remote", function() pending("              luagi_remote_stop                    ") end)
+describe( "check_cert #remote", function() pending("        luagi_remote_check_cert              ") end)
+describe( "set_callbacks #remote", function() pending("     luagi_remote_set_callbacks           ") end)
+
+describe( "set_autotag #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:load_remote( "origin" )
+   end)
+   it("should accept the autotag string all", function()
+      local autotag = "all"
+      remote:set_autotag( autotag )
+      assert.are.equal( autotag, remote:autotag( ) )
+   end)
+   it("should react releaxed and take auto", function()
+      remote:set_autotag( "foo" )
+      assert.are.equal( "auto", remote:autotag( ) )
+   end)
+
+   it("should accept the autotag string none", function()
+      local autotag = "none"
+      remote:set_autotag( autotag )
+      assert.are.equal( autotag, remote:autotag( ) )
+   end)
+   it("should accept the autotag string auto", function()
+      local autotag = "auto"
+      remote:set_autotag( autotag )
+      assert.are.equal( autotag, remote:autotag( ) )
+   end)
+end)
+
+describe( "rename #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:load_remote( "origin" )
+   end)
+
+   it("should have a new name", function()
+      local new_name = "foo"
+      assert.are.equal( "origin", remote:name() )
+      remote:rename( new_name )
+      assert.are.equal( new_name, remote:name() )
    end)
 
 end)
-describe( "stop #remote", function() pending("              luagi_remote_stop                    ") end)
-describe( "check_cert #remote", function() pending("        luagi_remote_check_cert              ") end)
-describe( "set_transport #remote", function() pending("     luagi_remote_set_transport           ") end)
-describe( "set_callbacks #remote", function() pending("     luagi_remote_set_callbacks           ") end)
-describe( "set_autotag #remote", function() pending("       luagi_remote_set_autotag             ") end)
-describe( "rename #remote", function() pending("            luagi_remote_rename                  ") end)
-describe( "fetch_head #remote", function() pending("        luagi_remote_update_fetch_head       ") end)
-describe( "set_fetch_head #remote", function() pending("    luagi_remote_set_update_fetch_head   ") end)
-describe( "update_tips #remote", function() pending("       luagi_remote_update_tips             ") end)
+
+describe( "fetch_head #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:load_remote( "origin" )
+   end)
+
+   it("should apply the set boolean values", function()
+      assert.is.True( remote:fetch_head() )
+      remote:set_fetch_head( false )
+      assert.is.False( remote:fetch_head() )
+   end)
+end)
+describe( "update_tips #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:load_remote( "origin" )
+   end)
+   it("should get some update tip callback", function()
+      remote:set_local_transport()
+      remote:set_url( test_helper.remote_path )
+      remote:fetch( test_helper.signature )
+
+      assert.has_no_error( function()
+         remote:update_tips( test_helper.signature )
+      end)
+   end)
+end)
