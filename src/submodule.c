@@ -23,11 +23,11 @@ int luagi_submodule_lookup( lua_State *L )
 int sub_foreach( git_submodule *sm, const char *name, void *payload )
 {
    luagi_foreach_t *p = payload;
+
    lua_pushvalue( p->L, p->callback_pos );
    git_submodule **sub = lua_newuserdata( p->L, sizeof( git_submodule * ) );
    *sub = sm;
-   luaL_getmetatable( p->L, LUAGI_SUBMODULE_FUNCS );
-   lua_setmetatable( p->L, -2 );
+   ltk_setmetatable( p->L, LUAGI_SUBMODULE_FUNCS );
 
    lua_pushstring( p->L, name );
 
@@ -414,11 +414,8 @@ int luagi_submodule_reload( lua_State *L )
 }
 static void push_flag_to_table( lua_State *L, const unsigned int bitfield, const char *name, const unsigned int flag )
 {
-   if( bitfield & flag )
-   {
-      lua_pushboolean( L, 1 );
-      lua_setfield( L, -2, name );
-   }
+   lua_pushboolean( L, bitfield & flag );
+   lua_setfield( L, -2, name );
 }
 
 static int luagi_push_status( lua_State *L, const unsigned int status )
@@ -433,6 +430,7 @@ static int luagi_push_status( lua_State *L, const unsigned int status )
    push_flag_to_table( L, status, DELETED, GIT_SUBMODULE_STATUS_INDEX_DELETED);
    push_flag_to_table( L, status, MODIFIED, GIT_SUBMODULE_STATUS_INDEX_MODIFIED);
    lua_setfield( L, -2, INDEX );
+   lua_newtable( L );
    push_flag_to_table( L, status, UNINITIALIZED, GIT_SUBMODULE_STATUS_WD_UNINITIALIZED);
    push_flag_to_table( L, status, ADDED, GIT_SUBMODULE_STATUS_WD_ADDED);
    push_flag_to_table( L, status, DELETED, GIT_SUBMODULE_STATUS_WD_DELETED );
