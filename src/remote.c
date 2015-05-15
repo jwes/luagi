@@ -44,48 +44,32 @@ int luagi_remote_load( lua_State *L )
    return 1; 
 }
 
-int luagi_remote_create_anonymous( lua_State *L )
-{ 
-   git_repository **repo = checkrepo( L, 1 );
-   const char *url = luaL_checkstring( L, 2 );
-   const char *fetch = luaL_checkstring( L, 3);
-
-   git_remote **out = (git_remote **) lua_newuserdata( L, sizeof( git_remote *) );
-
-   if( git_remote_create_anonymous( out, *repo, url, fetch ) )
-   {
-      return ltk_push_git_error( L );
-   }
-   ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
-   return 1; 
-}
-
-int luagi_remote_create_with_fetchspec( lua_State *L )
-{ 
-   git_repository **repo = checkrepo( L, 1 );
-   const char *name = luaL_checkstring( L, 2 );
-   const char *url = luaL_checkstring( L, 3 );
-   const char *fetch = luaL_optstring( L, 4, NULL );
-
-   git_remote **out = (git_remote **) lua_newuserdata( L, sizeof( git_remote *) );
-
-   if( git_remote_create_with_fetchspec( out, *repo, name, url, fetch ))
-   {
-      return ltk_push_git_error( L );
-   }
-   ltk_setmetatable( L, LUAGI_REMOTE_FUNCS );
-   return 1; 
-}
-
 int luagi_remote_create( lua_State *L )
 { 
    git_repository **repo = checkrepo( L, 1 );
-   const char *name = luaL_checkstring( L, 2 );
-   const char *url = luaL_checkstring( L, 3 );
+   luaL_checktype( L, 2, LUA_TTABLE );
+
+   lua_getfield( L, 2, URL );
+   const char *url = luaL_checkstring( L, -1 );
+
+   lua_getfield( L, 2, NAME );
+   const char *name = luaL_optstring( L, -1, NULL );
+
+   lua_getfield( L, 2, FETCH );
+   const char *fetch = luaL_optstring( L, -1, NULL );
 
    git_remote **out = (git_remote **) lua_newuserdata( L, sizeof( git_remote *) );
 
-   if( git_remote_create( out, *repo, name, url ) )
+   int ret = 0;
+   if( name && !fetch )
+      ret = git_remote_create_anonymous( out, *repo, url, fetch );
+   else if( name && fetch )
+      ret = git_remote_create_with_fetchspec( out, *repo, name, url, fetch );
+   else
+      ret = git_remote_create( out, *repo, name, url );
+
+
+   if( ret )
    {
       return ltk_push_git_error( L );
    }
@@ -496,7 +480,7 @@ static int http_callback ( git_smart_subtransport **out,
 int luagi_remote_set_transport_smart( lua_State *L )
 {
    git_remote **remote = checkremote( L );     
-   const char *tstring = luaL_checkstring( L, 2 );
+   const char *tstring = luaL_optstring( L, 2, "" );
    git_smart_subtransport_definition def;
    if( strncmp( tstring, HTTP, strlen( HTTP ) ) )
    {

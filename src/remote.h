@@ -6,8 +6,6 @@
 
 int luagi_remote_list( lua_State *L );
 int luagi_remote_load( lua_State *L );
-int luagi_remote_create_anonymous( lua_State *L );
-int luagi_remote_create_with_fetchspec( lua_State *L );
 int luagi_remote_create( lua_State *L );
 int luagi_remote_save( lua_State *L );
 int luagi_remote_name( lua_State *L );

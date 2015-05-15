@@ -136,10 +136,44 @@ describe( "create_anon_remote #remote", function()
       assert.is.not_nil( remote.pushurl )
       assert.are.equal( "", remote:name() )
    end)
+end)
+describe( "create_remote_with_fetch #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:create_remote( { name= "origin", url = test_helper.remote_path, fetch = "+refs/heads/*" })
+   end)
+
+   it("should return a valid remote", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( remote )
+      assert.is.not_nil( remote.pushurl )
+      assert.are.equal( "origin", remote:name() )
+   end)
+end)
+describe( "create_remote #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:create_remote({name= "new", url = test_helper.remote_path  })
+   end)
+
+   it("should return a valid remote", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( remote )
+      assert.is.not_nil( remote.pushurl )
+      assert.are.equal( "new", remote:name() )
+   end)
 ]]
 end)
-describe( "create_remote_with_fetch #remote", function() pending("luagi_remote_create_with_fetchspec") end)
-describe( "create_remote #remote", function() pending("luagi_remote_create") end)
 
 describe( "set_url #remote", function()
    local repo = nil
@@ -370,7 +404,36 @@ end)
 
 describe( "stop #remote", function() pending("              luagi_remote_stop                    ") end)
 describe( "check_cert #remote", function() pending("        luagi_remote_check_cert              ") end)
-describe( "set_callbacks #remote", function() pending("     luagi_remote_set_callbacks           ") end)
+describe( "set_callbacks #remote", function()
+   pending( "callbacks only really used on smart transports" )
+   --[[
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:load_remote( "origin" )
+   end)
+   it("should load without an error", function()
+
+      function f( a, b, c, d, e, f, g )
+         print( a,b,c,d,e,f,g )
+      end
+      remote:set_smart_transport()
+      remote:set_url( test_helper.remote_path )
+      remote:set_callbacks({
+         sideband_progress = f,
+         transfer_progress = f,
+         completion = f,
+         update_tips = f,
+      })
+         remote:fetch( test_helper.signature )
+         remote:download()
+   end)
+   ]]
+end)
 
 describe( "set_autotag #remote", function()
    local repo = nil

@@ -349,5 +349,6 @@
 #define ERROR "error"
 #define INDEXING "indexing"
 #define DOWNLOAD "download"
+#define URL "url"
 
 #endif
