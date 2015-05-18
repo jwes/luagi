@@ -166,10 +166,63 @@ describe( "ignore #submodule", function()
    end)
 end)
 
-describe( "update #submodule", function() pending("luagi_submodule_update ") end)
-describe( "set_update #submodule", function() pending("luagi_submodule_set_update ") end)
-describe( "fetch_recurse #submodule", function() pending("luagi_submodule_fetch_recurse_submodules ") end)
-describe( "set_fetch_recurse #submodule", function() pending("luagi_submodule_set_fetch_recurse_submodules ") end)
+describe( "update #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should have a submodule", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( sub )
+      assert.is.not_nil( sub.add_finalize )
+   end)
+
+   it("should show and set ignores", function()
+      local default = "checkout"
+      assert.are.equal( default, sub:update() )
+      assert.are.equal( default, sub:set_update( "rebase" ))
+      assert.are.equal( "rebase", sub:update() )
+      assert.are.equal( "rebase", sub:set_update( "merge" ))
+      assert.are.equal( "merge", sub:update() )
+      assert.are.equal( "merge", sub:set_update( "none" ))
+      assert.are.equal( "none", sub:update() )
+      assert.are.equal( "none", sub:set_update( "default" ))
+      assert.are.equal( default, sub:update() )
+      assert.are.equal( "default", sub:set_update( "checkout" ))
+      assert.are.equal( default, sub:update() )
+      assert.are.equal( default, sub:set_update( "reset" ))
+      assert.are.equal( default, sub:update() )
+   end)
+end)
+
+describe( "fetch_recurse #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should set fetch a submodule", function()
+      assert.are.equal( "no", sub:fetch_recurse() )
+      assert.are.equal( "no", sub:set_fetch_recurse("no") )
+      assert.are.equal( "no", sub:fetch_recurse() )
+      assert.are.equal( "no", sub:set_fetch_recurse("on demand") )
+      assert.are.equal( "on_demand", sub:fetch_recurse() )
+      assert.are.equal( "on_demand", sub:set_fetch_recurse("reset") )
+      assert.are.equal( "no", sub:fetch_recurse() )
+   end)
+end)
+
 describe( "init #submodule", function() pending("luagi_submodule_init ") end)
 describe( "sync #submodule", function()
    local repo = nil
