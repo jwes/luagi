@@ -124,20 +124,110 @@ describe( "foreach_submodule #submodule", function()
    end)
 end)
 describe( "add_submodule_setup #submodule", function() pending("luagi_submodule_add_setup") end)
+describe( "add_finalize #submodule", function() pending("luagi_submodule_add_finalize ") end)
+
 describe( "resolve_submodule_url #submodule", function() pending("luagi_submodule_resolve_url") end)
 describe( "reload_all_submodules #submodule", function() pending("luagi_submodule_reload_all") end)
 
-describe( "add_finalize #submodule", function() pending("luagi_submodule_add_finalize ") end)
 describe( "set_url #submodule", function() pending("luagi_submodule_set_url ") end)
-describe( "ignore #submodule", function() pending("luagi_submodule_ignore ") end)
-describe( "set_ignore #submodule", function() pending("luagi_submodule_set_ignore ") end)
+
+describe( "ignore #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should have a submodule", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( sub )
+      assert.is.not_nil( sub.add_finalize )
+   end)
+
+   it("should show and set ignores", function()
+      local default = "none"
+      assert.are.equal( default, sub:ignore() )
+      sub:set_ignore( "dirty" );
+      assert.are.equal( "dirty", sub:ignore() )
+      sub:set_ignore( "all" );
+      assert.are.equal( "all", sub:ignore() )
+      sub:set_ignore( "untracked" );
+      assert.are.equal( "untracked", sub:ignore() )
+      sub:set_ignore( "none" );
+      assert.are.equal( "none", sub:ignore() )
+      sub:set_ignore( "reset" );
+      assert.are.equal( default, sub:ignore() )
+      sub:set_ignore( "default" );
+      assert.are.equal( "dirty", sub:ignore() )
+   end)
+end)
+
 describe( "update #submodule", function() pending("luagi_submodule_update ") end)
 describe( "set_update #submodule", function() pending("luagi_submodule_set_update ") end)
 describe( "fetch_recurse #submodule", function() pending("luagi_submodule_fetch_recurse_submodules ") end)
 describe( "set_fetch_recurse #submodule", function() pending("luagi_submodule_set_fetch_recurse_submodules ") end)
 describe( "init #submodule", function() pending("luagi_submodule_init ") end)
-describe( "sync #submodule", function() pending("luagi_submodule_sync ") end)
-describe( "reload #submodule", function() pending("luagi_submodule_reload ") end)
+describe( "sync #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should run without an error", function()
+      assert.has_no_error( function()
+         sub:sync()
+      end)
+   end)
+end)
+describe( "reload #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should run without an error", function()
+      assert.has_no_error( function()
+         sub:reload()
+      end)
+   end)
+end)
+
 describe( "add_to_index #submodule", function() pending("luagi_submodule_add_to_index ") end)
-describe( "save #submodule", function() pending("luagi_submodule_save ") end)
-describe( "open_repository #submodule", function() pending("luagi_submodule_open ") end)
+describe( "open_repository #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should return a repository",function()
+      assert.is.falsy( err )
+      r, err = sub:open_repository()
+      assert.is.falsy( err )
+      assert.are.equal( repo.path, r.path )
+      --collect garbage to check if free on r removes repo
+      r = nil
+      collectgarbage("collect")      
+      assert.has_no_error(function()
+         repo:path()
+      end)
+   end)
+end)
