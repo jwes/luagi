@@ -40,7 +40,6 @@ describe( "lookup_submodule #submodule", function()
       end)
    end)
    describe( "branch #submodule", function()
-      pending( "should branch return nil?" )
       it("should have the right branch", function()
          assert.are.equal( nil, sub:branch() )
       end)
@@ -123,13 +122,99 @@ describe( "foreach_submodule #submodule", function()
 
    end)
 end)
-describe( "add_submodule_setup #submodule", function() pending("luagi_submodule_add_setup") end)
-describe( "add_finalize #submodule", function() pending("luagi_submodule_add_finalize ") end)
 
-describe( "resolve_submodule_url #submodule", function() pending("luagi_submodule_resolve_url") end)
-describe( "reload_all_submodules #submodule", function() pending("luagi_submodule_reload_all") end)
+describe( "add_submodule #submodule", function()
+   local repo = nil
+   local subrepo = nil
+   local sub = nil
+   local err = nil
+   local treeid = "064ee3e735ab74ab468be05c34e7f7fda011cb3b"
+   setup( function()
+      test_helper.setup()
+      local flags = {
+         bare = true,
+         mkdir = true,
+         mkpath = true,
+      }
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      subrepo, err = luagi.init_ext( test_helper.extract_path.."/subtwo.git", flags )
+   end)
 
-describe( "set_url #submodule", function() pending("luagi_submodule_set_url ") end)
+   it( "should have created a bare repo", function()
+      assert.is.falsy( err )
+      assert.is.True( subrepo:is_bare() )
+   end)
+
+   describe( "adding a new submodule", function()
+      local path = "subtwo"
+      setup( function()
+         sub, err = repo:add_submodule_setup( "../subtwo.git", path )
+         if err then return end
+      end)
+
+      it( "should have no error", function()
+         assert.is.falsy( err )
+      end)
+
+      it("should throw an error", function()
+         assert.has_error( function()
+            -- no head
+            sub:add_finalize()
+         end)
+      end)
+
+      it("should have two submodules", function()
+         local count = 0
+         function f( sub, name )
+            count = count + 1
+            return 0
+         end
+         repo:foreach_submodule( f )
+         assert.are.equal( 2, count )
+      end)
+      describe( "reload_all_submodules #submodule", function() 
+         it("should not have any error", function()
+            repo:reload_all_submodules() 
+         end)
+      end)
+   end)
+end)
+
+describe( "resolve_submodule_url #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should return a relative path", function()
+      assert.are.equal( sub:url() , repo:resolve_submodule_url( sub:url() ) )
+   end)
+
+end)
+
+describe( "set_url #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should set an url", function()
+      local url = "ssh://url.to.server/with/git.git"
+      sub:set_url( url )
+      assert.are.equal( url, sub:url() )
+   end)
+end)
 
 describe( "ignore #submodule", function()
    local repo = nil
@@ -223,7 +308,24 @@ describe( "fetch_recurse #submodule", function()
    end)
 end)
 
-describe( "init #submodule", function() pending("luagi_submodule_init ") end)
+describe( "init #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should not have an error", function()
+      assert.has_no_error( function()
+         sub:init()
+      end)
+   end)
+
+end)
 describe( "sync #submodule", function()
    local repo = nil
    local sub = nil
@@ -259,7 +361,30 @@ describe( "reload #submodule", function()
    end)
 end)
 
-describe( "add_to_index #submodule", function() pending("luagi_submodule_add_to_index ") end)
+describe( "add_to_index #submodule", function()
+   local repo = nil
+   local sub = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      sub, err = repo:lookup_submodule( "submodule" )
+   end)
+
+   it("should not have any errors",function()
+      assert.has_no_error( function()
+         sub:add_to_index()
+      end)
+   end)
+
+   it("should not have any errors",function()
+      assert.has_no_error( function()
+         sub:add_to_index(true)
+      end)
+   end)
+
+end)
 describe( "open_repository #submodule", function()
    local repo = nil
    local sub = nil

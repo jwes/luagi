@@ -37,6 +37,7 @@ return {
    --parameters
    remote_path = remote_path,
    submodule_path = submodule_path,
+   extract_path = extract_path,
    path = path,
    modification = modification,
    signature = signature,
