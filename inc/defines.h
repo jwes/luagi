@@ -164,14 +164,14 @@
 #define INDEXED "indexed"
 
 #define ORIGIN "origin"
-#define OLD_LINENO "old linenr"
-#define NEW_LINENO "old linenr"
+#define OLD_LINENO "old_linenr"
+#define NEW_LINENO "new_linenr"
 #define LINES "lines"
 
-#define OLD_START "old start"
-#define OLD_LINES "old lines"
-#define NEW_START "new start"
-#define NEW_LINES "new lines"
+#define OLD_START "old_start"
+#define OLD_LINES "old_lines"
+#define NEW_START "new_start"
+#define NEW_LINES "new_lines"
 
 #define MIN_MATCH "min_match"
 #define NEWEST "newest"

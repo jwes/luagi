@@ -122,6 +122,8 @@ describe( "diff_index_to_workdir #diff", function()
    end)
 end)
 
+local commit_id = "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09"
+
 describe( "diff_tree_to_workdir #diff", function()
    local diff = nil
    local err = nil
@@ -141,16 +143,97 @@ describe( "diff_tree_to_workdir #diff", function()
    it("should be one", function()
       assert.are.equal( 1, diff:num_deltas() )
    end)
+   describe( "print #diff", function()
+      it("should call the callback line by line", function()
+         local delta = nil
+         local hunks = nil
+         local lines = nil
+         local function f( a, b, c )
+            delta = a
+            hunks = b
+            lines = c
+            return 0
+         end
+         diff:print( "name_status", f )
+         assert.are.equal( 1, delta.number_of_files )
+         assert.are.equal( 1, hunks.old_lines )
+         assert.are.equal( 0, hunks.new_lines )
+         assert.are.equal( "mode content\n", lines.content )
+      end)
+   end)
 end)
 
-describe( "diff_tree_to_workdir_with_index #diff", function() pending("luagi_diff_tree_to_workdir_with_index") end)
-describe( "diff_commit_as_email #diff", function() pending("luagi_diff_commit_as_email") end)
+describe( "diff_commit_as_email #diff", function()
+   local repo = nil 
+   local err = nil
+   local commit = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      commit, err = repo:lookup_commit( commit_id )
+   end)
 
-describe( "print #diff", function() pending("print") end)
+   it( "should be initialized", function()
+      assert.is.falsy( err )
+      assert.is.not_nil( commit )
+      assert.is.not_nil( commit.ancestor )
+   end)
 
-describe( "merge #diff", function() pending("luagi_diff_merge ") end)
+   it( "should return a email string", function()
+
+      local result = repo:diff_commit_as_email( commit, 1, 1, {} )
+      assert.is.truthy( result:find("Subject:" ))
+      assert.is.truthy( result:find("From:" ))
+      assert.is.truthy( result:find(".gitignore" ))
+   end)
+end)
+
+describe( "diff_tree_to_workdir_with_index #diff", function()
+   local diff = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local tree, err = repo:lookup_tree( treeid )
+      if err then return end
+      diff, err = repo:diff_tree_to_workdir_with_index( tree )
+   end)
+
+   it("should have no error", function()
+      assert.is.falsy( err )
+   end)
+
+   it("should have six deltas", function()
+      assert.are.equal( 6, diff:num_deltas() )
+   end)
+
+end)
+
+describe( "merge #diff", function()
+   local diff = nil
+   local onto = nil
+   local err = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local tree, err = repo:lookup_tree( treeid )
+      onto, err = repo:diff_tree_to_workdir( tree )
+      if err then return end
+      diff, err = repo:diff_tree_to_workdir_with_index( tree )
+   end)
+
+   it("should perform a merge", function()
+      assert.are.equal( 1, onto:num_deltas() )
+      onto:merge( diff )
+      assert.are.equal( 6, onto:num_deltas() )
+   end)
+end)
+
+describe( "format_email", function() pending("luagi_diff_format_email ") end)
 describe( "find_similar #diff", function() pending("luagi_diff_find_similar ") end)
-describe( "format_email #diff", function() pending("luagi_diff_format_email ") end)
 
 describe( "get_stats", function()
    local stats = nil

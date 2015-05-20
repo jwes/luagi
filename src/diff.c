@@ -98,10 +98,14 @@ int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
                GIT_DIFF_SHOW_BINARY );
    
       lua_getfield( L, idx, IGNORE_SUBMODULES_TYPE );
-      opts->ignore_submodules = luagi_sub_check_ignore( L, -1 );
+      if( lua_type( L, -1 ) == LUA_TSTRING )
+         opts->ignore_submodules = luagi_sub_check_ignore( L, -1 );
    
       lua_getfield( L, idx, PATHSPEC );
-      opts->pathspec = ltk_check_strarray( L, -1 );
+      if( lua_type( L, -1 ) == LUA_TTABLE )
+      {
+         opts->pathspec = ltk_check_strarray( L, -1 );
+      }
 
       //TODO notify_cb
    
@@ -134,10 +138,10 @@ int luagi_diff_init_options( lua_State *L, int idx, git_diff_options *opts )
       }
 
       lua_getfield( L, idx, OLD_PREFIX );
-      opts->old_prefix = luaL_checkstring( L, -1 );
+      opts->old_prefix = luaL_optstring( L, -1, NULL );
    
       lua_getfield( L, idx, NEW_PREFIX );
-      opts->new_prefix = luaL_checkstring( L, -1 );
+      opts->new_prefix = luaL_optstring( L, -1, NULL );
    } 
    return ret;
 }
@@ -348,6 +352,7 @@ int luagi_diff_find_similar( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
 
+   luaL_checktype( L, 2, LUA_TTABLE );
    git_diff_find_options options;
    if( luagi_diff_find_init_options( L, 2, &options ) ) 
    {
@@ -423,7 +428,7 @@ static int diff_file_callback( const git_diff_delta *delta,
       luaL_error( f->L, "can not call file callback" );
    }
 
-   int ret = luaL_checkinteger( f->L, -1 );
+   int ret = luaL_optinteger( f->L, -1, 0 );
    lua_pop( f->L, 1 );
    return ret;
 }
@@ -494,7 +499,7 @@ static int diff_hunk_callback( const git_diff_delta *delta,
    {
       luaL_error( f->L, "can not call hunk callback" );
    }
-   int ret = luaL_checkinteger( f->L, -1 );
+   int ret = luaL_optinteger( f->L, -1, 0 );
    lua_pop( f->L, 1 );
    return ret;
 }
@@ -534,7 +539,7 @@ int diff_line_callback( const git_diff_delta *delta,
    {
       luaL_error( f->L, "can not call line callback" );
    }
-   int ret = luaL_checkinteger( f->L, -1 );
+   int ret = luaL_optinteger( f->L, -1, 0 );
    lua_pop( f->L, 1 );
    return ret;
 }
@@ -603,9 +608,7 @@ int luagi_diff_print( lua_State *L )
    if( git_diff_print( *diff, format, diff_line_callback, f ) )
    {
       free( f );
-      const git_error *err = giterr_last();
-      luaL_error(L, err->message );
-      return 0;
+      ltk_error_abort( L );
    }
    free( f );
    return 0; 
@@ -718,7 +721,15 @@ static int luagi_diff_format_email_init_options( lua_State *L, int index, git_di
    }
 
    lua_getfield( L, index, OID );
-   luagi_check_oid( (git_oid *)opts->id, L, -1 );
+   if( lua_type( L, -1) == LUA_TSTRING )
+   {
+      luagi_check_oid( (git_oid *)opts->id, L, -1 );
+   }
+   else
+   {
+      luaL_error( L, "no oid given" );
+   }
+
 
    lua_getfield( L, index, SUMMARY );
    const char *summary = luaL_optstring( L, -1, NULL );
@@ -726,11 +737,19 @@ static int luagi_diff_format_email_init_options( lua_State *L, int index, git_di
    {
       opts->summary = summary;
    }
+   else
+   {
+      luaL_error( L, "summary missing" );
+   }
 
    lua_getfield( L, index, AUTHOR );
    if( lua_type( L, -1 ) == LUA_TTABLE )
    {
       table_to_signature( L, (git_signature **)&opts->author, -1 );
+   }
+   else
+   {
+      luaL_error( L, "author missing" );
    }
 
    return ret;
@@ -739,6 +758,7 @@ static int luagi_diff_format_email_init_options( lua_State *L, int index, git_di
 int luagi_diff_format_email( lua_State *L )
 {
    git_diff **diff = checkdiff_at( L, 1 );
+   luaL_checktype( L, 2, LUA_TTABLE );
 
    git_buf out = GIT_BUF_INIT_CONST(NULL, 0);
    git_diff_format_email_options opts;
