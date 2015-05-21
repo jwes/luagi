@@ -35,6 +35,7 @@ static int luagi_push_init_options( lua_State *L __attribute__(( unused )), int 
 int luagi_push_set_options( lua_State *L )
 {
    git_push **push = checkpush_at( L, 1 );
+   luaL_checktype( L, 2, LUA_TTABLE );
    git_push_options opts;
    luagi_push_init_options( L, 2, &opts );
 

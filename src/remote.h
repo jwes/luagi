@@ -4,6 +4,8 @@
 #include <lauxlib.h>
 #include <lua.h>
 
+#include "push.h"
+
 int luagi_remote_list( lua_State *L );
 int luagi_remote_load( lua_State *L );
 int luagi_remote_create( lua_State *L );
@@ -84,6 +86,7 @@ static const struct luaL_Reg luagi_remote_funcs [] = {
    { "fetch_head",                  luagi_remote_update_fetch_head       },
    { "set_fetch_head",              luagi_remote_set_update_fetch_head   },
    { "update_tips",                 luagi_remote_update_tips             },
+   { "new_push",                    luagi_push_new                       },
    { NULL,                          NULL                                 },
 };
 #endif

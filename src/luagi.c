@@ -121,8 +121,6 @@ static const struct luaL_Reg repofuncs [] = {
    // cherrypick
    { "cherry_pick", luagi_cherry_pick },
    { "cherry_pick_commit", luagi_cherry_pick_commit },
-   //push
-   { "push", luagi_push_new },
 
    //reset
    { "reset", luagi_reset },
