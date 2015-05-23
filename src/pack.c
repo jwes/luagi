@@ -113,7 +113,7 @@ static int packbuilder_cb( void *buf, size_t size, void *payload )
       luaL_error( p->L, "error calling callback function" );
       return -1;
    }
-   int ret = luaL_checkinteger( p->L, -1 );
+   int ret = luaL_optinteger( p->L, -1, 0 );
    lua_pop( p->L, 1 );
    return ret;
 }
