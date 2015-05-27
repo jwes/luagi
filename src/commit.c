@@ -120,14 +120,14 @@ int luagi_commit_parentcount( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
    unsigned int count = git_commit_parentcount( *commit );
-   lua_pushunsigned( L, count );
+   lua_pushinteger( L, count );
    return 1;
 }
 
 int luagi_commit_parent( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
-   unsigned int n = luaL_checkunsigned( L, 2 );
+   unsigned int n = luaL_checkinteger( L, 2 );
    // lua to c
    n--;
 
@@ -146,7 +146,7 @@ int luagi_commit_parent( lua_State *L )
 int luagi_commit_parent_id( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
-   unsigned int n = luaL_checkunsigned( L, 2 );
+   unsigned int n = luaL_checkinteger( L, 2 );
   
    //luas index starts with 1
    n--;
@@ -158,7 +158,7 @@ int luagi_commit_parent_id( lua_State *L )
 int luagi_commit_nth_gen_ancestor( lua_State *L )
 {
    git_commit** commit = checkcommit( L );
-   unsigned int n = luaL_checkunsigned( L, 2 );
+   unsigned int n = luaL_checkinteger( L, 2 );
    //lua to c 
    n--;
    

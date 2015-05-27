@@ -109,7 +109,7 @@ int luagi_tree_entry_byname( lua_State *L )
 int luagi_tree_entry_byindex( lua_State *L )
 {
    git_tree** tree = checktree( L );
-   unsigned int index = luaL_checkunsigned( L , 2 );
+   unsigned int index = luaL_checkinteger( L , 2 );
    // indicies in lua are 1 based
    index--;
 
