@@ -87,19 +87,84 @@ end)
 describe( "create_note #note", function()
    local repo = nil
    local err = nil
+   local commit = "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09"
+   local note = nil
+   local noteId = nil
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
+      note, noteId = repo:create_note( test_helper.signature,
+                                    test_helper.signature,
+                                    commit,
+                                    "this is a note"
+                                    )
    end)
 
-   pending("create_note" )
+   it("should have a valid note", function()
+      assert.is.not_nil( noteId )
+      assert.are.equal( 40, #noteId )
+      assert.is.not_nil( note )
+      assert.is.not_nil( note.message )
+   end)
+
+   describe( "message #note", function()
+      it("should return a message", function()
+         assert.are.equal( "this is a note", note:message() )
+      end)
+   end)
+
+   describe( "__tostring #note", function()
+      it("should return a message", function()
+         assert.are.equal( "this is a note", tostring( note ) )
+      end)
+   end)
+   describe( "id #note", function()
+      it("should return the id", function()
+         assert.are.equal( noteId, note:id() )
+      end)
+   end)
+   describe( "note_default_ref #note", function()
+      it("should return the default refs/commits", function()
+         assert.are.equal("refs/notes/commits", repo:note_default_ref() )
+      end)
+   end)
 
 end)
-describe( "remove_note #note", function() pending("luagi_note_remove") end)
-describe( "note_default_ref #note", function() pending("luagi_note_default_ref") end)
 
+describe( "remove_note #note", function()
+   local repo = nil
+   local err = nil
+   local commit = "4aa7714edd19d6c8a0ccfb9a2d8650e69ae2bd09"
+   local note = nil
+   local noteId = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      note, noteId = repo:create_note( test_helper.signature,
+                                    test_helper.signature,
+                                    commit,
+                                    "this is a note"
+                                    )
+   end)
 
-describe( "message #note", function() pending("luagi_note_message ") end)
-describe( "__tostring #note", function() pending("luagi_note_message ") end)
-describe( "id #note", function() pending("luagi_note_id ") end)
+   it("should have a valid note", function()
+      assert.is.not_nil( noteId )
+      assert.are.equal( 40, #noteId )
+      assert.is.not_nil( note )
+      assert.is.not_nil( note.message )
+   end)
+
+   it( "should remove the note", function()
+      note, err = repo:read_note( commit )
+      assert.is.falsy( err )
+      assert.is.not_nil( note )
+      assert.is.not_nil( note.message )
+
+         -- not really notes...
+      repo:remove_note( test_helper.signature, test_helper.signature, commit )
+      note, err = repo:read_note( commit )
+      assert.are.equal( "Note could not be found", err )
+   end)
+end)

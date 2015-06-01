@@ -6,7 +6,18 @@
 #include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
-#include <stdio.h>
+
+static int luagi_push_note( lua_State *L, git_repository *repo, git_oid *oid, const char * notes_ref )
+{
+   git_note **note = lua_newuserdata( L, sizeof( git_note *) );
+
+   if( git_note_read( note, repo, notes_ref, oid ) )
+   {
+      return ltk_push_git_error( L );
+   }
+   ltk_setmetatable( L, LUAGI_NOTE_FUNCS );
+   return 1;
+}
 
 static int note_iter( lua_State *L )
 {
@@ -101,15 +112,7 @@ int luagi_note_read( lua_State *L )
    git_oid oid;
    luagi_check_oid( &oid, L, 2 );
    const char *notes_ref = luaL_optstring( L, 3, NULL );
-
-   git_note **note = lua_newuserdata( L, sizeof( git_note *) );
-
-   if( git_note_read( note, *repo, notes_ref, &oid ) )
-   {
-      return ltk_push_git_error( L );
-   }
-   ltk_setmetatable( L, LUAGI_NOTE_FUNCS );
-   return 1;
+   return luagi_push_note( L, *repo, &oid, notes_ref );
 }
 
 int luagi_note_create( lua_State *L )
@@ -119,10 +122,10 @@ int luagi_note_create( lua_State *L )
    table_to_signature( L, &author, 2 ); 
    table_to_signature( L, &committer, 3 ); 
 
-   const char *notes_ref = luaL_checkstring( L, 4 );
    git_oid oid, out;
-   luagi_check_oid( &oid, L, 5 );
-   const char *note = luaL_checkstring( L, 6 );
+   luagi_check_oid( &oid, L, 4 );
+   const char *note = luaL_checkstring( L, 5 );
+   const char *notes_ref = luaL_optstring( L, 6, NULL );
    int force = lua_toboolean( L, 7 );
 
    int ret = git_note_create( &out, *repo, author, committer, notes_ref, &oid, note, force );
@@ -133,20 +136,22 @@ int luagi_note_create( lua_State *L )
    {
       return ltk_push_git_error( L );
    }
-
-   return luagi_push_oid( L, &out );
+   ret = 0;
+   ret += luagi_push_note( L, *repo, &oid, notes_ref );
+   ret += luagi_push_oid( L, &out );
+   return ret; 
 }
 
 int luagi_note_remove( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const char *notes_ref = luaL_checkstring( L, 2 );
    git_signature *author, *committer;
-   table_to_signature( L, &author, 3); 
-   table_to_signature( L, &committer, 4 ); 
+   table_to_signature( L, &author, 2); 
+   table_to_signature( L, &committer, 3 ); 
 
    git_oid oid;
-   luagi_check_oid( &oid, L, 5 );
+   luagi_check_oid( &oid, L, 4 );
+   const char *notes_ref = luaL_optstring( L, 5, NULL );
 
    int ret = git_note_remove( *repo, notes_ref, author, committer, &oid );
    git_signature_free( author );
