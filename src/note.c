@@ -6,6 +6,7 @@
 #include "ltk.h"
 #include "luagi.h"
 #include "oid.h"
+#include <stdio.h>
 
 static int note_iter( lua_State *L )
 {
@@ -36,13 +37,13 @@ static int note_iter( lua_State *L )
 int luagi_note_iterator( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const char *note_ref = luaL_checkstring( L, 2 );
+   const char *note_ref = luaL_optstring( L, 2, NULL );
 
    git_note_iterator** iter =(git_note_iterator**) lua_newuserdata(L, sizeof(git_note_iterator*));
 
    if( git_note_iterator_new( iter, *repo, note_ref ) )
    {
-      return ltk_push_git_error( L );
+      ltk_error_abort( L );
    }
 
    ltk_setmetatable( L, LUAGI_NOTE_ITER_FUNCS );
@@ -71,7 +72,7 @@ static int note_foreach_cb( const git_oid *blob_id, const git_oid *annotated_obj
       return 1;
    }
 
-   int ret = luaL_checkinteger( p->L, -1 );
+   int ret = luaL_optinteger( p->L, -1, 0 );
    lua_pop( p->L, 1 );
    return ret;
 }
@@ -79,12 +80,12 @@ static int note_foreach_cb( const git_oid *blob_id, const git_oid *annotated_obj
 int luagi_note_foreach( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const char *notes_ref = luaL_checkstring( L, 2 );
-   luaL_checktype( L, 3, LUA_TFUNCTION );
+   luaL_checktype( L, 2, LUA_TFUNCTION );
+   const char *notes_ref = luaL_optstring( L, 3, NULL );
    luagi_foreach_t *p = malloc( sizeof( luagi_foreach_t ) );
    
    p->L = L;
-   p->callback_pos = 3;
+   p->callback_pos = 2;
    
    if( git_note_foreach( *repo, notes_ref, note_foreach_cb, p ) )
    {
@@ -97,9 +98,9 @@ int luagi_note_foreach( lua_State *L )
 int luagi_note_read( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
-   const char *notes_ref = luaL_checkstring( L, 2 );
    git_oid oid;
-   luagi_check_oid( &oid, L, 3 );
+   luagi_check_oid( &oid, L, 2 );
+   const char *notes_ref = luaL_optstring( L, 3, NULL );
 
    git_note **note = lua_newuserdata( L, sizeof( git_note *) );
 
