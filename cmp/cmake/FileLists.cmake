@@ -1,4 +1,5 @@
 set( SRC_FILES
+   ${SRC_DIR}/annotated_commit.c
    ${SRC_DIR}/blame.c
    ${SRC_DIR}/blob.c
    ${SRC_DIR}/branch.c

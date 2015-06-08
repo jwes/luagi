@@ -17,6 +17,8 @@ int luagi_note_default_ref( lua_State *L );
 int luagi_note_message( lua_State *L );
 int luagi_note_id( lua_State *L );
 int luagi_note_free( lua_State *L );
+int luagi_note_author( lua_State *L );
+int luagi_note_committer( lua_State *L );
 
 #define LUAGI_NOTE_FUNCS "is.luagi.note"
 #define LUAGI_NOTE_ITER_FUNCS "is.luagi.note.iter"
@@ -27,6 +29,8 @@ static const struct luaL_Reg luagi_note_funcs [] = {
    { "message", luagi_note_message },
    { "__tostring", luagi_note_message },
    { "id", luagi_note_id },
+   { "author", luagi_note_author },
+   { "committer", luagi_note_committer },
    { "__gc", luagi_note_free },
    { NULL, NULL }
 };

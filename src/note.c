@@ -128,7 +128,7 @@ int luagi_note_create( lua_State *L )
    const char *notes_ref = luaL_optstring( L, 6, NULL );
    int force = lua_toboolean( L, 7 );
 
-   int ret = git_note_create( &out, *repo, author, committer, notes_ref, &oid, note, force );
+   int ret = git_note_create( &out, *repo, notes_ref, author, committer, &oid, note, force );
 
    git_signature_free( author );
    git_signature_free( committer );
@@ -193,6 +193,22 @@ int luagi_note_id( lua_State *L )
    const git_oid *oid = git_note_id( *note );
 
    return luagi_push_oid( L, oid );
+}
+
+static int luagi_note_signature( lua_State *L, const git_signature * (*func)(const git_note*))
+{
+   git_note **note = checknote_at( L, 1 );
+   return signature_to_table( L, func( *note ) );
+}
+
+int luagi_note_author( lua_State *L )
+{
+   return luagi_note_signature( L, git_note_author );
+}
+
+int luagi_note_committer( lua_State *L )
+{
+   return luagi_note_signature( L, git_note_committer );
 }
 
 int luagi_note_free( lua_State *L )

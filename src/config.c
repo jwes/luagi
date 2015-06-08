@@ -173,16 +173,6 @@ int luagi_config_snapshot( lua_State *L )
    return 1;
 }
 
-int luagi_config_refresh( lua_State *L )
-{
-   git_config **cfg = checkconfig( L );
-
-   if( git_config_refresh( *cfg ) )
-   {
-      ltk_error_abort( L );
-   }
-   return 0;
-}
 static int luagi_push_config_entry( lua_State *L, const git_config_entry *entry )
 {
    lua_pushstring( L, entry->value );

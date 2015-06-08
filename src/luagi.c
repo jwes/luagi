@@ -40,6 +40,7 @@
 #include "patch.h"
 #include "pack.h"
 #include "revwalk.h"
+#include "annotated_commit.h"
 
 static const struct luaL_Reg repofuncs [] = {
    { "branch", luagi_create_branch },
@@ -104,9 +105,9 @@ static const struct luaL_Reg repofuncs [] = {
    { "merge_base", luagi_merge_base },
    { "merge_base_many", luagi_merge_base_many },
    { "merge_base_octopus", luagi_merge_base_octopus },
-   { "merge_head_from_ref", luagi_merge_head_from_ref },
-   { "merge_head_from_fetchhead", luagi_merge_head_from_fetchhead },
-   { "merge_head_from_id", luagi_merge_head_from_id },
+   { "annotated_commit_from_ref", luagi_annotated_commit_from_ref },
+   { "annotated_commit_from_fetchhead", luagi_annotated_commit_from_fetchhead },
+   { "annotated_commit_lookup", luagi_annotated_commit_lookup },
    { "merge_trees", luagi_merge_trees },
    { "merge_commits", luagi_merge_commits },
    { "merge", luagi_merge },
@@ -289,7 +290,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_OBJECT_FUNCS, luagi_object_funcs );
    setup_funcs(L, LUAGI_REFERENCE_FUNCS, luagi_reference_funcs );
    setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
-   setup_funcs(L, LUAGI_MERGEHEAD_FUNCS, luagi_mergehead_funcs );
+   setup_funcs(L, LUAGI_ANNOTATED_COMMIT_FUNCS, luagi_annotated_commit_funcs );
    setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
    setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
    setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );

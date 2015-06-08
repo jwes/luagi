@@ -7,29 +7,20 @@
 #include "luagi.h"
 #include "oid.h"
 #include "reference.h"
+#include "annotated_commit.h"
 
-static void fill_merge_heads( lua_State *L, int index, const git_merge_head **heads, int len )
-{
-   for( int i = 0; i < len; i++ )
-   {
-      lua_pushinteger( L, i + 1 );
-      lua_gettable( L, index );
-      heads[i] = *( check_mergehead_at( L, -1 ) );
-      lua_pop( L, 1 );
-   }
-}
 
 int luagi_merge_analysis( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    int len =  luaL_len( L, 2 );
-   const git_merge_head *heads[ len ];
-   fill_merge_heads( L, 2, heads, len );
+   const git_annotated_commit *commits[ len ];
+   fill_annotated_commit( L, 2, commits, len );
 
    git_merge_analysis_t anout;
    git_merge_preference_t pout;
 
-   if( git_merge_analysis( &anout, &pout, *repo, heads, len ) )
+   if( git_merge_analysis( &anout, &pout, *repo, commits, len ) )
    {
       return ltk_push_git_error( L );
    }
@@ -138,82 +129,6 @@ int luagi_merge_base_many( lua_State *L )
 int luagi_merge_base_octopus( lua_State *L )
 {
    return base_for_multiple( L, git_merge_base_octopus );
-}
-
-int luagi_merge_head_from_ref( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   git_reference **ref = check_ref_at( L, 2 );
-
-   git_merge_head **head = lua_newuserdata( L, sizeof( git_merge_head *) );
-
-   if( git_merge_head_from_ref( head, *repo, *ref ) )
-   {
-      return ltk_push_git_error( L );
-   }
-
-   ltk_setmetatable( L, LUAGI_MERGEHEAD_FUNCS );
-   return 1;
-}
-   
-int luagi_merge_head_from_fetchhead( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   const char *branch_name = luaL_checkstring( L, 2 );
-   const char *remote_url = luaL_checkstring( L, 3 );
-   git_oid oid;
-   if( luagi_check_oid( &oid, L, 4 ) )
-   {
-      ltk_error_abort( L );;
-      return 0;
-   }
-
-   git_merge_head **head = lua_newuserdata( L, sizeof( git_merge_head * ) );
-
-   if( git_merge_head_from_fetchhead( head, *repo, branch_name, remote_url, &oid ) )
-   {
-      return ltk_push_git_error( L );
-   }
-
-   ltk_setmetatable( L, LUAGI_MERGEHEAD_FUNCS );
-   return 1;
-}
-
-int luagi_merge_head_from_id( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   git_oid oid;
-   if( luagi_check_oid( &oid, L, 2 ) )
-   {
-      ltk_error_abort( L );;
-      return 0;
-   }
-
-   git_merge_head **head = lua_newuserdata( L, sizeof( git_merge_head * ) );
-
-   if( git_merge_head_from_id( head, *repo, &oid ) )
-   {
-      return ltk_push_git_error( L );
-   }
-
-   ltk_setmetatable( L, LUAGI_MERGEHEAD_FUNCS );
-   return 1;
-}
-
-   
-
-int luagi_merge_head_id( lua_State *L )
-{
-   git_merge_head **head = check_mergehead_at( L, 1 );
-   const git_oid *out = git_merge_head_id( *head );
-   return luagi_push_oid( L, out );
-}
-
-int luagi_merge_head_free( lua_State *L )
-{
-   git_merge_head **head = check_mergehead_at( L, 1 );
-   git_merge_head_free( *head );
-   return 0;
 }
 static void luagi_set_file_favor( git_merge_file_favor_t *favor, const char *favorstr )
 {
@@ -411,8 +326,8 @@ int luagi_merge( lua_State *L )
    luaL_checktype( L, 3, LUA_TTABLE );
    luaL_checktype( L, 4, LUA_TTABLE );
    int len =  luaL_len( L, 2 );
-   const git_merge_head *heads[ len ];
-   fill_merge_heads( L, 2, heads, len );
+   const git_annotated_commit *heads[ len ];
+   fill_annotated_commit( L, 2, heads, len );
 
    git_merge_options mopts;
    luagi_merge_init_options( L, 3, &mopts ); 
