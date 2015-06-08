@@ -17,14 +17,7 @@ int luagi_tag_lookup( lua_State *L )
    luagi_check_oid_prefix( &id, &len, L, 2 );
 
    git_tag **out = lua_newuserdata( L, sizeof( git_tag * ) ); 
-   if( len == GIT_OID_HEXSZ )
-   {
-      ret = git_tag_lookup( out, *repo, &id );
-   }
-   else
-   {
-      ret =  git_tag_lookup_prefix( out, *repo, &id, len );
-   }
+   ret =  git_tag_lookup_prefix( out, *repo, &id, len );
 
    if( ret )
    {
