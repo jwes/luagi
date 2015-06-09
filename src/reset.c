@@ -6,6 +6,7 @@
 #include "ltk.h"
 #include "luagi.h"
 #include "object.h"
+#include "checkout.h"
 
 #include <git2/reset.h>
 #include <lauxlib.h>
@@ -34,12 +35,16 @@ int luagi_reset( lua_State *L )
    git_object **target = checkobject_at( L, 2 );
    git_reset_t reset = luagi_check_resettype( L, 3 );
 
-   git_signature *sig;
+   git_checkout_options opts;
    luaL_checktype( L, 4, LUA_TTABLE );
-   table_to_signature( L, &sig, 4 );
-   const char *log_message = luaL_optstring( L, 5, NULL );
+   luagi_parse_checkout_options( &opts, L, 4 );
 
-   int ret = git_reset( *repo, *target, reset, sig, log_message );
+   git_signature *sig;
+   luaL_checktype( L, 5, LUA_TTABLE );
+   table_to_signature( L, &sig, 5 );
+   const char *log_message = luaL_optstring( L, 6, NULL );
+
+   int ret = git_reset( *repo, *target, reset, &opts, sig, log_message );
    git_signature_free( sig );
    if( ret )
    {

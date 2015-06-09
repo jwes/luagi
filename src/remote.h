@@ -4,10 +4,8 @@
 #include <lauxlib.h>
 #include <lua.h>
 
-#include "push.h"
-
 int luagi_remote_list( lua_State *L );
-int luagi_remote_load( lua_State *L );
+int luagi_remote_lookup( lua_State *L );
 int luagi_remote_create( lua_State *L );
 int luagi_remote_save( lua_State *L );
 int luagi_remote_name( lua_State *L );
@@ -46,8 +44,12 @@ int luagi_remote_update_fetch_head( lua_State *L );
 int luagi_remote_set_update_fetch_head( lua_State *L );
 int luagi_remote_update_tips( lua_State *L );
 int luagi_remote_is_valid_name( lua_State *L );
-int luagi_remote_valid_url( lua_State *L );
-int luagi_remote_supported_url( lua_State *L );
+int luagi_remote_prune( lua_State *L );
+int luagi_remote_prune_refs( lua_State *L );
+int luagi_remote_upload( lua_State *L );
+int luagi_remote_update_tips( lua_State *L );
+int luagi_remote_push( lua_State *L );
+int luagi_remote_delete( lua_State *L );
 
 static const struct luaL_Reg luagi_remote_funcs [] = {
    { "save",                        luagi_remote_save                    },
@@ -73,20 +75,25 @@ static const struct luaL_Reg luagi_remote_funcs [] = {
    { "stop",                        luagi_remote_stop                    },
    { "disconnect",                  luagi_remote_disconnect              },
    { "__gc",                        luagi_remote_free                    },
-   { "check_cert",                  luagi_remote_check_cert              },
+   /*
    { "set_transport_from_url",      luagi_remote_set_transport_from_url  },
    { "set_dummy_transport",         luagi_remote_set_transport_dummy     },
    { "set_local_transport",         luagi_remote_set_transport_local     },
    { "set_smart_transport",         luagi_remote_set_transport_smart     },
+   */
    { "set_callbacks",               luagi_remote_set_callbacks           },
    { "stats",                       luagi_remote_stats                   },
    { "autotag",                     luagi_remote_autotag                 },
    { "set_autotag",                 luagi_remote_set_autotag             },
-   { "rename",                      luagi_remote_rename                  },
    { "fetch_head",                  luagi_remote_update_fetch_head       },
    { "set_fetch_head",              luagi_remote_set_update_fetch_head   },
    { "update_tips",                 luagi_remote_update_tips             },
-   { "new_push",                    luagi_push_new                       },
+   { "prune",                       luagi_remote_prune                   },
+   { "prune_refs",                  luagi_remote_prune_refs              },
+   { "upload",                      luagi_remote_upload                  },
+   { "update_tips",                 luagi_remote_update_tips             },
+   { "push",                        luagi_remote_push                    },
+   //TODO
    { NULL,                          NULL                                 },
 };
 #endif

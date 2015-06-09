@@ -540,7 +540,7 @@ static int push_state( lua_State *L, int state )
       case GIT_REPOSITORY_STATE_REVERT:
         lua_pushstring( L, REVERT );
         break;
-      case GIT_REPOSITORY_STATE_CHERRY_PICK:
+      case GIT_REPOSITORY_STATE_CHERRYPICK:
         lua_pushstring( L, CHERRY_PICK );
         break;
       case GIT_REPOSITORY_STATE_BISECT:

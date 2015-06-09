@@ -23,7 +23,6 @@
 #include "merge.h"
 #include "blob.h"
 #include "cherrypick.h"
-#include "push.h"
 #include "reset.h"
 //#include "revert.h"
 #include "tag.h"
@@ -53,8 +52,10 @@ static const struct luaL_Reg repofuncs [] = {
    { "__gc", luagi_gc },
    //remotes
    { "remotes", luagi_remote_list },
-   { "load_remote", luagi_remote_load },
+   { "rename_remote", luagi_remote_rename },
+   { "lookup_remote", luagi_remote_lookup },
    { "create_remote", luagi_remote_create },
+   { "delete_remote", luagi_remote_delete },
    //status
    { "status_for_each", luagi_status_foreach },
    { "status_for_each_ext", luagi_status_foreach_ext },
@@ -218,8 +219,6 @@ static const struct luaL_Reg mylib [] = {
    { "clone", luagi_clone },
    // remote
    { "is_valid_remote_name", luagi_remote_is_valid_name   },
-   { "is_valid_remote_url", luagi_remote_valid_url },
-   { "is_supported_remote_url", luagi_remote_supported_url },
    //index if path is given, it does open
    { "create_index", luagi_index_new },
    { "reference_normalize_name", luagi_reference_normalize_name },
@@ -292,7 +291,6 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REFERENCE_ITER_FUNCS, luagi_reference_iter_funcs );
    setup_funcs(L, LUAGI_ANNOTATED_COMMIT_FUNCS, luagi_annotated_commit_funcs );
    setup_funcs(L, LUAGI_BLOB_FUNCS, luagi_blob_funcs );
-   setup_funcs(L, LUAGI_PUSH_FUNCS, luagi_push_funcs );
    setup_funcs(L, LUAGI_TAG_FUNCS, luagi_tag_funcs );
    setup_funcs(L, LUAGI_SUBMODULE_FUNCS, luagi_submodule_funcs );
    setup_funcs(L, LUAGI_NOTE_FUNCS, luagi_note_funcs );
