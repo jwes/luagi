@@ -12,16 +12,17 @@
 #define checktreebuilder(L) \
       (git_treebuilder**) luaL_checkudata( L, 1, LUAGI_TREE_BUILDER_FUNCS )
 /* treebuilder stuff */
-int luagi_tree_builder_create( lua_State *L )
+int luagi_tree_builder_new( lua_State *L )
 {
+   git_repository **repo = checkrepo( L, 1 );
    git_tree *tree = NULL;
-   if( lua_isuserdata( L, 1) )
+   if( lua_isuserdata( L, 2) )
    {
       tree = *checktree( L );
    }
    git_treebuilder** builder = (git_treebuilder**) lua_newuserdata( L, sizeof( git_treebuilder* ) );
 
-   int ret = git_treebuilder_create( builder, tree );
+   int ret = git_treebuilder_new( builder, *repo, tree );
    if( ret != 0 )
    {
       lua_pushnil( L );
@@ -82,11 +83,7 @@ int luagi_tree_builder_insert( lua_State *L )
 
    const char* filemode = luaL_checkstring( L, 4 );
    git_filemode_t mode = 0;
-   if( strncmp( filemode, NEW, strlen( NEW ) ) == 0 ) 
-   {
-      mode = GIT_FILEMODE_NEW;
-   } 
-   else if( strncmp( filemode, TREE, strlen( TREE ) ) == 0 )
+   if( strncmp( filemode, TREE, strlen( TREE ) ) == 0 )
    {
       mode = GIT_FILEMODE_TREE;
    }
@@ -145,10 +142,9 @@ int luagi_tree_builder_entry_count( lua_State *L )
 int luagi_tree_builder_write( lua_State *L )
 {
    git_treebuilder** builder = checktreebuilder( L );
-   git_repository** repo = checkrepo( L, 2 );
    git_oid oid;
    
-   git_treebuilder_write( &oid, *repo, *builder );
+   git_treebuilder_write( &oid, *builder );
    return luagi_push_oid( L, &oid );
 }
 

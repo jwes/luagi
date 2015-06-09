@@ -209,6 +209,7 @@ static const struct luaL_Reg repofuncs [] = {
    //object
    { "lookup_object", luagi_object_lookup },
    { "lookup_object_bypath", luagi_object_lookup_bypath },
+   { "tree_builder", luagi_tree_builder_new },
    { NULL, NULL },
 };
 
@@ -216,7 +217,6 @@ static const struct luaL_Reg mylib [] = {
    { "version", luagi_version },
    { "features", luagi_features },
    { "open", luagi_open },
-   { "tree_builder", luagi_tree_builder_create },
    { "clone", luagi_clone },
    // remote
    { "is_valid_remote_name", luagi_remote_is_valid_name   },
@@ -250,7 +250,6 @@ static const struct luaL_Reg mylib [] = {
    { "parse_int64", luagi_config_parse_int64 },
 
    { "patch_buffers", luagi_patch_from_buffers },
-   { "create_tree_builder", luagi_tree_builder_create },
    { NULL, NULL } /*sentinel*/
 };
 
