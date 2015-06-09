@@ -29,6 +29,7 @@ int luagi_submodule_wd_id( lua_State *L );
 int luagi_submodule_ignore( lua_State *L );
 int luagi_submodule_set_ignore( lua_State *L );
 int luagi_submodule_update( lua_State *L );
+int luagi_submodule_update_strategy( lua_State *L );
 int luagi_submodule_set_update( lua_State *L );
 int luagi_submodule_fetch_recurse_submodules( lua_State *L );
 int luagi_submodule_set_fetch_recurse_submodules( lua_State *L );
@@ -39,6 +40,7 @@ int luagi_submodule_status( lua_State *L );
 int luagi_submodule_location( lua_State *L );
 int luagi_submodule_add_to_index( lua_State *L );
 int luagi_submodule_save( lua_State *L );
+int luagi_submodule_repo_init( lua_State *L );
 
 static const struct luaL_Reg luagi_submodule_funcs [] = {
    { "__gc",  luagi_submodule_free },
@@ -55,6 +57,7 @@ static const struct luaL_Reg luagi_submodule_funcs [] = {
    { "ignore", luagi_submodule_ignore },
    { "set_ignore", luagi_submodule_set_ignore },
    { "update", luagi_submodule_update },
+   { "update_strategy", luagi_submodule_update_strategy },
    { "set_update", luagi_submodule_set_update },
    { "fetch_recurse", luagi_submodule_fetch_recurse_submodules },
    { "set_fetch_recurse", luagi_submodule_set_fetch_recurse_submodules },

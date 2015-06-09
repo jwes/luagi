@@ -150,6 +150,7 @@ static const struct luaL_Reg repofuncs [] = {
    { "add_submodule_setup", luagi_submodule_add_setup },
    { "resolve_submodule_url", luagi_submodule_resolve_url },
    { "reload_all_submodules", luagi_submodule_reload_all },
+   { "submodule_repo_init", luagi_submodule_repo_init },
 
    //graph
    { "graph_ahead_behind", luagi_graph_ahead_behind },

@@ -311,12 +311,41 @@ static git_submodule_update_t luagi_sub_check_update( lua_State *L, int index )
    return GIT_SUBMODULE_UPDATE_DEFAULT;
 }
 
+static int luagi_init_submodule_update_options(
+                git_submodule_update_options *opts,
+                lua_State *L,
+                int table_index )
+{
+   git_submodule_update_init_options( opts, GIT_SUBMODULE_UPDATE_OPTIONS_VERSION );
+   if( lua_type( L, table_index) == LUA_TTABLE )
+   {
+   }
+   return 0;
+}
+
 int luagi_submodule_update( lua_State *L )
 {
    git_submodule **sub = checksubmodule_at( L, 1 );
-   git_submodule_update_t t = git_submodule_update( *sub );
+   git_submodule_update_options opts;
+   luagi_init_submodule_update_options( &opts, L, 2 );
+
+   int init = luaL_optinteger( L, 3, 0 );
+
+   int ret = git_submodule_update( *sub, init, &opts );
+   if( ret )
+   {
+      ltk_error_abort( L );
+   }
+   return 0;
+}
+
+int luagi_submodule_update_strategy( lua_State *L )
+{
+   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_submodule_update_t t = git_submodule_update_strategy( *sub );
    return luagi_sub_push_update( L, t );
 }
+
 int luagi_submodule_set_update( lua_State *L )
 {
    git_submodule **sub = checksubmodule_at( L, 1 );
@@ -490,3 +519,17 @@ int luagi_submodule_save( lua_State *L )
    return 0;
 }
 
+int luagi_submodule_repo_init( lua_State *L )
+{
+   git_submodule **sub = checksubmodule_at( L, 1 );
+   int use_gitlink = lua_toboolean( L, 2 );
+
+   git_repository **repo = lua_newuserdata(L, sizeof(git_repository *) );
+
+   if( git_submodule_repo_init( repo, *sub, use_gitlink ) )
+   {
+      return ltk_push_git_error( L );
+   }
+   ltk_setmetatable( L, REPO_NAME );
+   return 1;
+}
