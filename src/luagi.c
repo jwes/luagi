@@ -24,7 +24,7 @@
 #include "blob.h"
 #include "cherrypick.h"
 #include "reset.h"
-//#include "revert.h"
+#include "revert.h"
 #include "tag.h"
 #include "submodule.h"
 #include "graph.h"
@@ -128,11 +128,9 @@ static const struct luaL_Reg repofuncs [] = {
    { "reset", luagi_reset },
    { "reset_default", luagi_reset_default },
    { "reset_index", luagi_reset_index },
-   /*
-   //revert TODO
+   //revert
    { "revert", luagi_revert },
    { "revert_commit", luagi_revert_commit },
-   */
    //tag
    { "lookup_tag", luagi_tag_lookup },
    { "create_tag", luagi_tag_create },

@@ -7,6 +7,7 @@
 #include "commit.h"
 #include "merge.h"
 #include "index.h"
+#include "ltk.h"
 
 
 int luagi_revert_commit( lua_State *L )
@@ -15,11 +16,16 @@ int luagi_revert_commit( lua_State *L )
    git_commit **revert_commit = checkcommit_at( L, 2 );
    git_commit **commit = checkcommit_at( L, 3 );
 
-   luaL_checktype( L, 4, LUA_TBOOLEAN );
-   int mainline = lua_toboolean( L, 4 );
+   int mainline = 0;
+   int index = 4;
+   if( lua_type( L, index) == LUA_TBOOLEAN )
+   {
+      mainline = lua_toboolean( L, index );
+      index++;
+   }
    
    git_merge_options opts;
-   luagi_merge_init_options( L, 5, &opts );
+   luagi_merge_init_options( L, index, &opts );
 
    git_index **out = lua_newuserdata( L, sizeof(git_index *) );
    if( git_revert_commit( out, *repo, *revert_commit, *commit, mainline, &opts ) )
@@ -48,7 +54,7 @@ int luagi_revert( lua_State *L )
 
    if( git_revert( *repo, *commit, &opts ) )
    {
-      ERROR_ABORT( L )
+      ltk_error_abort( L );
    }
 
    return 0;
