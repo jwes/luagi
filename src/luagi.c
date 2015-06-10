@@ -121,8 +121,8 @@ static const struct luaL_Reg repofuncs [] = {
    { "create_blob_from_chunks", luagi_blob_create_fromchunks },
    { "create_blob_from_buffer", luagi_blob_create_frombuffer },
    // cherrypick
-   { "cherry_pick", luagi_cherry_pick },
-   { "cherry_pick_commit", luagi_cherry_pick_commit },
+   { "cherrypick", luagi_cherrypick },
+   { "cherrypick_commit", luagi_cherrypick_commit },
 
    //reset
    { "reset", luagi_reset },

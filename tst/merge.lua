@@ -108,47 +108,47 @@ describe( "merge_base_octopus #merge", function()
    end)
 end)
 
-describe( "merge_head_from_ref #merge", function()
+describe( "annotated_commit_from_ref #merge", function()
    local repo = nil
    local err = nil
-   local merge_head = nil
+   local annotated_commit = nil
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
       local ref,  err = repo:lookup_reference( "refs/heads/work" )
       if err then return end
-      merge_head, err = repo:merge_head_from_ref( ref )
+      annotated_commit, err = repo:annotated_commit_from_ref( ref )
    end)
 
    it( "should be prepared", function()
       assert.is.falsy( err )
-      assert.is.not_nil( merge_head )
-      assert.are.equal( "userdata", type( merge_head ) )
+      assert.is.not_nil( annotated_commit )
+      assert.are.equal( "userdata", type( annotated_commit ) )
    end)
 end)
 
-describe( "merge_head_from_fetchhead #merge", function()
+describe( "annotated_commit_from_fetchhead #merge", function()
    pending( "set up test remote")
 end)
 
-describe( "merge_head_from_id #merge", function()
+describe( "annotated_commit_lookup #merge", function()
    local repo = nil
    local err = nil
-   local merge_head = nil
+   local annotated_commit = nil
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
 
-      merge_head, err = repo:merge_head_from_id( head_work )
+      annotated_commit, err = repo:annotated_commit_lookup( head_work )
    end)
 
    it( "should be prepared", function()
       assert.is.falsy( err )
-      assert.is.not_nil( merge_head )
-      assert.are.equal( "userdata", type( merge_head ) )
-      assert.is.not_nil( merge_head.__tostring )
+      assert.is.not_nil( annotated_commit )
+      assert.are.equal( "userdata", type( annotated_commit ) )
+      assert.is.not_nil( annotated_commit.__tostring )
    end)
 end)
 
@@ -215,25 +215,25 @@ end)
 describe( "merge #merge", function()
    local repo = nil
    local err = nil
-   local merge_heads = {}
+   local annotated_commits = {}
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      merge_heads[1], err = repo:merge_head_from_id( head_work )
+      annotated_commits[1], err = repo:annotated_commit_lookup( head_work )
    end)
 
    it( "should be prepared", function()
       assert.is.falsy( err )
-      assert.is.not_nil( merge_heads )
-      assert.are.equal( "table", type( merge_heads ) )
-      assert.are.equal( "userdata", type( merge_heads[1] ) )
-      assert.is.not_nil( merge_heads[1].__tostring )
+      assert.is.not_nil( annotated_commits )
+      assert.are.equal( "table", type( annotated_commits ) )
+      assert.are.equal( "userdata", type( annotated_commits[1] ) )
+      assert.is.not_nil( annotated_commits[1].__tostring )
    end)
 
    it( "should not fail", function()
       assert.has_no_error( function()
-         repo:merge( merge_heads, {}, {} )
+         repo:merge( annotated_commits, {}, {} )
       end)
    end)
 end)
@@ -242,24 +242,24 @@ describe( "merge_file_from_index #merge", function() pending("luagi_merge_file_f
 describe( "merge_analysis #merge", function()
    local repo = nil
    local err = nil
-   local merge_heads = {}
+   local annotated_commits = {}
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      merge_heads[1], err = repo:merge_head_from_id( head_work )
+      annotated_commits[1], err = repo:annotated_commit_lookup( head_work )
    end)
 
    it( "should be prepared", function()
       assert.is.falsy( err )
-      assert.is.not_nil( merge_heads )
-      assert.are.equal( "table", type( merge_heads ) )
-      assert.are.equal( "userdata", type( merge_heads[1] ) )
-      assert.is.not_nil( merge_heads[1].__tostring )
+      assert.is.not_nil( annotated_commits )
+      assert.are.equal( "table", type( annotated_commits ) )
+      assert.are.equal( "userdata", type( annotated_commits[1] ) )
+      assert.is.not_nil( annotated_commits[1].__tostring )
    end)
 
    it( "should return", function()
-      ancestor, pref = repo:merge_analysis( merge_heads )
+      ancestor, pref = repo:merge_analysis( annotated_commits )
       assert.are.equal( "none", pref )
       assert.are.equal( "normal", ancestor )
    end)

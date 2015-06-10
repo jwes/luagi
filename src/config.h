@@ -19,7 +19,6 @@ int luagi_config_open_level( lua_State *L );
 int luagi_config_open_global( lua_State *L );
 int luagi_config_snapshot( lua_State *L );
 
-int luagi_config_refresh( lua_State *L );
 int luagi_config_get_entry( lua_State *L );
 int luagi_config_get_int32( lua_State *L );
 int luagi_config_get_int64( lua_State *L );
@@ -70,7 +69,6 @@ static const struct luaL_Reg luagi_config_funcs [] = {
    { "open_global", luagi_config_open_global },
    { "snapshot", luagi_config_snapshot },
 
-   { "refresh", luagi_config_refresh },
    { "get_entry", luagi_config_get_entry },
    { "get_int32", luagi_config_get_int32 },
    { "get_int64", luagi_config_get_int64 },

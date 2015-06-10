@@ -71,14 +71,18 @@ end)
 
 describe( "tree entry", function()
    local entry = nil
+   local err = nil
    setup( function()
       test_helper.extract()
-      local repo = luagi.open( test_helper.path )
-      local tree = repo:lookup_tree( treeid )
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local tree, err = repo:lookup_tree( treeid )
+      if err then return end
       entry = tree:entry_byindex( 1 )
    end)
 
    it( "should not be nil", function()
+      assert.is.falsy( err )
       assert.is.not_nil( entry )
    end)
 
@@ -111,11 +115,14 @@ describe( "tree_builder #tree", function()
    local filename = "new_file"
    local path = test_helper.path.."/some/"..filename
    local filehash = nil
+   local err = nil
+
    setup( function()
       test_helper.extract()
       local repo = luagi.open( test_helper.path )
       local tree = repo:lookup_tree( treeid )
-      builder = tree:create_builder()
+      builder, err = repo:tree_builder(tree)
+      if err then return end
 
       local file = io.open( path, "w" )
       file:write( "some 'random' data" ) 
@@ -125,6 +132,7 @@ describe( "tree_builder #tree", function()
    end)
    
    it( "should not be nil", function()
+      assert.is.falsy( err )
       assert.is.not_nil( builder )
    end)
 
@@ -149,12 +157,16 @@ describe( "with inserted file", function()
    local filehash = nil
    local filehash_two = nil
    local repo = nil
+   local err = nil
 
    setup( function()
       test_helper.extract()
-      repo = luagi.open( test_helper.path )
-      local tree = repo:lookup_tree( treeid )
-      builder = tree:create_builder()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local tree, err = repo:lookup_tree( treeid )
+      if err then return end
+      builder, err = repo:tree_builder(tree)
+      if err then return end
 
       local file = io.open( path..filename, "w" )
       file:write( "some 'random' data" ) 
@@ -165,6 +177,10 @@ describe( "with inserted file", function()
 
       filehash, err = luagi.hashfile( path..filename, "blob" )
       filehash_two, err = luagi.hashfile( path..filename_two, "blob" )
+   end)
+
+   it( "should not have an error", function()
+      assert.is.falsy( err )
    end)
 
    local function refill()
@@ -221,6 +237,7 @@ describe( "with inserted file", function()
    describe( "write #tree", function()
       local oid = nil
       local result = nil
+      local err = nil
       setup( function()
                refill()
 

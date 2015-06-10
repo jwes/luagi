@@ -18,16 +18,14 @@ int luagi_tree_builder_new( lua_State *L )
    git_tree *tree = NULL;
    if( lua_isuserdata( L, 2) )
    {
-      tree = *checktree( L );
+      tree = *checktree_at( L, 2 );
    }
-   git_treebuilder** builder = (git_treebuilder**) lua_newuserdata( L, sizeof( git_treebuilder* ) );
+   git_treebuilder** builder = lua_newuserdata( L, sizeof( git_treebuilder* ) );
 
    int ret = git_treebuilder_new( builder, *repo, tree );
-   if( ret != 0 )
+   if( ret )
    {
-      lua_pushnil( L );
-      lua_pushfstring( L, "could not create builder -- %d", ret );
-      return 2;
+      return ltk_push_git_error( L );
    }
    
    ltk_setmetatable( L, LUAGI_TREE_BUILDER_FUNCS );

@@ -30,7 +30,7 @@ describe( "reset #reset", function()
 
    describe("soft reset one revision", function()
       setup( function()
-         repo:reset( object, "soft", test_helper.signature )
+         repo:reset( object, "soft", {}, test_helper.signature )
       end)
       it("should not be available anymore", function()
          assert.is.falsy( io.open( test_helper.path.."/.gitignore", "r") )

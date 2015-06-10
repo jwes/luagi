@@ -22,7 +22,7 @@ describe( "cherry_pick #cherry_pick", function()
    end)
 
    it( "should not produe an error", function()
-      assert.has_no_error( function() repo:cherry_pick( commit ) end)
+      assert.has_no_error( function() repo:cherrypick( commit ) end)
    end)
 end)
 
@@ -46,7 +46,7 @@ describe( "cherry_pick_commit #cherry_pick", function()
    end)
 
    it( "should return an index", function()
-      local index, err = repo:cherry_pick_commit( commit, our_commit, false, {} )
+      local index, err = repo:cherrypick_commit( commit, our_commit, false, {} )
       assert.is.falsy( err )
       assert.is.not_nil( index )
       assert.are.equal( "userdata", type(index) )
