@@ -3,6 +3,7 @@
 #include <git2/errors.h>
 #include <git2/remote.h>
 #include <git2/signature.h>
+#include <git2/transport.h>
 #include <string.h>
 
 #include "ltk.h"
@@ -552,7 +553,116 @@ static int cred_acquire_cb(
 	unsigned int allowed_types __attribute__((unused)),
 	void *payload __attribute__((unused)))
 {
+   remote_callback_t *f = payload;
+   lua_getfield( f->L, f->table_pos, CREDENTIALS );
+   if( lua_type( f->L, f->table_pos + 1 ) != LUA_TFUNCTION )
+   {
+      return 1;
+   }
+
+   lua_pushvalue( f->L, f->table_pos + 1 );
+   lua_pushstring( f->L, url );
+   lua_pushstring( f->L, username_from_url );
+
+   lua_newtable( f->L );
+   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT != 0 );
+   lua_pushfield( f->L, USERPASS_PLAINTEXT );
+
+   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_SSH_KEY != 0 );
+   lua_pushfield( f->L, SSH_KEY );
+
+   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_SSH_CUSTOM != 0 );
+   lua_pushfield( f->L, SSH_CUSTOM );
+
+   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_DEFAULT != 0 );
+   lua_pushfield( f->L, DEFAULT );
+
+   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE != 0 );
+   lua_pushfield( f->L, SSH_INTERACTIVE );
+
+   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_USERNAME != 0 );
+   lua_pushfield( f->L, USERNAME_ONLY );
+
+   if( lua_pcall( f->L, 3, 2, 0 ) != LUA_OK )
+   {
+      ltk_dump_stack( f->L );
+      return -1;
+   }
+   if( lua_type( f->L, -2 ) == LUA_TSTRING )
+   {
+      return -2;
+   }
+
+   const char *used_type = luaL_checkstring( f->L, -1 );
+
+   if( lua_type( f->L, -1 ) != LUA_TTABLE )
+   {
+      return -3;
+   }
+
+
+
+
  // TODO implement
+   return 0;
+}
+static int luagi_push_cert( lua_State *L, git_cert *cert )
+{
+   lua_newtable( L );
+   switch( cert->cert_type )
+   {
+      case GIT_CERT_X509:
+        lua_pushstring( L, LUAGI_STR_X509 );
+        lua_setfield( L, -2, TYPE );
+        git_cert_x509 *xcert = ( git_cert_x509 * ) cert;
+
+        lua_pushlstring( L, xcert->data, xcert->len );
+        lua_setfield( L, -2, DATA );
+      break;
+      case GIT_CERT_HOSTKEY_LIBSSH2:
+        lua_pushstring( L, LUAGI_STR_SSH_HOSTKEY );
+        lua_setfield( L, -2, TYPE );
+
+        git_cert_hostkey *scert = ( git_cert_hostkey * ) cert;
+        if( scert->type == GIT_CERT_SSH_MD5 )
+        {
+           lua_pushlstring( L, (char*)scert->hash_md5, 16 );
+        }
+        else if( scert->type == GIT_CERT_SSH_SHA1 )
+        {
+           lua_pushlstring( L, (char*)scert->hash_sha1, 20 );
+        } else
+        {
+           lua_pushnil( L );
+        }
+        lua_setfield( L, -2, HASH );
+      break;
+   }
+   return 1;
+}
+
+static int certificate_check_cb(git_cert *cert, int valid, const char *host, void *payload)
+{
+   remote_callback_t *f = payload;
+   lua_getfield( f->L, f->table_pos, CERTIFICATE_CHECK );
+   if( lua_type( f->L, f->table_pos + 1 ) != LUA_TFUNCTION )
+   {
+      return 1;
+   }
+   lua_pushvalue( f->L, f->table_pos + 1 );
+   
+   luagi_push_cert( f->L, cert );
+   lua_pushboolean( f->L, valid );
+   lua_pushstring( f->L, host );
+
+   if( lua_pcall( f->L, 3, 1, 0 ) != LUA_OK )
+   {
+      ltk_dump_stack( f->L );
+      return 1;
+   }
+   valid = lua_toboolean( f->L, -1 );
+   lua_pop( f->L, 1 );
+
    return 0;
 }
 
@@ -649,6 +759,7 @@ int luagi_remote_set_callbacks( lua_State *L )
    callbacks.credentials = cred_acquire_cb;
    callbacks.transfer_progress = progress_cb;
    callbacks.update_tips = update_tips;
+   callbacks.certificate_check = certificate_check_cb;
    callbacks.payload = c;
 
    int ret = git_remote_set_callbacks( *rem, &callbacks);

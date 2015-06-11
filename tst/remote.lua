@@ -352,7 +352,6 @@ describe( "fetch and download #remote", function()
 end)
 
 describe( "stop #remote", function() pending("              luagi_remote_stop                    ") end)
-describe( "check_cert #remote", function() pending("        luagi_remote_check_cert              ") end)
 describe( "set_callbacks #remote", function()
    pending( "callbacks only really used on smart transports" )
    --[[
@@ -475,10 +474,32 @@ describe( "update_tips #remote", function()
    end)
 end)
 
+describe( " prune_refs #remote", function()
+   local repo = nil
+   local err = nil
+   local remote = nil
+   setup( function()
+      test_helper.setup()
+      repo, err = luagi.open( test_helper.path )
+      if err then return end
+      remote, err = repo:lookup_remote( "origin" )
+   end)
+
+   it("should return zero", function()
+      assert.are.equal( 0, remote:prune_refs() )
+   end)
+   it("should have no error", function()
+      assert.has_no_error( function()
+         remote:set_url( test_helper.remote_path )
+         remote:connect()
+         remote:prune()
+      end)
+   end)
+end)
+
 describe( " upload #remote", function() pending( "luagi_remote_upload" ) end)
-describe( " prune #remote", function() pending( "luagi_remote_prune" ) end)
-describe( " prune_refs #remote", function() pending( "luagi_remote_prune_refs" ) end)
 describe( " push #remote", function() pending( "luagi_remote_push" ) end)
+
 describe( " delete #remote", function()
    local repo = nil
    local err = nil

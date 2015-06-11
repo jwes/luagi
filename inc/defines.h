@@ -344,11 +344,18 @@
 #define COMPLETION "completion"
 #define TRANSFER_PROGRESS "transfer_progress"
 #define CREDENTIALS "credentials"
+#define CERTIFICATE_CHECK "certificate_check"
 #define UPDATE_TIPS "update_tips"
 
 #define ERROR "error"
 #define INDEXING "indexing"
 #define DOWNLOAD "download"
 #define URL "url"
+
+#define LUAGI_STR_X509 "X509"
+#define LUAGI_STR_SSH_HOSTKEY "ssh_hostkey"
+#define TYPE "type"
+#define HASH "hash"
+#define DATA "data"
 
 #endif
