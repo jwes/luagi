@@ -602,17 +602,46 @@ static int cred_acquire_cb(
 
    if( strcmp( USERPASS_PLAINTEXT, used_type ) )
    {
+      lua_getfield( f->L, -1, USERNAME );
+      const char *username = luaL_checkstring( f->L, -1 );
+      lua_getfield( f->L, -1, PASSWORD );
+      const char *password = luaL_checkstring( f->L, -1 );
+      if( git_cred_userpass_plaintext_new( cred, username, password ) )
+         return -5;
    }
    else if( strcmp( SSH_KEY, used_type ) )
-   {}
+   {
+      lua_getfield( f->L, -1, USERNAME );
+	   const char *username = luaL_checkstring( f->L, -1 );
+      lua_getfield( f->L, -1, PUBLIC_KEY );
+	   const char *publickey = luaL_checkstring( f->L, -1 );
+      lua_getfield( f->L, -1, PRIVATE_KEY );
+	   const char *privatekey = luaL_checkstring( f->L, -1 );
+      lua_getfield( f->L, -1, PASSPHRASE );
+	   const char *passphrase = luaL_checkstring( f->L, -1 );
+
+      if( git_cred_ssh_key_new( cred, username, publickey, privatekey, passphrase ) )
+        return -6;
+   }
    else if( strcmp( SSH_CUSTOM, used_type ) )
-   {}
+   {
+      return -7;
+   }
    else if( strcmp( DEFAULT, used_type ) )
-   {}
+   {
+      return -8;
+   }
    else if( strcmp( SSH_INTERACTIVE, used_type ) )
-   {}
+   {
+      return -9;
+   }
    else if( strcmp( USERNAME_ONLY, used_type ) )
-   {}
+   {
+      lua_getfield( f->L, -1, USERNAME );
+	   const char *username = luaL_checkstring( f->L, -1 );
+      if( git_cred_username_new( cred, username ) )
+         return -10;
+   }
    else
    {
       return -4;

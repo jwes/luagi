@@ -364,4 +364,10 @@
 #define SSH_INTERACTIVE "ssh_interactive"
 #define USERNAME_ONLY "username_only"
 
+#define USERNAME "username"
+#define PASSWORD "password"
+#define PUBLIC_KEY "public_key"
+#define PRIVATE_KEY "private_key"
+#define PASSPHRASE "passphrase"
+
 #endif
