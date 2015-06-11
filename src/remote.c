@@ -565,23 +565,23 @@ static int cred_acquire_cb(
    lua_pushstring( f->L, username_from_url );
 
    lua_newtable( f->L );
-   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT != 0 );
-   lua_pushfield( f->L, USERPASS_PLAINTEXT );
+   lua_pushboolean( f->L, ( allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT ) != 0 );
+   lua_setfield( f->L, -2, USERPASS_PLAINTEXT );
 
-   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_SSH_KEY != 0 );
-   lua_pushfield( f->L, SSH_KEY );
+   lua_pushboolean( f->L, ( allowed_types & GIT_CREDTYPE_SSH_KEY ) != 0 );
+   lua_setfield( f->L, -2, SSH_KEY );
 
-   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_SSH_CUSTOM != 0 );
-   lua_pushfield( f->L, SSH_CUSTOM );
+   lua_pushboolean( f->L, ( allowed_types & GIT_CREDTYPE_SSH_CUSTOM ) != 0 );
+   lua_setfield( f->L, -2, SSH_CUSTOM );
 
-   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_DEFAULT != 0 );
-   lua_pushfield( f->L, DEFAULT );
+   lua_pushboolean( f->L, ( allowed_types & GIT_CREDTYPE_DEFAULT ) != 0 );
+   lua_setfield( f->L, -2, DEFAULT );
 
-   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE != 0 );
-   lua_pushfield( f->L, SSH_INTERACTIVE );
+   lua_pushboolean( f->L, ( allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE ) != 0 );
+   lua_setfield( f->L, -2, SSH_INTERACTIVE );
 
-   lua_pushboolean( f->L, allowed_types & GIT_CREDTYPE_USERNAME != 0 );
-   lua_pushfield( f->L, USERNAME_ONLY );
+   lua_pushboolean( f->L, ( allowed_types & GIT_CREDTYPE_USERNAME ) != 0 );
+   lua_setfield( f->L, -2, USERNAME_ONLY );
 
    if( lua_pcall( f->L, 3, 2, 0 ) != LUA_OK )
    {
@@ -600,10 +600,24 @@ static int cred_acquire_cb(
       return -3;
    }
 
+   if( strcmp( USERPASS_PLAINTEXT, used_type ) )
+   {
+   }
+   else if( strcmp( SSH_KEY, used_type ) )
+   {}
+   else if( strcmp( SSH_CUSTOM, used_type ) )
+   {}
+   else if( strcmp( DEFAULT, used_type ) )
+   {}
+   else if( strcmp( SSH_INTERACTIVE, used_type ) )
+   {}
+   else if( strcmp( USERNAME_ONLY, used_type ) )
+   {}
+   else
+   {
+      return -4;
+   }
 
-
-
- // TODO implement
    return 0;
 }
 static int luagi_push_cert( lua_State *L, git_cert *cert )

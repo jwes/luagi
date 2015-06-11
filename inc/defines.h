@@ -357,5 +357,11 @@
 #define TYPE "type"
 #define HASH "hash"
 #define DATA "data"
+#define USERPASS_PLAINTEXT "userpass_plaintext"
+#define SSH_KEY "ssh_key"
+#define SSH_CUSTOM "ssh_custom"
+#define DEFAULT "default"
+#define SSH_INTERACTIVE "ssh_interactive"
+#define USERNAME_ONLY "username_only"
 
 #endif
