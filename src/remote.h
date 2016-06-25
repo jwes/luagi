@@ -30,19 +30,13 @@
 int luagi_remote_list( lua_State *L );
 int luagi_remote_lookup( lua_State *L );
 int luagi_remote_create( lua_State *L );
-int luagi_remote_save( lua_State *L );
 int luagi_remote_name( lua_State *L );
 int luagi_remote_url( lua_State *L );
 int luagi_remote_pushurl( lua_State *L );
 int luagi_remote_set_url( lua_State *L );
 int luagi_remote_set_pushurl( lua_State *L );
 int luagi_remote_add_fetch( lua_State *L );
-int luagi_remote_get_fetch_refspecs( lua_State *L );
-int luagi_remote_set_fetch_refspecs( lua_State *L );
 int luagi_remote_add_push( lua_State *L );
-int luagi_remote_get_push_refspecs( lua_State *L );
-int luagi_remote_set_push_refspecs( lua_State *L );
-int luagi_remote_clear_refspecs( lua_State *L );
 int luagi_remote_refspec_count( lua_State *L );
 int luagi_remote_get_refspec( lua_State *L );
 int luagi_remote_connect( lua_State *L );
@@ -63,31 +57,17 @@ int luagi_remote_stats( lua_State *L );
 int luagi_remote_autotag( lua_State *L );
 int luagi_remote_set_autotag( lua_State *L );
 int luagi_remote_rename( lua_State *L );
-int luagi_remote_update_fetch_head( lua_State *L );
-int luagi_remote_set_update_fetch_head( lua_State *L );
-int luagi_remote_update_tips( lua_State *L );
 int luagi_remote_is_valid_name( lua_State *L );
 int luagi_remote_prune( lua_State *L );
 int luagi_remote_prune_refs( lua_State *L );
 int luagi_remote_upload( lua_State *L );
-int luagi_remote_update_tips( lua_State *L );
 int luagi_remote_push( lua_State *L );
 int luagi_remote_delete( lua_State *L );
 
 static const struct luaL_Reg luagi_remote_funcs [] = {
-   { "save",                        luagi_remote_save                    },
    { "name",                        luagi_remote_name                    },
    { "url",                         luagi_remote_url                     },
    { "pushurl",                     luagi_remote_pushurl                 },
-   { "set_url",                     luagi_remote_set_url                 },
-   { "set_pushurl",                 luagi_remote_set_pushurl             },
-   { "add_fetch",                   luagi_remote_add_fetch               },
-   { "get_fetch_refspecs",          luagi_remote_get_fetch_refspecs      },
-   { "set_fetch_refspecs",          luagi_remote_set_fetch_refspecs      },
-   { "add_push",                    luagi_remote_add_push                },
-   { "get_push_refspecs",           luagi_remote_get_push_refspecs       },
-   { "set_push_refspecs",           luagi_remote_set_push_refspecs       },
-   { "clear_refspecs",              luagi_remote_clear_refspecs          },
    { "refspec_count",               luagi_remote_refspec_count           },
    { "get_refspec",                 luagi_remote_get_refspec             },
    { "connect",                     luagi_remote_connect                 },
@@ -107,14 +87,9 @@ static const struct luaL_Reg luagi_remote_funcs [] = {
    { "set_callbacks",               luagi_remote_set_callbacks           },
    { "stats",                       luagi_remote_stats                   },
    { "autotag",                     luagi_remote_autotag                 },
-   { "set_autotag",                 luagi_remote_set_autotag             },
-   { "fetch_head",                  luagi_remote_update_fetch_head       },
-   { "set_fetch_head",              luagi_remote_set_update_fetch_head   },
-   { "update_tips",                 luagi_remote_update_tips             },
    { "prune",                       luagi_remote_prune                   },
    { "prune_refs",                  luagi_remote_prune_refs              },
    { "upload",                      luagi_remote_upload                  },
-   { "update_tips",                 luagi_remote_update_tips             },
    { "push",                        luagi_remote_push                    },
    //TODO
    { NULL,                          NULL                                 },

@@ -132,6 +132,8 @@ static int luagi_push_level( lua_State *L, git_config_level_t level )
          levelstr = APP;
       case GIT_CONFIG_HIGHEST_LEVEL:
          levelstr = HIGHEST;
+      case GIT_CONFIG_LEVEL_PROGRAMDATA:
+         levelstr = PROGRAMDATA;
    }
       
    lua_pushstring( L, levelstr );
@@ -209,7 +211,7 @@ int luagi_config_get_entry( lua_State *L )
    git_config **cfg = checkconfig( L );
    const char *name = luaL_checkstring( L, 2 );
 
-   const git_config_entry *entry;
+   git_config_entry *entry;
    if( git_config_get_entry( &entry, *cfg, name ) )
    {
       return ltk_push_git_error( L );

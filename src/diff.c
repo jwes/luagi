@@ -527,6 +527,15 @@ static int diff_hunk_callback( const git_diff_delta *delta,
    return ret;
 }
 
+static int diff_binary_callback( const git_diff_delta *delta __attribute__((unused)),
+                const git_diff_binary *binary __attribute__((unused)),
+                void *payload)
+{
+   struct foreach_f *f = payload;
+   luaL_error( f->L, "not yet implemented");
+   return 0;
+}
+
 int diff_line_callback( const git_diff_delta *delta,
                 const git_diff_hunk *hunk,
                 const git_diff_line *line,
@@ -591,6 +600,7 @@ int luagi_diff_foreach( lua_State *L )
 
    git_diff_foreach( *diff,
                    diff_file_callback,
+                   diff_binary_callback,
                    diff_hunk_callback,
                    diff_line_callback,
                    f );

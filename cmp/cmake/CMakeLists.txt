@@ -25,7 +25,7 @@ file( GLOB TST_FILES
 )
 
 find_package( Lua52 REQUIRED ) # LUA52_LIBRARIES / LUA52_INCLUDE_DIR
-find_package( GIT2 "0.22.0" EXACT REQUIRED ) # GIT2_LIBRARIES / GIT2_INCLUDE_DIRS
+find_package( GIT2 "0.24.0" EXACT REQUIRED ) # GIT2_LIBRARIES / GIT2_INCLUDE_DIRS
 
 ########################################################################################################################
 # build - make

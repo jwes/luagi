@@ -89,47 +89,6 @@ int luagi_blob_create_fromdisk( lua_State *L )
    return luagi_push_oid( L, &oid );
 }
 
-static int chunk_cb( char *content, size_t max_length, void *payload )
-{
-   luagi_foreach_t *p = payload;
-   lua_pushvalue( p->L, p->callback_pos );
-   lua_pushinteger( p->L, max_length );
-   
-   if( lua_pcall( p->L, 1, 1, 0 ) )
-   {
-      return 0;
-   }
-   int len = 0;
-   if( lua_type(p->L, -1) != LUA_TNIL )
-   {
-      len = luaL_len( p->L, -1 );
-      const char *str = luaL_checkstring( p->L, -1 );
-      strncpy( content, str, len );
-   }
-   lua_pop( p->L, 1 );
-   return len; 
-}
-int luagi_blob_create_fromchunks( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   luaL_checktype( L, 2, LUA_TFUNCTION );
-   const char *hintpath = luaL_optstring( L, 3, NULL );
-
-   luagi_foreach_t *p = malloc( sizeof(luagi_foreach_t ));
-   p->L = L,
-   p->callback_pos = 2;
-
-   git_oid oid;
-   if( git_blob_create_fromchunks( &oid, *repo, hintpath, chunk_cb, p ) )
-   {
-      free( p );
-      return ltk_push_git_error( L );
-   }
-   
-   free( p );
-   return luagi_push_oid( L, &oid );
-}
-
 int luagi_blob_create_frombuffer( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );

@@ -28,11 +28,12 @@ describe( "lookup_submodule #submodule", function()
    local repo = nil
    local err = nil
    local sub = nil
+   local name = "submodule"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      sub, err = repo:lookup_submodule( "submodule" )
+      sub, err = repo:lookup_submodule( name )
    end)
 
    it( "should return an error", function()
@@ -84,7 +85,7 @@ describe( "lookup_submodule #submodule", function()
    end)
    describe( "status #submodule", function()
       it( "should return the status", function()
-         local stats = sub:status()
+         local stats = repo:submodule_status( name, "none" )
          assert.is.True( stats.in_workdir )
          assert.is.True( stats.in_head )
          assert.is.True( stats.in_index )
@@ -98,7 +99,7 @@ describe( "lookup_submodule #submodule", function()
    end)
    describe( "location #submodule", function()
       it( "should return the status", function()
-         local stats = sub:location()
+         local stats = sub:location( )
          assert.is.True( stats.in_workdir )
          assert.is.True( stats.in_head )
          assert.is.True( stats.in_index )
@@ -196,11 +197,6 @@ describe( "add_submodule #submodule", function()
          repo:foreach_submodule( f )
          assert.are.equal( 2, count )
       end)
-      describe( "reload_all_submodules #submodule", function() 
-         it("should not have any error", function()
-            repo:reload_all_submodules() 
-         end)
-      end)
    end)
 end)
 
@@ -225,16 +221,17 @@ describe( "set_url #submodule", function()
    local repo = nil
    local sub = nil
    local err = nil
+   local name = "submodule"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      sub, err = repo:lookup_submodule( "submodule" )
+      sub, err = repo:lookup_submodule( name )
    end)
 
    it("should set an url", function()
       local url = "ssh://url.to.server/with/git.git"
-      sub:set_url( url )
+      repo:submodule_set_url( name, url )
       assert.are.equal( url, sub:url() )
    end)
 end)
@@ -243,11 +240,12 @@ describe( "ignore #submodule", function()
    local repo = nil
    local sub = nil
    local err = nil
+   local name = "submodule"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      sub, err = repo:lookup_submodule( "submodule" )
+      sub, err = repo:lookup_submodule( name )
    end)
 
    it("should have a submodule", function()
@@ -259,17 +257,17 @@ describe( "ignore #submodule", function()
    it("should show and set ignores", function()
       local default = "none"
       assert.are.equal( default, sub:ignore() )
-      sub:set_ignore( "dirty" );
+      repo:submodule_set_ignore( name, "dirty" );
       assert.are.equal( "dirty", sub:ignore() )
-      sub:set_ignore( "all" );
+      repo:submodule_set_ignore( name, "all" );
       assert.are.equal( "all", sub:ignore() )
-      sub:set_ignore( "untracked" );
+      repo:submodule_set_ignore( name, "untracked" );
       assert.are.equal( "untracked", sub:ignore() )
-      sub:set_ignore( "none" );
+      repo:submodule_set_ignore( name, "none" );
       assert.are.equal( "none", sub:ignore() )
-      sub:set_ignore( "reset" );
+      repo:submodule_set_ignore( name, "reset" );
       assert.are.equal( default, sub:ignore() )
-      sub:set_ignore( "default" );
+      repo:submodule_set_ignore( name, "default" );
       assert.are.equal( "dirty", sub:ignore() )
    end)
 end)
@@ -278,11 +276,12 @@ describe( "update #submodule", function()
    local repo = nil
    local sub = nil
    local err = nil
+   local name = "submodule"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      sub, err = repo:lookup_submodule( "submodule" )
+      sub, err = repo:lookup_submodule( name )
    end)
 
    it("should have a submodule", function()
@@ -294,17 +293,17 @@ describe( "update #submodule", function()
    it("should show and set ignores", function()
       local default = "checkout"
       assert.are.equal( default, sub:update_strategy() )
-      assert.are.equal( default, sub:set_update( "rebase" ))
+      assert.are.equal( default, repo:submodule_set_update( name, "rebase" ))
       assert.are.equal( "rebase", sub:update_strategy() )
-      assert.are.equal( "rebase", sub:set_update( "merge" ))
+      assert.are.equal( "rebase", repo:submodule_set_update( name, "merge" ))
       assert.are.equal( "merge", sub:update_strategy() )
-      assert.are.equal( "merge", sub:set_update( "none" ))
+      assert.are.equal( "merge", repo:submodule_set_update( name, "none" ))
       assert.are.equal( "none", sub:update_strategy() )
-      assert.are.equal( "none", sub:set_update( "default" ))
+      assert.are.equal( "none", repo:submodule_set_update( name, "default" ))
       assert.are.equal( default, sub:update_strategy() )
-      assert.are.equal( "default", sub:set_update( "checkout" ))
+      assert.are.equal( "default", repo:submodule_set_update( name, "checkout" ))
       assert.are.equal( default, sub:update_strategy() )
-      assert.are.equal( default, sub:set_update( "reset" ))
+      assert.are.equal( default, repo:submodule_set_update( name, "reset" ))
       assert.are.equal( default, sub:update_strategy() )
    end)
 end)
@@ -313,20 +312,21 @@ describe( "fetch_recurse #submodule", function()
    local repo = nil
    local sub = nil
    local err = nil
+   local name = "submodule"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      sub, err = repo:lookup_submodule( "submodule" )
+      sub, err = repo:lookup_submodule( name )
    end)
 
    it("should set fetch a submodule", function()
       assert.are.equal( "no", sub:fetch_recurse() )
-      assert.are.equal( "no", sub:set_fetch_recurse("no") )
+      assert.are.equal( "no", repo:submodule_set_fetch_recurse(name, "no") )
       assert.are.equal( "no", sub:fetch_recurse() )
-      assert.are.equal( "no", sub:set_fetch_recurse("on demand") )
+      assert.are.equal( "no", repo:submodule_set_fetch_recurse(name, "on demand") )
       assert.are.equal( "on_demand", sub:fetch_recurse() )
-      assert.are.equal( "on_demand", sub:set_fetch_recurse("reset") )
+      assert.are.equal( "on_demand", repo:submodule_set_fetch_recurse(name, "reset") )
       assert.are.equal( "no", sub:fetch_recurse() )
    end)
 end)

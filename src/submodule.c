@@ -110,18 +110,6 @@ int luagi_submodule_resolve_url( lua_State *L )
    return 1;
 }
 
-int luagi_submodule_reload_all( lua_State *L )
-{
-   git_repository **repo = checkrepo( L, 1 );
-   int force = lua_toboolean( L, 2 );
-
-   if( git_submodule_reload_all( *repo, force ) )
-   {
-      ltk_error_abort( L );
-   }
-   return 0;
-}
-
 int luagi_submodule_open( lua_State *L )
 {
    git_submodule **sub = checksubmodule_at( L, 1 );
@@ -181,12 +169,13 @@ int luagi_submodule_branch( lua_State *L )
    return luagi_sub_get_string( L, git_submodule_branch );
 }
 
-static int luagi_sub_set_string( lua_State *L, int (*func)( git_submodule *sub, const char *str ) )
+static int luagi_sub_set_string( lua_State *L, int (*func)( git_repository *repo, const char *name, const char *str ) )
 {
-   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
    const char *str = luaL_checkstring( L, 2 );
 
-   if( func( *sub, str ) )
+   if( func( *repo, name, str ) )
    {
       ltk_error_abort( L );
    }
@@ -237,9 +226,6 @@ static int luagi_sub_push_ignore( lua_State *L, git_submodule_ignore_t ignore )
       case GIT_SUBMODULE_IGNORE_ALL: 
          lua_pushstring( L, ALL );
          break;
-      case GIT_SUBMODULE_IGNORE_DEFAULT: 
-         lua_pushstring( L, DEFAULT );
-         break;
    }
    return 1;
 }
@@ -250,6 +236,7 @@ git_submodule_ignore_t luagi_sub_check_ignore( lua_State *L, int index )
    
    switch( ignore[0] )
    {
+      default:
       case 'a':
          return GIT_SUBMODULE_IGNORE_ALL;
       case 'd':
@@ -258,11 +245,6 @@ git_submodule_ignore_t luagi_sub_check_ignore( lua_State *L, int index )
          return GIT_SUBMODULE_IGNORE_NONE;
       case 'u':
          return GIT_SUBMODULE_IGNORE_UNTRACKED;
-      case 'r':
-         return GIT_SUBMODULE_IGNORE_RESET;
-      default:
-         return GIT_SUBMODULE_IGNORE_DEFAULT;
-       
    }         
 }
 
@@ -275,10 +257,11 @@ int luagi_submodule_ignore( lua_State *L )
 
 int luagi_submodule_set_ignore( lua_State *L )
 {
-   git_submodule **sub = checksubmodule_at( L, 1 );
-   git_submodule_ignore_t ign = luagi_sub_check_ignore( L, 2 );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
+   git_submodule_ignore_t ign = luagi_sub_check_ignore( L, 3 );
 
-   git_submodule_ignore_t old =  git_submodule_set_ignore( *sub, ign );
+   git_submodule_ignore_t old =  git_submodule_set_ignore( *repo, name, ign );
    return luagi_sub_push_ignore( L, old );
 }
 
@@ -324,10 +307,6 @@ static git_submodule_update_t luagi_sub_check_update( lua_State *L, int index )
          {
             return GIT_SUBMODULE_UPDATE_REBASE;
          }
-         else
-         {
-            return GIT_SUBMODULE_UPDATE_RESET;
-         }
       default:
          return GIT_SUBMODULE_UPDATE_DEFAULT;
    }         
@@ -371,9 +350,10 @@ int luagi_submodule_update_strategy( lua_State *L )
 
 int luagi_submodule_set_update( lua_State *L )
 {
-   git_submodule **sub = checksubmodule_at( L, 1 );
-   git_submodule_update_t value = luagi_sub_check_update( L, 2 );
-   git_submodule_update_t t = git_submodule_set_update( *sub, value );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
+   git_submodule_update_t value = luagi_sub_check_update( L, 3 );
+   git_submodule_update_t t = git_submodule_set_update( *repo, name, value );
    return luagi_sub_push_update( L, t );
 }
 
@@ -404,12 +384,10 @@ static git_submodule_recurse_t luagi_sub_check_recurse( lua_State *L, int index 
       case 'y':
          return GIT_SUBMODULE_RECURSE_YES;
       case 'n':
+      default:
          return GIT_SUBMODULE_RECURSE_NO;
       case 'o':
          return GIT_SUBMODULE_RECURSE_ONDEMAND;
-      default:
-      case 'r':
-         return GIT_SUBMODULE_RECURSE_RESET;
    }         
 }
 
@@ -424,9 +402,10 @@ int luagi_submodule_fetch_recurse_submodules( lua_State *L )
 
 int luagi_submodule_set_fetch_recurse_submodules( lua_State *L )
 {
-   git_submodule **sub = checksubmodule_at( L, 1 );
-   git_submodule_recurse_t recurse = luagi_sub_check_recurse( L, 2 );
-   git_submodule_recurse_t t = git_submodule_set_fetch_recurse_submodules( *sub, recurse );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
+   git_submodule_recurse_t recurse = luagi_sub_check_recurse( L, 3 );
+   git_submodule_recurse_t t = git_submodule_set_fetch_recurse_submodules( *repo, name, recurse );
    return luagi_sub_push_recurse( L, t );
 }
 
@@ -495,13 +474,15 @@ static int luagi_push_status( lua_State *L, const unsigned int status )
    return 1;
 }
 
-static int luagi_get_status( lua_State *L, int (*func)( unsigned int *status, git_submodule *sub ) )
+int luagi_submodule_status( lua_State *L )
 {
-   git_submodule **sub = checksubmodule_at( L, 1 );
+   git_repository **repo = checkrepo( L, 1 );
+   const char *name = luaL_checkstring( L, 2 );
+   git_submodule_ignore_t ignore = luagi_sub_check_ignore( L, 3 );
 
    unsigned int status;
 
-   if( func( &status, *sub ) )
+   if( git_submodule_status( &status, *repo, name, ignore ) )
    {
       return ltk_push_git_error( L );
    }
@@ -509,14 +490,16 @@ static int luagi_get_status( lua_State *L, int (*func)( unsigned int *status, gi
    return luagi_push_status( L, status );
 }
 
-int luagi_submodule_status( lua_State *L )
-{
-   return luagi_get_status( L, git_submodule_status ); 
-}
-
 int luagi_submodule_location( lua_State *L )
 {
-   return luagi_get_status( L, git_submodule_location ); 
+   git_submodule **sub = checksubmodule_at( L, 1 );
+
+   unsigned int status = 0;
+   if( git_submodule_location( &status, *sub ) )
+   {
+      return ltk_push_git_error( L );
+   }
+   return luagi_push_status( L, status );
 }
 
 int luagi_submodule_add_to_index( lua_State *L )
@@ -525,17 +508,6 @@ int luagi_submodule_add_to_index( lua_State *L )
    int write_index = lua_toboolean( L, 2 );
 
    if( git_submodule_add_to_index( *sub, write_index ) )
-   {
-      ltk_error_abort( L );
-   }
-   return 0;
-}
-
-int luagi_submodule_save( lua_State *L )
-{
-   git_submodule **sub = checksubmodule_at( L, 1 );
-
-   if( git_submodule_save( *sub ) )
    {
       ltk_error_abort( L );
    }

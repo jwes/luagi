@@ -307,6 +307,7 @@
 #define GLOBAL "global"
 #define APP "app"
 #define HIGHEST "highest"
+#define PROGRAMDATA "programdata"
 
 #define SAFE "safe"
 #define SAFE_CREATE "safe_create"

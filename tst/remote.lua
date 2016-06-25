@@ -153,11 +153,12 @@ describe( "set_url #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
+   local name = "origin"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      remote, err = repo:lookup_remote( "origin" )
+      remote, err = repo:lookup_remote( name )
    end)
 
    it("should return a loaded remote", function()
@@ -167,12 +168,12 @@ describe( "set_url #remote", function()
 
    it( "should save the url", function()
       local url = "http://some.testurl/git.git" 
-      remote:set_url( url )
+      repo:remote_set_url( name, url )
       assert.are.equal( url, remote:url() )
    end)
    it( "should save the url", function()
       local url = "ssh://some.testurl/git.git" 
-      remote:set_pushurl( url )
+      repo:remote_set_pushurl( name, url )
       assert.are.equal( url, remote:pushurl() )
    end)
    describe( "refspec_count #remote", function()
@@ -198,13 +199,6 @@ describe( "set_url #remote", function()
          assert.are.same( spec, remote:get_refspec(1) )
       end)
    end)
-   describe( "get_fetch_refspecs #remote", function()
-      it("should return a list of fetch refspecs", function()
-         local list, err = remote:get_fetch_refspecs()
-         assert.are.equal( 1, #list )
-         assert.are.equal( "+refs/heads/*:refs/remotes/origin/*", list[1] )
-      end)
-   end)
    describe( "stats #remote", function()
       it("should return a table filled with zeros", function()
          for k, v in pairs( remote:stats() ) do
@@ -217,107 +211,18 @@ describe( "set_url #remote", function()
          assert.are.equal( "auto", remote:autotag() )
       end)
    end)
-   describe( "save #remote", function()
-      it("should not have an error", function()
-         assert.has_no_error( function()
-            remote:save()
-         end)
-      end)
-   end)
-end)
-
-describe( "refspecs #remote", function()
-   local repo = nil
-   local err = nil
-   local remote = nil
-   setup( function()
-      test_helper.setup()
-      repo, err = luagi.open( test_helper.path )
-      if err then return end
-      remote, err = repo:lookup_remote( "origin" )
-      remote:clear_refspecs()
-   end)
-
-   it("should be prepared", function()
-      list = remote:get_fetch_refspecs()
-      assert.are.equal( 0, #list )
-      list = remote:get_push_refspecs()
-      assert.are.equal( 0, #list )
-   end)
-
-   describe( "add_fetch #remote", function()
-      it("should contain the new refspec", function()
-         remote:clear_refspecs()
-         local spec = "my_own_refspec"
-         remote:add_fetch(spec)
-         list = remote:get_fetch_refspecs()
-         assert.are.equal( 1, #list )
-         assert.are.equal( spec, list[1] )
-         remote:add_fetch(spec)
-         list = remote:get_fetch_refspecs()
-         assert.are.equal( 2, #list )
-         assert.are.equal( spec, list[1] )
-         assert.are.equal( spec, list[2] )
-         local push = remote:get_push_refspecs()
-         assert.are.equal( 0, #push )
-      end)
-   end)
-   describe( "set_fetch_refspecs #remote", function()
-      it("should contain only the new refspec", function()
-         remote:clear_refspecs()
-         local list = {}
-         list[1] = "my_own_refspec"
-         list[2] = "some_other_refspec"
-         remote:set_fetch_refspecs( list )
-         local result = remote:get_fetch_refspecs()
-         assert.are.same( list, result )
-         local push = remote:get_push_refspecs()
-         assert.are.equal( 0, #push )
-      end)
-   end)
-
-   describe( "add_push #remote", function()
-      it( "should add new push refspecs", function()
-         remote:clear_refspecs()
-         local spec = "my_own_refspec"
-         remote:add_push(spec)
-         local list = remote:get_push_refspecs()
-         assert.are.equal( 1, #list )
-         assert.are.equal( spec, list[1] )
-         remote:add_push(spec)
-         list = remote:get_push_refspecs()
-         assert.are.equal( 2, #list )
-         assert.are.equal( spec, list[1] )
-         assert.are.equal( spec, list[2] )
-         local fetch = remote:get_fetch_refspecs()
-         assert.are.equal( 0, #fetch )
-      end)
-   end)
-
-   describe( "set_push_refspecs #remote", function()
-      it("should contain only the new refspec", function()
-         remote:clear_refspecs()
-         local list = {}
-         list[1] = "my_own_refspec"
-         list[2] = "some_other_refspec"
-         remote:set_push_refspecs( list )
-         local result = remote:get_push_refspecs()
-         assert.are.same( list, result )
-         local fetch = remote:get_fetch_refspecs()
-         assert.are.equal( 0, #fetch )
-      end)
-   end)
 end)
 
 describe( "ls #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
+   local name = "origin"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      remote, err = repo:lookup_remote( "origin" )
+      remote, err = repo:lookup_remote( name )
    end)
 
    it("should return a loaded remote", function()
@@ -329,7 +234,7 @@ describe( "ls #remote", function()
       assert.is.False( remote:is_connected())
       local heads, err = remote:ls()
       assert.is.truthy( err:find( "connected" ))
-      remote:set_url( test_helper.remote_path )
+      repo:remote_set_url( name, test_helper.remote_path )
       remote:connect()
       assert.is.True( remote:is_connected())
 
@@ -352,16 +257,17 @@ describe( "fetch and download #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
+   local name = "origin"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      remote, err = repo:lookup_remote( "origin" )
+      remote, err = repo:lookup_remote( name )
    end)
 
    it("should load without an error", function()
 
-      remote:set_url( test_helper.remote_path )
+      repo:remote_set_url( name, test_helper.remote_path )
       assert.has_error( function()
          remote:download( refspecs )
       end)
@@ -410,30 +316,31 @@ describe( "set_autotag #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
+   local name = "origin"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      remote, err = repo:lookup_remote( "origin" )
+      remote, err = repo:lookup_remote( name )
    end)
    it("should accept the autotag string all", function()
       local autotag = "all"
-      remote:set_autotag( autotag )
+      repo:remote_set_autotag( name,  autotag )
       assert.are.equal( autotag, remote:autotag( ) )
    end)
    it("should react releaxed and take auto", function()
-      remote:set_autotag( "foo" )
+      repo:remote_set_autotag( name, "foo" )
       assert.are.equal( "auto", remote:autotag( ) )
    end)
 
    it("should accept the autotag string none", function()
       local autotag = "none"
-      remote:set_autotag( autotag )
+      repo:remote_set_autotag( name, autotag )
       assert.are.equal( autotag, remote:autotag( ) )
    end)
    it("should accept the autotag string auto", function()
       local autotag = "auto"
-      remote:set_autotag( autotag )
+      repo:remote_set_autotag( name, autotag )
       assert.are.equal( autotag, remote:autotag( ) )
    end)
 end)
@@ -460,35 +367,19 @@ describe( "rename #remote", function()
 
 end)
 
-describe( "fetch_head #remote", function()
-   local repo = nil
-   local err = nil
-   local remote = nil
-   setup( function()
-      test_helper.setup()
-      repo, err = luagi.open( test_helper.path )
-      if err then return end
-      remote, err = repo:lookup_remote( "origin" )
-   end)
-
-   it("should apply the set boolean values", function()
-      assert.is.True( remote:fetch_head() )
-      remote:set_fetch_head( false )
-      assert.is.False( remote:fetch_head() )
-   end)
-end)
 describe( "update_tips #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
+   local name = "origin"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      remote, err = repo:lookup_remote( "origin" )
+      remote, err = repo:lookup_remote( name )
    end)
    it("should get some update tip callback", function()
-      remote:set_url( test_helper.remote_path )
+      repo:remote_set_url( name, test_helper.remote_path )
       remote:fetch( refspecs,  test_helper.signature )
 
       assert.has_no_error( function()
@@ -501,11 +392,12 @@ describe( " prune_refs #remote", function()
    local repo = nil
    local err = nil
    local remote = nil
+   local name = "origin"
    setup( function()
       test_helper.setup()
       repo, err = luagi.open( test_helper.path )
       if err then return end
-      remote, err = repo:lookup_remote( "origin" )
+      remote, err = repo:lookup_remote( name )
    end)
 
    it("should return zero", function()
@@ -513,7 +405,7 @@ describe( " prune_refs #remote", function()
    end)
    it("should have no error", function()
       assert.has_no_error( function()
-         remote:set_url( test_helper.remote_path )
+         repo:remote_set_url( name, test_helper.remote_path )
          remote:connect()
          remote:prune()
       end)

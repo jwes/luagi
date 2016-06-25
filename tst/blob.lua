@@ -152,45 +152,6 @@ describe( "create_blob_from_buffer #blob", function()
    end)
 end)
 
-describe( "create_blob_from_chunks #blob", function()
-   local repo = nil
-   local content = "some 'random' data"  
-   local has_content = false
-   function content_provider()
-      if not has_content then
-         has_content = true
-         return content
-      else
-         return nil
-      end
-   end
-   setup( function ()   
-      test_helper.setup()
-      repo = luagi.open( test_helper.path )
-   end)
-
-   describe( "with opened repo", function()
-      local oid, err = repo:create_blob_from_chunks( content_provider )
-   
-      it( "is valid", function()
-         assert.is.falsy( err )
-         assert.is.not_nil( oid )
-      end)
-
-      describe( "is a blob object", function()
-         local blob, err = repo:lookup_blob( oid )
-         it( "is valid", function()
-            assert.is.falsy( err )
-            assert.is.not_nil( blob )
-         end)
-
-         it( "can be read", function()
-            assert.are.equal(content, blob:raw_content() )
-         end)
-      end)
-   end)
-end)
-
 describe( "with blob", function()
    local blob = nil
    local repo = nil

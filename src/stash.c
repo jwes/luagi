@@ -25,6 +25,7 @@
 
 #include <git2/oid.h>
 #include <git2/signature.h>
+#include <git2/checkout.h>
 #include <git2/stash.h>
 
 #include "ltk.h"

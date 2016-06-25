@@ -300,7 +300,7 @@ describe( "new #config", function()
             local v, k, l = config:get_entry( key )
             assert.are.equal( value, v )
             assert.are.equal( key, k )
-            assert.are.equal( "highest", l )
+            assert.are.equal( "programdata", l )
          end)
          
       end)
@@ -312,7 +312,7 @@ describe( "new #config", function()
             local v, k, l = config:get_entry( key )
             assert.are.equal( value, v )
             assert.are.equal( key, k )
-            assert.are.equal( "highest", l )
+            assert.are.equal( "programdata", l )
             config:delete_entry( key )
             v, k, l = config:get_entry( key )
             assert.is.falsy( v )
@@ -343,7 +343,7 @@ describe( "iterator #config", function()
    it("should iterate all values", function()
       count = 0
       for v, k, l in config:iterator() do
-         if l == "highest" then
+         if l == "programdata" then
             count = count + 1
          end
       end
@@ -353,7 +353,7 @@ describe( "iterator #config", function()
    describe( "iterator_glob_new #config", function()
       count = 0
       for v, k, l in config:iterator_glob("ba") do
-         if l == "highest" then
+         if l == "programdata" then
             count = count + 1
          end
       end

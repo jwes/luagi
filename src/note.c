@@ -23,6 +23,7 @@
  */
 #include "note.h"
 
+#include <git2/buffer.h>
 #include <git2/notes.h>
 #include <git2/signature.h>
 
@@ -191,13 +192,15 @@ int luagi_note_default_ref( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
 
-   const char *out;
-
+   git_buf out = GIT_BUF_INIT_CONST( NULL, 0 );
    if( git_note_default_ref( &out, *repo ) )
    {
+      git_buf_free( &out );
       return ltk_push_git_error( L );
    }
-   lua_pushstring( L, out );
+
+   lua_pushlstring( L, out.ptr, out.size );
+   git_buf_free( &out );
    return 1;
 }
 

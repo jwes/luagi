@@ -23,6 +23,7 @@
  */
 #include <lua.h>
 #include <lauxlib.h>
+#include <git2/global.h>
 #include <git2/signature.h>   
 
 #include <string.h>
@@ -141,7 +142,6 @@ static const struct luaL_Reg repofuncs [] = {
    { "lookup_blob", luagi_blob_lookup },
    { "create_blob_from_workdir", luagi_blob_create_fromworkdir },
    { "create_blob_from_disk", luagi_blob_create_fromdisk },
-   { "create_blob_from_chunks", luagi_blob_create_fromchunks },
    { "create_blob_from_buffer", luagi_blob_create_frombuffer },
    // cherrypick
    { "cherrypick", luagi_cherrypick },
@@ -170,7 +170,6 @@ static const struct luaL_Reg repofuncs [] = {
    { "foreach_submodule", luagi_submodule_foreach },
    { "add_submodule_setup", luagi_submodule_add_setup },
    { "resolve_submodule_url", luagi_submodule_resolve_url },
-   { "reload_all_submodules", luagi_submodule_reload_all },
    { "submodule_repo_init", luagi_submodule_repo_init },
 
    //graph
@@ -231,6 +230,18 @@ static const struct luaL_Reg repofuncs [] = {
    { "lookup_object", luagi_object_lookup },
    { "lookup_object_bypath", luagi_object_lookup_bypath },
    { "tree_builder", luagi_tree_builder_new },
+   //remote
+   { "remote_set_autotag",                 luagi_remote_set_autotag             },
+   { "remote_set_pushurl",                 luagi_remote_set_pushurl             },
+   { "remote_add_fetch",                   luagi_remote_add_fetch               },
+   { "remote_add_push",                    luagi_remote_add_push                },
+   { "remote_set_url",                     luagi_remote_set_url                 },
+   //submodule
+   { "submodule_status", luagi_submodule_status },
+   { "submodule_set_update", luagi_submodule_set_update },
+   { "submodule_set_url", luagi_submodule_set_url },
+   { "submodule_set_fetch_recurse", luagi_submodule_set_fetch_recurse_submodules },
+   { "submodule_set_ignore", luagi_submodule_set_ignore },
    { NULL, NULL },
 };
 
@@ -283,6 +294,7 @@ void setup_funcs( lua_State *L, const char *meta_name, const luaL_Reg *funcs )
 }
 int luaopen_luagi(lua_State *L)
 {
+   git_libgit2_init();
    /* metatable for the branch iterator */
    luaL_newmetatable( L, LUAGI_BRANCH_STATICS );
    lua_pushcfunction( L, luagi_branch_iter_gc);
@@ -328,6 +340,7 @@ int luaopen_luagi(lua_State *L)
    setup_funcs(L, LUAGI_REFLOG_FUNCS, luagi_reflog_funcs );
    setup_funcs(L, REPO_NAME, repofuncs);
 
+   //TODO lua close hook to deinitialize git_libgit2_shutdown()
    luaL_newlib( L, mylib );
    return 1;
 }

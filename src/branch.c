@@ -46,21 +46,11 @@ int luagi_create_branch( lua_State *L )
    git_repository** repo = checkrepo(L, 1);
    const char* branch_name = luaL_checkstring(L, 2);
    git_commit** target = ( git_commit** ) luaL_checkudata( L, 3, LUAGI_COMMIT_FUNCS);
-   git_signature *sig;
-   int ret = table_to_signature( L, &sig, 4 );
-   if( ret != 0 )
-   {
-      ltk_error_abort( L );
-   }
    int force = lua_toboolean(L, 5);
-   const char* log_message = luaL_optstring(L, 6, NULL);
 
    git_reference** out = (git_reference**) lua_newuserdata(L, sizeof(git_reference*) );
 
-   ret = git_branch_create( out, *repo, branch_name, *target,
-               force, sig, log_message);
-   git_signature_free( sig );
-   if( ret != 0 )
+   if( git_branch_create( out, *repo, branch_name, *target, force ) )
    {
       return ltk_push_git_error( L );
    }
@@ -90,22 +80,10 @@ int luagi_move_branch( lua_State *L )
       luaL_error( L, "signature is no table" );
       return 0;
    }
-   /* signature type needed */
-   const char* log_message = luaL_optstring(L, 4, NULL);
    int force = lua_toboolean(L, 5 );
 
-   git_signature *sig;
-   int ret = table_to_signature( L, &sig, 3 );
-   if( ret != 0 )
-   {
-      ltk_error_abort( L );
-      return 0;
-   }
-
    git_reference** out = (git_reference**) lua_newuserdata(L, sizeof(git_reference*) );
-   ret = git_branch_move( out, *ref, to_name, force, sig, log_message);
-   git_signature_free( sig );
-   if( ret != 0 )
+   if( git_branch_move( out, *ref, to_name, force ) )
    {
       return ltk_push_git_error( L );
    }

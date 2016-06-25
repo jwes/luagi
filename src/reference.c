@@ -94,17 +94,11 @@ int luagi_reference_symbolic_create_matching( lua_State *L )
    }
    const char *target = luaL_checkstring( L, 3 );
    const char *current_value = luaL_checkstring( L, 4 );
-   git_signature *sig;
-   luaL_checktype( L, 5, LUA_TTABLE );
-   table_to_signature( L, &sig, 5 );
-
    const char *log_message = luaL_checkstring( L, 6 );
    int force = lua_toboolean( L, 7 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference *) );
-   int ret = git_reference_symbolic_create_matching( out, *repo, name, target, force, current_value, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_symbolic_create_matching( out, *repo, name, target, force, current_value, log_message ) )
    {
       return ltk_push_git_error( L );
    }
@@ -122,17 +116,11 @@ int luagi_reference_symbolic_create( lua_State *L )
       return 0;
    }
    const char *target = luaL_checkstring( L, 3 );
-   git_signature *sig;
-   luaL_checktype( L, 4, LUA_TTABLE );
-   table_to_signature( L, &sig, 4 );
-
    const char *log_message = luaL_checkstring( L, 5 );
    int force = lua_toboolean( L, 6 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference *) );
-   int ret = git_reference_symbolic_create( out, *repo, name, target, force, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_symbolic_create( out, *repo, name, target, force, log_message ) )
    {
       return ltk_push_git_error( L );
    }
@@ -155,17 +143,11 @@ int luagi_reference_create( lua_State *L )
       ltk_error_abort( L );
    }
 
-   git_signature *sig;
-   luaL_checktype( L, 4, LUA_TTABLE );
-   table_to_signature( L, &sig, 4 );
-
    const char *log_message = luaL_checkstring( L, 5 );
    int force = lua_toboolean( L, 6 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference *) );
-   int ret = git_reference_create( out, *repo, name, &oid, force, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_create( out, *repo, name, &oid, force, log_message ) )
    {
       return ltk_push_git_error( L );
    }
@@ -193,17 +175,11 @@ int luagi_reference_create_matching( lua_State *L )
       ltk_error_abort( L );
    }
 
-   git_signature *sig;
-   luaL_checktype( L, 5, LUA_TTABLE );
-   table_to_signature( L, &sig, 5 );
-
    const char *log_message = luaL_checkstring( L, 6 );
    int force = lua_toboolean( L, 7 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference *) );
-   int ret = git_reference_create_matching( out, *repo, name, &oid, force, &curr_oid, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_create_matching( out, *repo, name, &oid, force, &curr_oid, log_message ) )
    {
       return ltk_push_git_error( L );
    }
@@ -276,17 +252,10 @@ int luagi_reference_gen_symbolic_set_target( lua_State *L, const char *tablename
 {
    git_reference **ref = luaL_checkudata( L, 1, tablename );
    const char *target = luaL_checkstring( L, 2 );
-   git_signature *sig;
-   if( table_to_signature( L, &sig, 3 ) )
-   {
-      ltk_error_abort( L );
-   }
    const char *log_message = luaL_checkstring( L, 4 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
-   int ret =  git_reference_symbolic_set_target( out, *ref, target, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_symbolic_set_target( out, *ref, target, log_message ) )
    {
       return ltk_push_git_error( L );
    }
@@ -302,18 +271,10 @@ int luagi_reference_gen_set_target( lua_State *L, const char *tablename )
    {
       ltk_error_abort( L );
    }
-   luaL_checktype( L, 3, LUA_TTABLE );
-   git_signature *sig;
-   if( table_to_signature( L, &sig, 3 ) )
-   {
-      ltk_error_abort( L );
-   }
    const char *log_message = luaL_checkstring( L, 4 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
-   int ret = git_reference_set_target( out, *ref, &oid, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_set_target( out, *ref, &oid, log_message ) )
    {
       return ltk_push_git_error( L );
    }
@@ -325,19 +286,11 @@ int luagi_reference_gen_rename( lua_State *L, const char *tablename )
 {
    git_reference **ref = luaL_checkudata( L, 1, tablename );
    const char *name = luaL_checkstring( L, 2 );
-   luaL_checktype( L, 3, LUA_TTABLE );
-   git_signature *sig;
-   if( table_to_signature( L, &sig, 3 ) )
-   {
-      ltk_error_abort( L );
-   }
    const char *log_message = luaL_checkstring( L, 4 );
    int force = lua_toboolean( L, 5 );
 
    git_reference **out = lua_newuserdata( L, sizeof( git_reference * ) );
-   int ret = git_reference_rename( out, *ref, name, force, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reference_rename( out, *ref, name, force, log_message ) )
    {
       return ltk_push_git_error( L );
    }

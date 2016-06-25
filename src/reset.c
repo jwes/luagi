@@ -62,14 +62,7 @@ int luagi_reset( lua_State *L )
    luaL_checktype( L, 4, LUA_TTABLE );
    luagi_parse_checkout_options( &opts, L, 4 );
 
-   git_signature *sig;
-   luaL_checktype( L, 5, LUA_TTABLE );
-   table_to_signature( L, &sig, 5 );
-   const char *log_message = luaL_optstring( L, 6, NULL );
-
-   int ret = git_reset( *repo, *target, reset, &opts, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_reset( *repo, *target, reset, &opts ) )
    {
       ltk_error_abort( L );
    }

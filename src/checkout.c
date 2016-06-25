@@ -45,8 +45,6 @@ int luagi_parse_checkout_options( git_checkout_options *opts, lua_State *L, cons
       add_flag( opts->checkout_strategy, L, -1, 
                       SAFE, GIT_CHECKOUT_SAFE );
       add_flag( opts->checkout_strategy, L, -1, 
-                      SAFE_CREATE, GIT_CHECKOUT_SAFE_CREATE );
-      add_flag( opts->checkout_strategy, L, -1, 
                       FORCE, GIT_CHECKOUT_FORCE );
       add_flag( opts->checkout_strategy, L, -1, 
                       ALLOW_CONFLICTS, GIT_CHECKOUT_ALLOW_CONFLICTS );

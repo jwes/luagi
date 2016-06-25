@@ -152,7 +152,6 @@ describe( "create_note #note", function()
          assert.are.equal("refs/notes/commits", repo:note_default_ref() )
       end)
    end)
-
 end)
 
 describe( "remove_note #note", function()

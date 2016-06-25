@@ -29,7 +29,6 @@
 int luagi_blob_lookup( lua_State *L );
 int luagi_blob_create_fromworkdir( lua_State *L );
 int luagi_blob_create_fromdisk( lua_State *L );
-int luagi_blob_create_fromchunks( lua_State *L );
 int luagi_blob_create_frombuffer( lua_State *L );
 
 // blob

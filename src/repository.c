@@ -501,13 +501,8 @@ int luagi_repository_set_head( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    const char *refname = luaL_checkstring( L, 2 );
    luaL_checktype( L, 3, LUA_TTABLE );
-   git_signature *sig;
-   table_to_signature( L, &sig, 3 );
-   const char *log_message = luaL_checkstring( L, 4 );
 
-   int ret = git_repository_set_head( *repo, refname, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_repository_set_head( *repo, refname ) )
    {
       ltk_error_abort( L );
    }
@@ -519,14 +514,8 @@ int luagi_repository_set_head_detached( lua_State *L )
    git_repository **repo = checkrepo( L, 1 );
    git_oid oid;
    luagi_check_oid( &oid, L, 2 );
-   git_signature *sig;
-   luaL_checktype( L, 3, LUA_TTABLE );
-   table_to_signature( L, &sig, 3 );
-   const char *log_message = luaL_checkstring( L, 4 );
 
-   int ret = git_repository_set_head_detached( *repo, &oid, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_repository_set_head_detached( *repo, &oid  ) )
    {
       ltk_error_abort( L );
    }
@@ -537,13 +526,8 @@ int luagi_repository_detach_head( lua_State *L )
 {
    git_repository **repo = checkrepo( L, 1 );
    luaL_checktype( L, 2, LUA_TTABLE );
-   git_signature *sig;
-   table_to_signature( L, &sig, 2 );
-   const char *log_message = luaL_checkstring( L, 3 );
 
-   int ret = git_repository_detach_head( *repo, sig, log_message );
-   git_signature_free( sig );
-   if( ret )
+   if( git_repository_detach_head( *repo  ) )
    {
       ltk_error_abort( L );
    }

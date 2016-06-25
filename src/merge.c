@@ -216,8 +216,6 @@ int luagi_merge_init_options( lua_State *L __attribute__((unused)), int index __
 {
    int ret =  git_merge_init_options( opts, GIT_MERGE_OPTIONS_VERSION );
 
-   add_flag( opts->flags, L, index, FIND_RENAMES, GIT_MERGE_TREE_FIND_RENAMES );
-
    lua_getfield( L, index, RENAME_THRESHOLD );
    if( lua_type( L, -1 ) == LUA_TNUMBER )
    {
