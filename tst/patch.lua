@@ -21,6 +21,21 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 ]=]--
+local luagi = require("luagi")
+local test_helper = require("test_helper")
+
+local treeid = "064ee3e735ab74ab468be05c34e7f7fda011cb3b"
+local tree2 = "2add3e2b70b08e7fa390dc24ba70920b78ed1076"
+
+describe( "patch #diff", function()
+   local diff = nil
+   local err = nil
+   local patch = nil
+   setup( function()
+      test_helper.setup()
+      local repo, err = luagi.open( test_helper.path )
+      if err then return end
+      local t1, err = repo:lookup_tree( treeid )
       if err then return end
       local t2, err = repo:lookup_tree( tree2 )
       if err then return end
